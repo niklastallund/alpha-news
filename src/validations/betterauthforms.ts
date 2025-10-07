@@ -2,10 +2,11 @@ import z from "zod";
 
 // Schemas for for better auth.
 
-/*
-		schema meets req from: (optional image and callbackURL)
-		from https://www.better-auth.com/docs/authentication/email-password
-	*/
+
+
+// schema meets req from: (optional image and callbackURL)
+// from https://www.better-auth.com/docs/authentication/email-password
+
 export const SignUpFormSchema = z
   .object({
     name: z.string().min(2).max(100),
@@ -21,6 +22,7 @@ export const SignUpFormSchema = z
         path: ["confirmPassword"],
       });
   });
+
 
 export const SignInFormSchema = z.object({
   email: z.email().max(250),

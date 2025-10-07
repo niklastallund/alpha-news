@@ -1,0 +1,53 @@
+"use client";
+// So this is a solution for handling the session and user data in the whole application. This just provides down the same session to the other components, so it is lika a parent component for the whole app and we dont need to get the session in other places etc. 
+
+// In client components, just add in the "mainfunction":
+//  const { session, user } = useSession();
+// The user will have role.
+
+// In server components / actions, we still need to do this though:
+// const sessionData = await auth.api.getSession({
+//   headers: await headers(),
+// });
+
+
+import { createContext, useContext, ReactNode } from "react";
+
+import type { Session, User } from "better-auth";
+
+// Add role to User in SessionContextProps. (Its not there as default).
+interface UserAndRole extends User {
+  role: string | null;
+}
+
+interface SessionContextProps {
+  session: Session | null;
+  user: UserAndRole | null;
+}
+
+
+
+// about create-context:
+/* Lets you create a Context that components can provide or read.
+The value you want the context to have when there is no matching Provider in the tree above the component reading the context. This is meant as a "last resort" fallback.
+*/
+const sessionContext = createContext<SessionContextProps | null>(null);
+
+export const useSession = () => {
+  const context = useContext(sessionContext);
+  if (!context) {
+    throw new Error("useSession must be used within a SessionProvider");
+  }
+  return context;
+};
+
+
+
+export function SessionProvider ({ children, session, user }:{ children: ReactNode; session: Session | null; user: UserAndRole | null;}) {
+
+  return (
+    <sessionContext.Provider value={{ session, user }}>
+      {children}
+    </sessionContext.Provider>
+  );
+};
