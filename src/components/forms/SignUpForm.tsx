@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -84,8 +83,6 @@ export default function SignUpForm() {
         // Signed in
         // i use this because the sessionprovider wont be updated yet. so this reloads everything and then redirect. 
         window.location.reload();
-
-
 
       }
       

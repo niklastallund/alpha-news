@@ -41,6 +41,7 @@ export default async function RootLayout({
       >
         <SessionProvider session={sessionData?.session ?? null} user={sessionData?.user ?? null}>
           {/* Also put navbar inside here! */}
+          
         {children}
         </SessionProvider>
       </body>
