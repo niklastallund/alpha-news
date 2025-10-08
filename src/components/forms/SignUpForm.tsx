@@ -108,7 +108,7 @@ export default function SignUpForm() {
   if (session) return null; // Maybe unessasary?
   
   return (
-    <Card className="max-w-sm mx-auto">
+    <Card className="max-w-sm mx-auto mt-10">
       <CardHeader>
         <CardTitle>Sign Up</CardTitle>
         <CardDescription>
