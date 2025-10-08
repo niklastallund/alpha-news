@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/lib/SessionProvider";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { getSessionData } from "@/lib/actions/sessiondata";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +27,7 @@ export default async function RootLayout({
 }>) {
 
   // Get the sessionData and provide it to the sessionprov.
-  const sessionData = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const sessionData = await getSessionData();
 
 
 
