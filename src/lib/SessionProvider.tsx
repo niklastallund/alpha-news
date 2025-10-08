@@ -5,10 +5,11 @@
 //  const { session, user } = useSession();
 // The user will have role.
 
-// In server components / actions, we still need to do this though:
-// const sessionData = await auth.api.getSession({
-//   headers: await headers(),
-// });
+// In server components / actions, use await getSessionData() or await getRole() like:
+// const sessionData = await getSessionData();
+// const user = sessionData?.user;
+// const role = await getRole(); // if you just need the role.
+// (see lib/actions/sessiondata.ts)
 
 
 import { createContext, useContext, ReactNode } from "react";
