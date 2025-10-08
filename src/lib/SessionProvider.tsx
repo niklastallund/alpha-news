@@ -33,6 +33,7 @@ The value you want the context to have when there is no matching Provider in the
 */
 const sessionContext = createContext<SessionContextProps | null>(null);
 
+// So this is then used in our client components for easely getting the session and user (with role).
 export const useSession = () => {
   const context = useContext(sessionContext);
   if (!context) {
@@ -40,7 +41,6 @@ export const useSession = () => {
   }
   return context;
 };
-
 
 
 export function SessionProvider ({ children, session, user }:{ children: ReactNode; session: Session | null; user: UserAndRole | null;}) {
