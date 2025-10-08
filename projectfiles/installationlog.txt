@@ -394,6 +394,10 @@ stripe listen --forward-to localhost:3000/api/auth/stripe/webhook
 
 Copy the key into STRIPE_WEBHOOK_SECRET in .env file
 
+//
+
+or run 
+
 
 ***********************************
 

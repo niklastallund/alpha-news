@@ -1,32 +1,4 @@
 -- CreateTable
-CREATE TABLE "Article" (
-    "id" TEXT NOT NULL,
-
-    CONSTRAINT "Article_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Category" (
-    "id" TEXT NOT NULL,
-
-    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Subscription" (
-    "id" TEXT NOT NULL,
-
-    CONSTRAINT "Subscription_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "SubscriptionType" (
-    "id" TEXT NOT NULL,
-
-    CONSTRAINT "SubscriptionType_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -39,6 +11,7 @@ CREATE TABLE "user" (
     "banned" BOOLEAN DEFAULT false,
     "banReason" TEXT,
     "banExpires" TIMESTAMP(3),
+    "stripeCustomerId" TEXT,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
