@@ -1,12 +1,8 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// ---------------------------
+// Prisma Client + Datakälla
+// ---------------------------
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,89 +10,647 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Author {
-  id String @id @default(uuid())
+// ---------------------------
+// ENUMS
+// ---------------------------
+
+enum RoleName {
+  ADMIN
+  EDITOR
+  READER
 }
 
-model Article {
-  id String @id @default(uuid())
+enum ArticleStatus {
+  DRAFT
+  REVIEW
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
 }
 
-model Category {
-  id String @id @default(uuid())
+enum ReactionKind {
+  LIKE
+  LOVE
+  INSIGHTFUL
+  SAD
+  ANGRY
 }
 
-model Subscription {
-  id String @id @default(uuid())
+enum NewsletterCadence {
+  DAILY
+  WEEKLY
+  CUSTOM
 }
 
-model SubscriptionType {
-  id String @id @default(uuid())
+enum PaymentStatus {
+  REQUIRES_ACTION
+  SUCCEEDED
+  FAILED
 }
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+enum RenewalMode {
+  NONE
+  MANUAL
+  AUTO
+}
+
+// ---------------------------
+// AUTH / USERS
+// ---------------------------
+// Bas: användare, roller, sessioner och e-postflöden
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  role          String    @default("user")
-  banned        Boolean?  @default(false)
-  banReason     String?
-  banExpires    DateTime?
-  sessions      Session[]
-  accounts      Account[]
+  id              String           @id @default(cuid())
+  email           String           @unique
+  passwordHash    String
+  status          String           @default("ACTIVE")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
-  stripeCustomerId String?
+  // Relations
+  roles           UserRole[]
+  sessions        Session[]
+  emailTokens     EmailVerificationToken[]
+  passwordResets  PasswordResetToken[]
 
-  @@unique([email])
-  @@map("user")
+  // Content & interaktion
+  articles        Article[]        @relation("AuthorArticles")
+  comments        Comment[]
+  reactions       Reaction[]
+  bookmarks       Bookmark[]
+  readHistory     ReadHistory[]
+  editedVersions  ArticleVersion[] @relation("EditedVersions")
+  reportedComments CommentReport[] @relation("UserCommentReports")
+  orders          Order[]          @relation("UserOrders")
+  pageViews       PageView[]       @relation("UserPageViews")
+  consents        ConsentEvent[]   @relation("UserConsents")
+
+  // Betalning & prenumerationer
+  subscriptions   Subscription[]
+  invoices        Invoice[]
+  paymentMethods  PaymentMethod[]
+  payments        PaymentIntent[]  @relation("UserPayments")
+
+  // Kommunikation
+  newsletterSubs  NewsletterSubscription[]
+  emailQueueItems EmailQueue[]     @relation("EmailQueueToUser")
+
+  // Profil & preferenser
+  profile         UserProfile?
+  preference      UserPreference?
+
+  // Loggar
+  auditLogs       AuditLog[]       @relation("ActorAuditLogs")
+}
+
+model Role {
+  id          String     @id @default(cuid())
+  name        RoleName   @unique
+  description String?
+
+  users       UserRole[]
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role  @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
 }
 
 model Session {
-  id             String   @id
-  expiresAt      DateTime
-  token          String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  ipAddress      String?
-  userAgent      String?
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  impersonatedBy String?
-
-  @@unique([token])
-  @@map("session")
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  meta      Json?
 }
 
-model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  @@map("account")
-}
-
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
+/// E-postverifiering och reset-tokens
+model EmailVerificationToken {
+  id         String   @id @default(cuid())
+  userId     String
+  token      String   @unique
   expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-
-  @@map("verification")
+  consumedAt DateTime?
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  userId     String
+  token      String   @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------
+// USER EXTRAS (publik profil + inställningar)
+// ---------------------------
+
+model UserProfile {
+  userId      String  @id
+  displayName String
+  authorSlug  String  @unique   // offentlig URL-slug för författarsida
+  avatarUrl   String?
+  bio         String?
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([authorSlug])
+}
+
+model UserPreference {
+  userId            String   @id
+  locale            String   @default("sv-SE")
+  timezone          String   @default("Europe/Stockholm")
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(false)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------
+// CONTENT
+// ---------------------------
+// Kategorier, taggar, media, artikel (med versionshistorik)
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  articles  Article[]
+
+  @@index([deletedAt])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  articles  ArticleTag[]
+
+  @@index([deletedAt])
+}
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  kind       String   // "image" | "video" | ...
+  url        String
+  width      Int?
+  height     Int?
+  alt        String?
+  checksum   String?  @unique
+  createdBy  String?
+  createdAt  DateTime @default(now())
+  deletedAt  DateTime?
+
+  articles  Article[] @relation("ArticleImage")
+  products  Product[] @relation("ProductImage")
+
+  @@index([deletedAt])
+}
+
+model Article {
+  id             String        @id @default(cuid())
+  // Slug unik per språk för i18n-stöd
+  slug           String
+  language       String        @default("sv")
+  headline       String
+  summary        String?
+  contentRich    Json          // editor/blocks som JSON
+  imageId        String?
+  image          MediaAsset?   @relation("ArticleImage", fields: [imageId], references: [id])
+  categoryId     String
+  category       Category      @relation(fields: [categoryId], references: [id])
+  authorId       String
+  author         User          @relation("AuthorArticles", fields: [authorId], references: [id])
+  status         ArticleStatus @default(DRAFT)
+  isEditorChoice Boolean       @default(false)
+  scheduledAt    DateTime?
+  publishedAt    DateTime?
+  views          Int           @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  versions       ArticleVersion[]
+  tags           ArticleTag[]
+  comments       Comment[]
+  reactions      Reaction[]
+  bookmarks      Bookmark[]
+  reads          ReadHistory[]
+  editorPick     EditorPickOrder? @relation("EditorPick")
+  pageViews      PageView[]       @relation("ArticlePageViews")
+
+  @@unique([slug, language])
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([deletedAt])
+  @@index([scheduledAt])
+  // Publicering får inte vara före planering
+  // NOTE: CHECK flyttad till SQL-migration (ALTER TABLE Article ADD CONSTRAINT ...)
+}
+
+model ArticleVersion {
+  id         String   @id @default(cuid())
+  articleId  String
+  versionNo  Int
+  diff       Json?
+  snapshot   Json?    // full snapshot om ni vill
+  editorId   String?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  editor     User?    @relation("EditedVersions", fields: [editorId], references: [id])
+
+  @@unique([articleId, versionNo])
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+}
+
+
+model Comment {
+  id         String   @id @default(cuid())
+  articleId  String
+  userId     String
+  body       String
+  status     String   @default("VISIBLE") // VISIBLE|HIDDEN|FLAGGED
+  createdAt  DateTime @default(now())
+
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports     CommentReport[] @relation("CommentReports")
+
+  @@index([articleId, status])
+}
+
+model Reaction {
+  id         String       @id @default(cuid())
+  articleId  String
+  userId     String
+  kind       ReactionKind
+  createdAt  DateTime     @default(now())
+
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, userId, kind])
+}
+
+// Rapporter för moderation
+model CommentReport {
+  id         String   @id @default(cuid())
+  commentId  String
+  reporterId String?
+  reason     String
+  createdAt  DateTime @default(now())
+  comment    Comment  @relation("CommentReports", fields: [commentId], references: [id], onDelete: Cascade)
+  reporter   User?    @relation("UserCommentReports", fields: [reporterId], references: [id], onDelete: SetNull)
+  @@index([commentId, createdAt])
+}
+
+// Editor’s choice ordning per period
+model EditorPickOrder {
+  id        String   @id @default(cuid())
+  articleId String   @unique
+  rank      Int
+  fromDate  DateTime
+  toDate    DateTime?
+
+  article   Article  @relation("EditorPick", fields: [articleId], references: [id], onDelete: Cascade)
+  @@index([fromDate, toDate])
+}
+
+// ---------------------------
+// COMMERCE (prenumeration + betalning + fakturor)
+// ---------------------------
+
+model SubscriptionType {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  description  String?
+  priceSek     Decimal  @db.Decimal(10,2)
+  durationDays Int
+  features     Json?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id          String              @id @default(cuid())
+  userId      String
+  typeId      String
+  startedAt   DateTime            @default(now())
+  expiresAt   DateTime
+  status      SubscriptionStatus  @default(ACTIVE)
+  renewalMode RenewalMode         @default(NONE)
+
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        SubscriptionType    @relation(fields: [typeId], references: [id])
+  payments    PaymentIntent[]
+  invoices    Invoice[]
+
+  @@index([userId, status])
+  // NOTE: CHECK flyttad till SQL-migration (ALTER TABLE Subscription ADD CONSTRAINT ...)
+}
+
+// Kundens sparade betalmetoder (Stripe m.m.)
+model PaymentMethod {
+  id           String   @id @default(cuid())
+  userId       String
+  provider     String   // "STRIPE"
+  customerRef  String   // t.ex. cus_xxx
+  methodRef    String   // t.ex. pm_xxx
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, methodRef])
+  @@index([userId, isDefault])
+}
+
+// Betalningsintentioner (kan kopplas till order eller prenumeration)
+model PaymentIntent {
+  id             String         @id @default(cuid())
+  userId         String
+  subscriptionId String?
+  orderId        String?
+  amountSek      Decimal        @db.Decimal(10,2)
+  status         PaymentStatus
+  provider       String         // "FAKE" | "STRIPE" | ...
+  providerRef    String?        @unique
+  idempotencyKey String?        @unique
+  createdAt      DateTime       @default(now())
+
+  user           User           @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+  subscription   Subscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  order          Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+}
+
+model Invoice {
+  id             String    @id @default(cuid())
+  userId         String
+  subscriptionId String?
+  amountSek      Decimal   @db.Decimal(10,2)
+  vatSek         Decimal   @db.Decimal(10,2)
+  issuedAt       DateTime  @default(now())
+  paidAt         DateTime?
+  pdfUrl         String?
+
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  // NOTE: CHECKs flyttade till SQL-migration (ALTER TABLE Invoice ADD CONSTRAINT amount/vat >= 0)
+}
+
+// (Valfri) enkel webshop för framtida behov
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  priceSek    Decimal  @db.Decimal(10,2)
+  imageId     String?
+  image       MediaAsset? @relation("ProductImage", fields: [imageId], references: [id])
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orderItems  OrderItem[] @relation("ProductOrderItems")
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  userId     String?
+  totalSek   Decimal  @db.Decimal(10,2)
+  status     String   @default("CREATED") // CREATED|PAID|CANCELLED|FULFILLED
+  createdAt  DateTime @default(now())
+  paidAt     DateTime?
+
+  user       User?    @relation("UserOrders", fields: [userId], references: [id], onDelete: SetNull)
+  items      OrderItem[]
+  payments   PaymentIntent[]
+}
+
+model OrderItem {
+  orderId   String
+  productId String
+  qty       Int     @default(1)
+  unitSek   Decimal @db.Decimal(10,2)
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation("ProductOrderItems", fields: [productId], references: [id], onDelete: Restrict)
+
+  @@id([orderId, productId])
+}
+
+// ---------------------------
+// COMMS (nyhetsbrev + mailkö)
+// ---------------------------
+
+model Newsletter {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  description String?
+  cadence     NewsletterCadence
+  templateId  String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  subscriptions NewsletterSubscription[]
+  schedule      NewsletterSchedule?
+}
+
+model NewsletterSubscription {
+  id             String     @id @default(cuid())
+  userId         String
+  newsletterId   String
+  preferences    Json?
+  createdAt      DateTime   @default(now())
+  unsubscribedAt DateTime?
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  newsletter  Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, newsletterId])
+}
+
+// Körschema per nyhetsbrev (DAILY/WEEKLY/CUSTOM)
+model NewsletterSchedule {
+  id           String     @id @default(cuid())
+  newsletterId String     @unique
+  dayOfWeek    Int?       // 0=Sun..6=Sat (för WEEKLY)
+  hourOfDay    Int?       // 0..23
+  customSpec   String?    // cron-liknande om CUSTOM
+  newsletter   Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
+}
+
+// Outbox/Jobbkö för utskick och andra batchjobb
+model OutboxJob {
+  id         String   @id @default(cuid())
+  kind       String   // "NEWSLETTER_SEND" | "REBUILD_SITEMAP" | ...
+  payload    Json
+  runAfter   DateTime @default(now())
+  attempts   Int      @default(0)
+  lastError  String?
+  lockedAt   DateTime?
+  doneAt     DateTime?
+
+  @@index([kind, runAfter])
+}
+
+// E-postkö (transaktionella mail)
+model EmailQueue {
+  id          String    @id @default(cuid())
+  toUserId    String
+  subject     String
+  bodyHtml    String
+  templateId  String?
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  status      String     @default("QUEUED")
+  error       String?
+
+  toUser      User       @relation("EmailQueueToUser", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledAt])
+  @@unique([toUserId, subject, scheduledAt])
+}
+
+// ---------------------------
+// PERSONALIZATION
+// ---------------------------
+
+model Bookmark {
+  userId    String
+  articleId String
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, articleId])
+}
+
+model ReadHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  articleId String
+  readAt    DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+// ---------------------------
+// INTEGRATIONS
+// ---------------------------
+
+model ExternalDataCache {
+  id        String   @id @default(cuid())
+  source    String   // "WEATHER" | "ELECTRICITY" | ...
+  cacheKey  String
+  payload   Json
+  fetchedAt DateTime @default(now())
+  ttlSec    Int      @default(900)
+
+  @@unique([source, cacheKey])
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  provider    String
+  eventType   String
+  payload     Json
+  receivedAt  DateTime @default(now())
+  processedAt DateTime?
+  status      String   @default("PENDING")
+  @@index([provider, status])
+}
+
+// ---------------------------
+// OPS & ANALYTICS
+// ---------------------------
+
+model PageView {
+  id         String   @id @default(cuid())
+  userId     String?
+  sessionId  String?
+  path       String
+  articleId  String?
+  occurredAt DateTime @default(now())
+  uaHash     String?
+  country    String?
+
+  user       User?    @relation("UserPageViews", fields: [userId], references: [id], onDelete: SetNull)
+  article    Article? @relation("ArticlePageViews", fields: [articleId], references: [id], onDelete: SetNull)
+
+  @@index([occurredAt])
+  @@index([articleId])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  actorUserId  String?
+  action       String   // CREATE|UPDATE|DELETE|PUBLISH|LOGIN|...
+  entity       String   // ARTICLE|USER|SUBSCRIPTION|...
+  entityId     String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  actor        User?    @relation("ActorAuditLogs", fields: [actorUserId], references: [id], onDelete: SetNull)
+  @@index([entity, createdAt])
+}
+
+// ---------------------------
+// PRIVACY / COMPLIANCE
+// ---------------------------
+
+model ConsentEvent {
+  id         String   @id @default(cuid())
+  userId     String?
+  kind       String   // "COOKIE" | "TERMS" | "PRIVACY"
+  version    String
+  granted    Boolean
+  ipHash     String?
+  uaHash     String?
+  occurredAt DateTime @default(now())
+
+  user       User?    @relation("UserConsents", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([kind, occurredAt])
+}
+
+// ---------------------------
+// FTS (manuell patch efter migrering)
+// ---------------------------
+// Lägg tsvector-kolumner och triggers via SQL efter `prisma migrate` om ni vill ha Postgres FTS.
