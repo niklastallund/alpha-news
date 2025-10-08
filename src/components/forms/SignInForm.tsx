@@ -48,7 +48,12 @@ export default function SignInForm() {
     },
   });
 
+  /**
+   * 
+   * @param values Values must contain email and password, based on SignInFormSchema.
+   */
   async function onSubmit(values: FormValues) {
+
     const { error } = await authClient.signIn.email({
       email: values.email,
       password: values.password,
@@ -56,19 +61,20 @@ export default function SignInForm() {
     if (error) {
       alert(error.message);
     } else {
-      // Signed in
+      // Signed in! Reload to make sure the provider gets the session, and then be redirected.
       window.location.reload();
     }
   }
 
-
+  // So after the reload (or if getting to this page with a session), goto user page!
   useEffect(() => {
     if (session) router.push("/user");
   }, [session, router])
 
     if (session) return null;
+
   return (
-    <Card className="max-w-sm mx-auto">
+    <Card className="max-w-sm mx-auto mt-10">
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
         <CardDescription>

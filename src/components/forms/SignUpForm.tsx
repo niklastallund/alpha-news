@@ -30,7 +30,6 @@ import z from "zod";
 import { useSession } from "@/lib/SessionProvider";
 import { useRouter } from "next/navigation";
 
-
 const formSchema = SignUpFormSchema;
 
 type FormValues = z.infer<typeof formSchema>;
@@ -101,13 +100,12 @@ export default function SignUpForm() {
       
   }
 
+  // So after the reload (or if getting to this page with a session), goto user page!
   useEffect( () => {
-
     if (session) router.push("/user");
-
   },[session, router]);
 
-  if (session) return null;
+  if (session) return null; // Maybe unessasary?
   
   return (
     <Card className="max-w-sm mx-auto">

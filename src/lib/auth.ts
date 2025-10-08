@@ -24,7 +24,7 @@ export const auth = betterAuth({
     admin(),
      stripe({
             stripeClient,
-            stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+            stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!, // (The ! in the end promise ts that it is a string.)
             createCustomerOnSignUp: true,
         })
   ], // This includes role into session:

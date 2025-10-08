@@ -7,6 +7,7 @@ import z from "zod";
 // schema meets req from: (optional image and callbackURL)
 // from https://www.better-auth.com/docs/authentication/email-password
 
+// So this is for our sign-up form.
 export const SignUpFormSchema = z
   .object({
     name: z.string().min(2).max(100),
@@ -23,7 +24,7 @@ export const SignUpFormSchema = z
       });
   });
 
-
+// So this is for our sign-in form.
 export const SignInFormSchema = z.object({
   email: z.email().max(250),
   password: z.string().min(6).max(128),
