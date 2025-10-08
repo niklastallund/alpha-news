@@ -26,6 +26,20 @@ export const auth = betterAuth({
             stripeClient,
             stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!, // (The ! in the end promise ts that it is a string.)
             createCustomerOnSignUp: true,
+            subscription: {
+              enabled: true,
+              plans: [
+                  {
+                      name: "basic", // the name of the plan, it'll be automatically lower cased when stored in the database
+                      priceId: "price_1SFxfR1PAHMjKtKVWu5yWfT7", // the price ID from stripe
+                      // annualDiscountPriceId: "price_1234567890", // (optional) the price ID for annual billing with a discount
+                  },
+                  {
+                      name: "pro",
+                      priceId: "price_1SFxfz1PAHMjKtKVqTmeyj58",
+                  }
+              ]
+}
         })
   ], // This includes role into session:
     user: {
