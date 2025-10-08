@@ -8,7 +8,7 @@ export const authClient = createAuthClient(
     plugins: [
       adminClient(),
        stripeClient({
-            subscription: true //if you want to enable subscription management
+            subscription: true //if you want to enable subscription management. Have not read about this yet, but i guess it should be enabled. // Tobbe.
         })
     ] 
   }

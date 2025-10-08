@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,7 +29,6 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { useSession } from "@/lib/SessionProvider";
 import { useRouter } from "next/navigation";
-
 
 const formSchema = SignUpFormSchema;
 
@@ -85,8 +83,6 @@ export default function SignUpForm() {
         // i use this because the sessionprovider wont be updated yet. so this reloads everything and then redirect. 
         window.location.reload();
 
-
-
       }
       
       } else {
@@ -104,16 +100,15 @@ export default function SignUpForm() {
       
   }
 
+  // So after the reload (or if getting to this page with a session), goto user page!
   useEffect( () => {
-
     if (session) router.push("/user");
-
   },[session, router]);
 
-  if (session) return null;
+  if (session) return null; // Maybe unessasary?
   
   return (
-    <Card className="max-w-sm mx-auto">
+    <Card className="max-w-sm mx-auto mt-10">
       <CardHeader>
         <CardTitle>Sign Up</CardTitle>
         <CardDescription>
