@@ -1,3 +1,53 @@
+/**
+ * NEWS PROJECT — DATAMODELL (förklaring)
+ *
+ * Syfte:
+ * Denna datamodell är utformad för en komplett nyhetsplattform som hanterar användarautentisering, innehållsproduktion och publicering, prenumerationer, betalningar, kommunikation, personalisering, integrationer, analys samt dataskydd. Modellen möjliggör skalbarhet, hög dataintegritet och tydlig separation mellan olika domäner.
+ *
+ * Domäner och modeller:
+ * - AUTH: User, Role, UserRole, Session, EmailVerificationToken, PasswordResetToken
+ * - CONTENT: Category, Tag, MediaAsset, Article, ArticleVersion, ArticleTag, Comment, Reaction, CommentReport, EditorPickOrder
+ * - COMMERCE: SubscriptionType, Subscription, PaymentMethod, PaymentIntent, Invoice, Product, Order, OrderItem
+ * - COMMS: Newsletter, NewsletterSubscription, NewsletterSchedule, OutboxJob, EmailQueue
+ * - PERSONALIZATION: Bookmark, ReadHistory
+ * - INTEGRATIONS: ExternalDataCache, WebhookEvent
+ * - OPS/ANALYTICS: PageView, AuditLog
+ * - PRIVACY: ConsentEvent
+ *
+ * Viktiga relationer:
+ * - User → Article (författarskap)
+ * - User → Subscription (prenumerationer)
+ * - User → Comment, Reaction, Bookmark, ReadHistory (interaktion och personalisering)
+ * - Article → Category, Article → Tag (klassificering)
+ * - Article → ArticleVersion (versionshistorik)
+ * - Article → Comment, Reaction, Bookmark, ReadHistory (användarinteraktion)
+ * - Article → EditorPickOrder (utvald artikel)
+ * - Subscription → PaymentIntent, Invoice (betalningsflöde)
+ * - User → NewsletterSubscription → Newsletter (nyhetsbrev)
+ * - User → PaymentMethod, PaymentIntent, Order (handel)
+ * - Product → OrderItem → Order (webshop)
+ * - User → ConsentEvent (samtyckeshistorik)
+ * - User → PageView, AuditLog (analys och loggning)
+ *
+ * Index och constraints:
+ * - Unika index på email, sluggar, kombinationer av id:n (t.ex. [userId, roleId], [slug, language]), och andra naturliga nycklar för att säkerställa dataintegritet och snabba uppslag.
+ * - Constraints såsom @unique, @id, och sammansatta index för att förhindra dubbletter och säkerställa korrekt relationshantering.
+ * - Många relationer använder onDelete: Cascade/SetNull för att hantera borttagning på ett säkert sätt.
+ * - CHECK constraints (t.ex. på Article, Subscription, Invoice) hanteras i SQL-migreringar för avancerad datavalidering.
+ *
+ * Modellens uppbyggnad:
+ * - Separation av domäner möjliggör modulär utveckling och enkel utbyggnad.
+ * - Relationsmodellen stödjer både många-till-många (ArticleTag, UserRole) och en-till-många/valfri (t.ex. UserProfile).
+ * - Indexering och constraints är utformade för att möjliggöra hög prestanda vid sökningar och rapportering.
+ *
+ * Praktiskt flöde:
+ * - Användare kan registrera sig, logga in, hantera sin profil och preferenser.
+ * - Redaktionella användare kan skapa, redigera och publicera artiklar med versionering och klassificering.
+ * - Prenumeranter kan köpa prenumerationer, hantera betalningar och ta emot fakturor.
+ * - Nyhetsbrev skickas till prenumeranter enligt schema och köhantering.
+ * - Användare kan interagera med innehåll via reaktioner, kommentarer, bokmärken och läsa historik, vilket möjliggör personalisering.
+ * - Systemet lagrar samtycken, hanterar integrationer (t.ex. väderdata), och loggar viktiga händelser för analys och regelefterlevnad.
+ */
 // ---------------------------
 // Prisma Client + Datakälla
 // ---------------------------
