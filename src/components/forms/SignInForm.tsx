@@ -70,7 +70,7 @@ export default function SignInForm() {
   if (session) return null;
 
   return (
-    <Card className="max-w-sm mx-auto mt-10">
+    <Card className="w-full max-w-small">
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
         <CardDescription>

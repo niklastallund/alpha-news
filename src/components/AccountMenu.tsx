@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import Link from "next/link";
 import { LogIn, UserPlus, User, LogOut } from "lucide-react";
 import {
   NavigationMenuContent,
@@ -47,6 +46,7 @@ export default function AccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <Button
                   variant="ghost"
                   className="flex-row items-center gap-2 w-full"
+                  onClick={() => router.push("/user")}
                 >
                   <User className="h-4 w-4" />
                   Profile
