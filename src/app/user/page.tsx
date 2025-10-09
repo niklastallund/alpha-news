@@ -13,7 +13,7 @@ import NameForm from "./NameForm";
 export default async function UserPage() {
   const session = await getSessionData();
 
-  if (!session) redirect("/sign-in");
+  if (!session) redirect("/");
 
   return (
     <Page>
