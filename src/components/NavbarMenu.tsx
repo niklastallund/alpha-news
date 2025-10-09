@@ -13,6 +13,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import AccountMenu from "./AccountMenu";
 
 // Temporary until we can fetch this data
 const categories: { title: string; href: string }[] = [
@@ -77,27 +78,9 @@ export default function NavbarMenu({
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Account</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[200px] gap-4">
-              <li>
-                <NavigationMenuLink asChild>
-                  <Link href="#" className="flex-row items-center gap-2">
-                    <LogIn />
-                    Sign In
-                  </Link>
-                </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link href="#" className="flex-row items-center gap-2">
-                    <UserPlus />
-                    Sign Up
-                  </Link>
-                </NavigationMenuLink>
-              </li>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
+        <AccountMenu isLoggedIn={isLoggedIn} />
+
+        {/* Admin Menu, only visible if user is admin */}
         {isAdmin && (
           <NavigationMenuItem>
             <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
