@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/lib/SessionProvider";
 import { getSessionData } from "@/lib/actions/sessiondata";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,23 +26,58 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   // Get the sessionData and provide it to the sessionprov.
   const sessionData = await getSessionData();
-
-
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider session={sessionData?.session ?? null} user={sessionData?.user ?? null}>
-          {/* Also put navbar inside here! */}
-          
-        {children}
+        <SessionProvider
+          session={sessionData?.session ?? null}
+          user={sessionData?.user ?? null}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {/* Also put navbar inside here! */}
+
+            {children}
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>
   );
 }
+
+// import "./globals.css";
+// import { ThemeProvider } from "@/components/theme-provider";
+// import { ModeToggle } from "@/components/theme-toggle";
+
+// export default function RootLayout({
+//   children,
+// }: {
+//   children: React.ReactNode;
+// }) {
+//   return (
+//     <>
+//       <html lang="en" suppressHydrationWarning>
+//         <head />
+//         <body>
+//           <ThemeProvider
+//             attribute="class"
+//             defaultTheme="system"
+//             enableSystem
+//             disableTransitionOnChange
+//           >
+//             {children}
+//           </ThemeProvider>
+//         </body>
+//       </html>
+//     </>
+//   );
+// }
