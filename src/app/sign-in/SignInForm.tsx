@@ -30,15 +30,12 @@ import { useSession } from "@/lib/SessionProvider";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-
 const formSchema = SignInFormSchema;
 type FormValues = z.infer<typeof formSchema>;
 
 export default function SignInForm() {
-
   const { session } = useSession();
   const router = useRouter();
-
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -49,11 +46,10 @@ export default function SignInForm() {
   });
 
   /**
-   * 
+   *
    * @param values Values must contain email and password, based on SignInFormSchema.
    */
   async function onSubmit(values: FormValues) {
-
     const { error } = await authClient.signIn.email({
       email: values.email,
       password: values.password,
@@ -69,9 +65,9 @@ export default function SignInForm() {
   // So after the reload (or if getting to this page with a session), goto user page!
   useEffect(() => {
     if (session) router.push("/user");
-  }, [session, router])
+  }, [session, router]);
 
-    if (session) return null;
+  if (session) return null;
 
   return (
     <Card className="max-w-sm mx-auto mt-10">
@@ -84,12 +80,10 @@ export default function SignInForm() {
           <Button variant="link" asChild>
             <Link href="/sign-up">Sign Up</Link>
           </Button>
-
         </CardAction>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
@@ -121,14 +115,17 @@ export default function SignInForm() {
             <Button className="w-full" type="submit">
               Sign In
             </Button>
-
           </form>
         </Form>
 
-              {form.formState.isSubmitting && <div className="w-full flex justify-center p-5 mx-auto"><div className="w-20 h-20 rounded-full animate-spin border-8 border-blue-600 border-t-blue-200 text-2xl flex text-center items-center"><div className="w-10 h-10 border-6 border-red-600 border-b-red-200 rounded-full mx-auto my-auto"></div></div></div>}
-
+        {form.formState.isSubmitting && (
+          <div className="w-full flex justify-center p-5 mx-auto">
+            <div className="w-20 h-20 rounded-full animate-spin border-8 border-blue-600 border-t-blue-200 text-2xl flex text-center items-center">
+              <div className="w-10 h-10 border-6 border-red-600 border-b-red-200 rounded-full mx-auto my-auto"></div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
-
 }

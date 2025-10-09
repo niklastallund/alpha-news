@@ -35,12 +35,10 @@ const formSchema = SignUpFormSchema;
 type FormValues = z.infer<typeof formSchema>;
 
 export default function SignUpForm() {
-
-
   const { session } = useSession();
   const router = useRouter();
 
-  const [signUpError, setSignUpError] = useState<{msg: string}>({msg: ""});
+  const [signUpError, setSignUpError] = useState<{ msg: string }>({ msg: "" });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -53,9 +51,7 @@ export default function SignUpForm() {
   });
 
   async function onSubmit(values: FormValues) {
-
     try {
-
       const response = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,50 +59,41 @@ export default function SignUpForm() {
           name: values.name,
           email: values.email,
           password: values.password,
-          confirmPassword: values.confirmPassword
-        })
+          confirmPassword: values.confirmPassword,
+        }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-
         // Sign in and go to user page!
-      const { error } = await authClient.signIn.email({
-        email: values.email,
-        password: values.password,
-      });
-      if (error) {
-        alert(error.message);
+        const { error } = await authClient.signIn.email({
+          email: values.email,
+          password: values.password,
+        });
+        if (error) {
+          alert(error.message);
+        } else {
+          // Signed in
+          // i use this because the sessionprovider wont be updated yet. so this reloads everything and then redirect.
+          window.location.reload();
+        }
       } else {
-        // Signed in
-        // i use this because the sessionprovider wont be updated yet. so this reloads everything and then redirect. 
-        window.location.reload();
-
+        setSignUpError({ msg: result.error ?? "Signup failed." });
       }
-      
-      } else {
-        
-        setSignUpError({msg: result.error ?? "Signup failed."});
-
-      }
-
     } catch (error) {
-
-      setSignUpError({msg: String(error)});
+      setSignUpError({ msg: String(error) });
       //console.log("Network error:", error);
-
     }
-      
   }
 
   // So after the reload (or if getting to this page with a session), goto user page!
-  useEffect( () => {
+  useEffect(() => {
     if (session) router.push("/user");
-  },[session, router]);
+  }, [session, router]);
 
   if (session) return null; // Maybe unessasary?
-  
+
   return (
     <Card className="max-w-sm mx-auto mt-10">
       <CardHeader>
@@ -184,8 +171,13 @@ export default function SignUpForm() {
           </form>
         </Form>
 
-              {form.formState.isSubmitting && <div className="w-full flex justify-center p-5 mx-auto"><div className="w-20 h-20 rounded-full animate-spin border-8 border-blue-600 border-t-blue-200 text-2xl flex text-center items-center"><div className="w-10 h-10 border-6 border-red-600 border-b-red-200 rounded-full mx-auto my-auto"></div></div></div>}
-
+        {form.formState.isSubmitting && (
+          <div className="w-full flex justify-center p-5 mx-auto">
+            <div className="w-20 h-20 rounded-full animate-spin border-8 border-blue-600 border-t-blue-200 text-2xl flex text-center items-center">
+              <div className="w-10 h-10 border-6 border-red-600 border-b-red-200 rounded-full mx-auto my-auto"></div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
