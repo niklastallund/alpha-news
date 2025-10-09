@@ -25,7 +25,7 @@ export default function AccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await authClient.signOut({
+    const { error } = await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
           toast.success("Successfully signed out");
@@ -33,6 +33,10 @@ export default function AccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
         },
       },
     });
+
+    if (error) {
+      toast.error("Error signing out: " + error.message);
+    }
   };
 
   return (
