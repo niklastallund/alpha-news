@@ -136,6 +136,7 @@ export default function ImageUploader() {
 
             <Button
               type="submit"
+              disabled={imageUploadForm.formState.isSubmitting}
               className="bg-green-500 cursor-pointer p-3 w-full"
             >
               Upload
@@ -145,6 +146,13 @@ export default function ImageUploader() {
       </CardContent>
       <CardFooter className="bg-amber-200">
         <p>{msg}</p>
+        {imageUploadForm.formState.isSubmitting && (
+          <div className="w-full flex justify-center p-5 mx-auto">
+            <div className="w-20 h-20 rounded-full animate-spin border-8 border-blue-600 border-t-blue-200 text-2xl flex text-center items-center">
+              <div className="w-10 h-10 border-6 border-red-600 border-b-red-200 rounded-full mx-auto my-auto"></div>
+            </div>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
