@@ -3,7 +3,7 @@ import NavbarMenu from "./NavbarMenu";
 
 export default function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 border-b border-border backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 bg-background/95 border-b-2 border-border backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center justify-center p-2">
         <Image
           src="/tmplogo.png"
