@@ -25,21 +25,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   // Get the sessionData and provide it to the sessionprov.
   const sessionData = await getSessionData();
-
-
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider session={sessionData?.session ?? null} user={sessionData?.user ?? null}>
+        <SessionProvider
+          session={sessionData?.session ?? null}
+          user={sessionData?.user ?? null}
+        >
           {/* Also put navbar inside here! */}
-          
-        {children}
+
+          {children}
         </SessionProvider>
       </body>
     </html>

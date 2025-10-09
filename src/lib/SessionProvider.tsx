@@ -1,5 +1,5 @@
 "use client";
-// So this is a solution for handling the session and user data in the whole application. This just provides down the same session to the other components, so it is lika a parent component for the whole app and we dont need to get the session in other places etc. 
+// So this is a solution for handling the session and user data in the whole application. This just provides down the same session to the other components, so it is lika a parent component for the whole app and we dont need to get the session in other places etc.
 
 // In client components, just add in the "mainfunction":
 //  const { session, user } = useSession();
@@ -10,7 +10,6 @@
 // const user = sessionData?.user;
 // const role = await getRole(); // if you just need the role.
 // (see lib/actions/sessiondata.ts)
-
 
 import { createContext, useContext, ReactNode } from "react";
 
@@ -25,7 +24,6 @@ interface SessionContextProps {
   session: Session | null;
   user: UserAndRole | null;
 }
-
 
 // about create-context:
 /* Lets you create a Context that components can provide or read.
@@ -42,12 +40,18 @@ export const useSession = () => {
   return context;
 };
 
-
-export function SessionProvider ({ children, session, user }:{ children: ReactNode; session: Session | null; user: UserAndRole | null;}) {
-
+export function SessionProvider({
+  children,
+  session,
+  user,
+}: {
+  children: ReactNode;
+  session: Session | null;
+  user: UserAndRole | null;
+}) {
   return (
     <sessionContext.Provider value={{ session, user }}>
       {children}
     </sessionContext.Provider>
   );
-};
+}
