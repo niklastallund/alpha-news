@@ -2,13 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {
-  CircleCheckIcon,
-  CircleHelpIcon,
-  CircleIcon,
-  LogIn,
-  UserPlus,
-} from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 
 import {
   NavigationMenu,
@@ -19,9 +13,6 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-
-// Temporary admin check for testing of button
-const isAdmin = true;
 
 // Temporary until we can fetch this data
 const categories: { title: string; href: string }[] = [
@@ -43,7 +34,16 @@ const categories: { title: string; href: string }[] = [
   },
 ];
 
-export default function NavbarMenu() {
+export default function NavbarMenu({
+  isLoggedIn,
+  isAdmin,
+}: {
+  isLoggedIn: boolean;
+  isAdmin: boolean;
+}) {
+  // Temporary admin check for testing of button
+  isAdmin = true;
+
   return (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>
