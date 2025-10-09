@@ -394,5 +394,14 @@ stripe listen --forward-to localhost:3000/api/auth/stripe/webhook
 
 Copy the key into STRIPE_WEBHOOK_SECRET in .env file
 
+//
 
-C:\Users\secre\Desktop>
+or run 
+
+
+***********************************
+
+
+
+OKEY, so i think the techstack is installed now, but we will install more things later but it wont be logged here.
+(like shadcn components etc).

@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,42 +8,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Author {
-  id String @id @default(uuid())
-}
-
-model Article {
-  id String @id @default(uuid())
-}
-
-model Category {
-  id String @id @default(uuid())
-}
-
-model Subscription {
-  id String @id @default(uuid())
-}
-
-model SubscriptionType {
-  id String @id @default(uuid())
-}
-
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  role          String    @default("user")
-  banned        Boolean?  @default(false)
-  banReason     String?
-  banExpires    DateTime?
-  sessions      Session[]
-  accounts      Account[]
-
+  id               String    @id
+  name             String
+  email            String
+  emailVerified    Boolean   @default(false)
+  image            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+  role             String?
+  banned           Boolean?  @default(false)
+  banReason        String?
+  banExpires       DateTime?
   stripeCustomerId String?
+  sessions         Session[]
+  accounts         Account[]
 
   @@unique([email])
   @@map("user")
@@ -99,4 +72,40 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+model Article {
+  id         Int      @id @default(autoincrement())
+  headline   String?
+  summary    String?
+  content    String?
+  views      Int
+  image      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  articles Article[]
+}
+
+model Subscription {
+  id                   String    @id
+  plan                 String
+  referenceId          String
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  status               String?
+  periodStart          DateTime?
+  periodEnd            DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  cancelAtPeriodEnd    Boolean?  @default(false)
+  seats                Int?
+
+  @@map("subscription")
 }
