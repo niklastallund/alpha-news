@@ -2,6 +2,7 @@ import Image from "next/image";
 import NavbarMenu from "./NavbarMenu";
 import { getRole, getSessionData } from "@/lib/actions/sessiondata";
 import Link from "next/link";
+import { ModeToggle } from "./theme-toggle";
 
 export default async function Navbar() {
   // Session checks for the navbar menu
@@ -11,7 +12,7 @@ export default async function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 border-b-2 border-border backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center justify-center p-2">
+      <div className="flex items-center justify-center gap-5 p-2">
         <Link
           href="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
@@ -25,6 +26,8 @@ export default async function Navbar() {
           />
         </Link>
         <NavbarMenu isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
+
+        <ModeToggle />
       </div>
     </nav>
   );
