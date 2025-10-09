@@ -17,7 +17,7 @@ export default async function UserPage() {
 
   return (
     <Page>
-      <div className="w-full md:grid md:grid-cols-2 gap-2 border-2">
+      <div className="w-full md:grid md:grid-cols-2 gap-2">
         <div className="p-2 col-span-2 md:flex md:flex-wrap md:gap-2 items-end">
           <UserPic></UserPic>
 

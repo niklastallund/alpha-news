@@ -7,7 +7,7 @@ interface Props {
 export default function Page({ children }: Props) {
   return (
     <div className="w-full mt-2">
-      <div className="p-2 container mx-auto bg-card text-card-foreground">
+      <div className="container mx-auto bg-card text-card-foreground border-border border-2 rounded-xl">
         {children}
       </div>
     </div>
