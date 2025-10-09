@@ -31,5 +31,4 @@ export async function getSessionData() : Promise<SessionData | null> {
     });
 
     return sessionData;
-
 }

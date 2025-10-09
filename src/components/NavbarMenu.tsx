@@ -41,9 +41,6 @@ export default function NavbarMenu({
   isLoggedIn: boolean;
   isAdmin: boolean;
 }) {
-  // Temporary admin check for testing of button
-  isAdmin = true;
-
   return (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>
