@@ -31,11 +31,11 @@ export default async function RootLayout({
   const sessionData = await getSessionData();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
         <SessionProvider
           session={sessionData?.session ?? null}
           user={sessionData?.user ?? null}
@@ -47,39 +47,11 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             {/* Also put navbar inside here! */}
-              <Navbar />
-              {children}
+            <Navbar />
+            {children}
           </ThemeProvider>
         </SessionProvider>
       </body>
     </html>
   );
 }
-
-// import "./globals.css";
-// import { ThemeProvider } from "@/components/theme-provider";
-// import { ModeToggle } from "@/components/theme-toggle";
-
-// export default function RootLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   return (
-//     <>
-//       <html lang="en" suppressHydrationWarning>
-//         <head />
-//         <body>
-//           <ThemeProvider
-//             attribute="class"
-//             defaultTheme="system"
-//             enableSystem
-//             disableTransitionOnChange
-//           >
-//             {children}
-//           </ThemeProvider>
-//         </body>
-//       </html>
-//     </>
-//   );
-// }
