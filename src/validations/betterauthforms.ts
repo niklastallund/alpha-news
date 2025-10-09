@@ -2,8 +2,6 @@ import z from "zod";
 
 // Schemas for for better auth.
 
-
-
 // schema meets req from: (optional image and callbackURL)
 // from https://www.better-auth.com/docs/authentication/email-password
 

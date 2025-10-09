@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 import { SessionProvider } from "@/lib/SessionProvider";
 import { getSessionData } from "@/lib/actions/sessiondata";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -34,6 +35,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        
         <SessionProvider
           session={sessionData?.session ?? null}
           user={sessionData?.user ?? null}
@@ -45,8 +47,8 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             {/* Also put navbar inside here! */}
-
-            {children}
+              <Navbar />
+              {children}
           </ThemeProvider>
         </SessionProvider>
       </body>

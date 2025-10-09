@@ -73,6 +73,7 @@ model Verification {
 
   @@map("verification")
 }
+
 model Article {
   id         Int      @id @default(autoincrement())
   headline   String?
@@ -87,7 +88,24 @@ model Article {
 }
 
 model Category {
-  id        Int       @id @default(autoincrement())
-  name      String
-  articles  Article[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  articles Article[]
+}
+
+model Subscription {
+  id                   String    @id
+  plan                 String
+  referenceId          String
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  status               String?
+  periodStart          DateTime?
+  periodEnd            DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  cancelAtPeriodEnd    Boolean?  @default(false)
+  seats                Int?
+
+  @@map("subscription")
 }
