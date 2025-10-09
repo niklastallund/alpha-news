@@ -12,6 +12,146 @@ import path from "path";
 import { auth } from "../auth";
 import { headers } from "next/headers";
 
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
+
+/**
+ * Uploads an image and saves it to our cloud storage in folder uploads with a random name, and sets the filename as image in the user.
+ * @param formData Must contain a valid image file < 1mb in format jpg or png, and userId.
+ * @returns {success: boolean, msg: string}
+ */
+export async function uploadUserImageToCloud(
+  formData: FormData
+): Promise<{ success: boolean; msg: string }> {
+  console.log("uploadUserImageToCloud called");
+
+  try {
+    const userId = formData.get("userId") as string;
+    if (!userId) return { success: false, msg: "No user id." };
+
+    // Check file
+    const file = formData.get("file") as File;
+    if (!file || file.size === 0)
+      return { success: false, msg: "No valid file." };
+
+    if (file.size > 1 * 1024 * 1024)
+      return { success: false, msg: "File is too big. (1MB)" };
+
+    // Check filetype
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const fileType = await fileTypeFromBuffer(buffer);
+    if (
+      !fileType ||
+      (fileType.mime !== "image/png" && fileType.mime !== "image/jpeg")
+    )
+      return { success: false, msg: "Invalid filetype (only jpg or png)" };
+
+    const fileExtension = fileType.ext;
+
+    // Parse validation
+    const parseResult = imageUploadSchema.safeParse(
+      Object.fromEntries(formData.entries())
+    );
+
+    if (!parseResult.success)
+      return { success: false, msg: parseResult.error.issues[0].message };
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { image: true },
+    });
+
+    if (!existingUser)
+      return { success: false, msg: "No existing user with id " + userId };
+
+    // Delete old image from R2 if exists
+    if (existingUser.image) {
+      // Extract filename from URL (e.g., from https://pub-xxx.r2.dev/userid_timestamp.jpg)
+      const oldFileName = existingUser.image.split("/").pop();
+      if (oldFileName) {
+        try {
+          await s3Client.send(
+            new DeleteObjectCommand({
+              Bucket: process.env.R2_BUCKET_NAME!,
+              Key: oldFileName,
+            })
+          );
+          console.log(`Deleted old image: ${oldFileName}`);
+        } catch (e) {
+          console.log("Could not delete old image:", e);
+          // Continue anyway ✌️ =)
+        }
+      }
+    }
+
+    // Upload new image to R2 =)
+    const fileName = `${userId}_${Date.now()}.${fileExtension}`;
+
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME!,
+        Key: fileName,
+        Body: buffer,
+        ContentType: fileType.mime,
+      })
+    );
+
+    // Construct public URL
+    const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+
+    // Update user with new image URL
+    const updUserWithPic = await prisma.user.update({
+      where: { id: userId },
+      data: { image: imageUrl },
+    });
+
+    if (updUserWithPic) {
+      return { success: true, msg: "Profile pic uploaded!" };
+    }
+    return { success: false, msg: "Update failed." };
+  } catch (e) {
+    console.error("Upload error:", e);
+    return { success: false, msg: "Server error. \n" + e };
+  }
+}
+
+// /**
+//  * Uploads an image and saves it to our cloudstorage in folder uploads with a random name, and sets the filename as image in the user.
+//  * @param formData Must contain a valid image file < 1mb in format jpg or png, and userId.
+//  * @returns  {success: boolean, msg: string}
+//  */
+// export async function uploadUserImageToCloud(
+//   formData: FormData
+// ): Promise<{ success: boolean; msg: string }> {
+//   // CHECK parse and valid file.
+
+//   // So first create the file locally i guess?
+
+//   // Upload the file
+
+//   // Get the url for the file
+
+//   //Save the url in our db.
+
+//   return { success: false, msg: "not done" };
+// }
+
+//Fix: cloud instead! I just keep this...
 /**
  * Uploads an image and saves it to public/uploads folder with a random name, and sets the filename as image in the user.
  * @param formData Must contain a valid image file < 1mb in format jpg or png, and userId.

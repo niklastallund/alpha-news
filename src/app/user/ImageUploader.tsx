@@ -14,7 +14,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { useSession } from "@/lib/SessionProvider";
-import { uploadUserImage } from "@/lib/actions/edituser";
+import { uploadUserImageToCloud } from "@/lib/actions/edituser";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -66,8 +66,7 @@ export default function ImageUploader() {
       return;
     }
 
-    // Check size here..
-
+    // Check size
     const file = formData.get("file") as File;
     if (!file || file.size === 0) {
       setMsg("File is empty.");
@@ -79,9 +78,8 @@ export default function ImageUploader() {
       return;
     }
 
-    const result: { success: boolean; msg: string } = await uploadUserImage(
-      formData
-    );
+    const result: { success: boolean; msg: string } =
+      await uploadUserImageToCloud(formData);
 
     if (!result.success) {
       imageUploadForm.setError("file", { message: result.msg });
