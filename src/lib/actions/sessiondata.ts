@@ -27,5 +27,5 @@ export async function getSessionData(): Promise<SessionData | null> {
     headers: await headers(),
   });
 
-  return sessionData;
+    return sessionData;
 }
