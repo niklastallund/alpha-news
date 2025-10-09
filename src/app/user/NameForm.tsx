@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { changeUserName } from "@/lib/actions/edituser";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
+import Loader from "@/components/Loader";
 
 export default function NameForm() {
   const { user } = useSession();
@@ -126,6 +127,7 @@ export default function NameForm() {
 
             <Button
               type="submit"
+              disabled={nameForm.formState.isSubmitting}
               className="bg-green-500 cursor-pointer p-3 w-full"
             >
               Save
@@ -133,8 +135,9 @@ export default function NameForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="bg-amber-200 text-black">
         <p>{msg}</p>
+        {nameForm.formState.isSubmitting && <Loader />}
       </CardFooter>
     </Card>
   );

@@ -17,8 +17,8 @@ export default async function UserPage() {
 
   return (
     <Page>
-      <div className="w-full md:grid md:grid-cols-2 gap-2">
-        <div className="p-2 col-span-2 md:flex md:flex-wrap md:gap-2 items-end">
+      <div className="w-full md:grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="p-2 md:col-span-3 md:flex md:flex-wrap md:gap-2 md:items-end">
           <UserPic></UserPic>
 
           <div>
@@ -41,7 +41,7 @@ export default async function UserPage() {
           <NameForm />
         </div>
 
-        <div className="p-2">
+        <div className="p-2 md:col-span-3">
           Data like subscription, articles, discussions(?)
         </div>
       </div>

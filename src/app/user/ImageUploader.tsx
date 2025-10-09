@@ -29,6 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Loader from "@/components/Loader";
 
 // If we need an update function? I dont know. fix
 
@@ -144,15 +145,9 @@ export default function ImageUploader() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="bg-amber-200">
+      <CardFooter className="bg-amber-200 text-black">
         <p>{msg}</p>
-        {imageUploadForm.formState.isSubmitting && (
-          <div className="w-full flex justify-center p-5 mx-auto">
-            <div className="w-20 h-20 rounded-full animate-spin border-8 border-blue-600 border-t-blue-200 text-2xl flex text-center items-center">
-              <div className="w-10 h-10 border-6 border-red-600 border-b-red-200 rounded-full mx-auto my-auto"></div>
-            </div>
-          </div>
-        )}
+        {imageUploadForm.formState.isSubmitting && <Loader />}
       </CardFooter>
     </Card>
   );
