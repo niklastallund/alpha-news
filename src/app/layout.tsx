@@ -34,13 +34,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider
-          session={sessionData?.session ?? null}
-          user={sessionData?.user ?? null}
-        >
+        
+        <SessionProvider session={sessionData?.session ?? null} user={sessionData?.user ?? null}>
           {/* Also put navbar inside here! */}
           <Navbar />
-
           {children}
         </SessionProvider>
       </body>

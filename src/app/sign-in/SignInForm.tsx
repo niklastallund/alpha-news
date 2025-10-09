@@ -64,7 +64,7 @@ export default function SignInForm() {
 
   // So after the reload (or if getting to this page with a session), goto user page!
   useEffect(() => {
-    if (session) router.push("/");
+    if (session) router.push("/user");
   }, [session, router]);
 
   if (session) return null;
