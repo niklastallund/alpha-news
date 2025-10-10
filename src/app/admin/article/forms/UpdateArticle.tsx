@@ -18,32 +18,38 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  CreateArticleInput,
-  createArticleSchema,
-} from "@/validations/article-forms";
+import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { createArticle } from "@/lib/actions/article";
+import { updateArticle } from "@/lib/actions/article";
+import { Article } from "@/generated/prisma";
+import {
+  UpdateArticleInput,
+  updateArticleSchema,
+} from "@/validations/article-forms";
 
-export default function CreateArticleForm() {
-  const form = useForm<CreateArticleInput>({
-    resolver: zodResolver(createArticleSchema),
+interface UpdateArticleFormProps {
+  article: Article;
+}
+
+export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
+  const form = useForm<UpdateArticleInput>({
+    resolver: zodResolver(updateArticleSchema),
     defaultValues: {
-      headline: "",
-      summary: "",
-      content: "",
-      image: "",
-      editorsChoice: false,
+      id: article.id,
+      headline: article.headline ?? "",
+      summary: article.summary ?? "",
+      content: article.content ?? "",
+      image: article.image ?? "",
+      editorsChoice: article.editorsChoice ?? false,
     },
   });
 
-  async function onSubmit(data: CreateArticleInput) {
+  async function onSubmit(data: UpdateArticleInput) {
     try {
-      await createArticle(data);
+      await updateArticle(data);
       toast.success("Article updated");
-      form.reset();
     } catch (error) {
       toast.error("Failed to update article");
       console.error(error);
@@ -53,8 +59,8 @@ export default function CreateArticleForm() {
   return (
     <Card className="w-full max-w-lg mx-auto">
       <CardHeader>
-        <CardTitle>Create Article</CardTitle>
-        <CardDescription>Enter details to add a new article</CardDescription>
+        <CardTitle>Article ID: {article.id}</CardTitle>
+        <CardDescription>Edit the article details here</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -72,6 +78,8 @@ export default function CreateArticleForm() {
                 </FormItem>
               )}
             />
+
+            {/* Larger textarea for Summary */}
             <FormField
               control={form.control}
               name="summary"
@@ -79,12 +87,19 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Textarea
+                      {...field}
+                      rows={6}
+                      className="min-h-28 resize-y"
+                      placeholder="Write a short summary..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Larger textarea for Content */}
             <FormField
               control={form.control}
               name="content"
@@ -92,12 +107,18 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Textarea
+                      {...field}
+                      rows={12}
+                      className="min-h-40 resize-y"
+                      placeholder="Main article content..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="image"
@@ -111,6 +132,7 @@ export default function CreateArticleForm() {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="editorsChoice"
@@ -119,8 +141,8 @@ export default function CreateArticleForm() {
                   <FormControl>
                     <Checkbox
                       checked={field.value}
-                      onCheckedChange={(checked: boolean) =>
-                        field.onChange(checked)
+                      onCheckedChange={(checked) =>
+                        field.onChange(Boolean(checked))
                       }
                     />
                   </FormControl>
@@ -133,7 +155,10 @@ export default function CreateArticleForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Create</Button>
+
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Updating..." : "Update"}
+            </Button>
           </form>
         </Form>
       </CardContent>
