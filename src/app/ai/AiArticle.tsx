@@ -39,11 +39,10 @@ export default function AiArticle() {
               <CardDescription>{article.date}</CardDescription>
             </CardHeader>
             <CardContent className="break-all">
-              <Image
-                width="300"
-                height="300"
+              <img
                 src={article.img}
                 alt="Article image"
+                className="sm:float-left w-full sm:w-[320px] m-2 mx-4"
               />
               <pre className="whitespace-pre-line break-words">
                 {article.content}
