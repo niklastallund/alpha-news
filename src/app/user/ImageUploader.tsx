@@ -29,6 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Loader from "@/components/Loader";
 
 // If we need an update function? I dont know. fix
 
@@ -136,6 +137,7 @@ export default function ImageUploader() {
 
             <Button
               type="submit"
+              disabled={imageUploadForm.formState.isSubmitting}
               className="bg-green-500 cursor-pointer p-3 w-full"
             >
               Upload
@@ -143,8 +145,9 @@ export default function ImageUploader() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="bg-amber-200">
+      <CardFooter className="bg-amber-200 text-black">
         <p>{msg}</p>
+        {imageUploadForm.formState.isSubmitting && <Loader />}
       </CardFooter>
     </Card>
   );

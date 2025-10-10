@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { changeUserPw } from "@/lib/actions/edituser";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/SessionProvider";
+import Loader from "@/components/Loader";
 
 export default function PasswordForm() {
   const [msg, setMsg] = useState<string>("");
@@ -140,15 +141,9 @@ export default function PasswordForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="bg-amber-200">
+      <CardFooter className="bg-amber-200 text-black">
         <p>{msg}</p>
-        {formEditPw.formState.isSubmitting && (
-          <div className="w-full flex justify-center p-5 mx-auto">
-            <div className="w-20 h-20 rounded-full animate-spin border-8 border-blue-600 border-t-blue-200 text-2xl flex text-center items-center">
-              <div className="w-10 h-10 border-6 border-red-600 border-b-red-200 rounded-full mx-auto my-auto"></div>
-            </div>
-          </div>
-        )}
+        {formEditPw.formState.isSubmitting && <Loader />}
       </CardFooter>
     </Card>
   );
