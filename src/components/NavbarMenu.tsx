@@ -12,7 +12,6 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import AccountMenu from "./AccountMenu";
 
 // Temporary until we can fetch this data
 const categories: { title: string; href: string }[] = [
@@ -34,71 +33,67 @@ const categories: { title: string; href: string }[] = [
   },
 ];
 
-export default function NavbarMenu({
-  isLoggedIn,
-  isAdmin,
-}: {
-  isLoggedIn: boolean;
-  isAdmin: boolean;
-}) {
+export default function NavbarMenu({ isAdmin }: { isAdmin: boolean }) {
   return (
-    <NavigationMenu viewport={false}>
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link href="/">Home</Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>News</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
-              {categories.map((category) => (
-                <ListItem
-                  key={category.title}
-                  title={category.title}
-                  href={category.href}
-                ></ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>{`Editor's Choice`}</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
-              {categories.map((category) => (
-                <ListItem
-                  key={category.title}
-                  title={category.title}
-                  href={category.href}
-                ></ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <AccountMenu isLoggedIn={isLoggedIn} />
-
-        {/* Admin Menu, only visible if user is admin */}
-        {isAdmin && (
+      <NavigationMenu viewport={false}>
+        <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
+            <NavigationMenuLink
+              asChild
+              className={navigationMenuTriggerStyle()}
+            >
+              <Link href="/">Home</Link>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>News</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[200px] gap-4">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <Link href="#">Dashboard</Link>
-                  </NavigationMenuLink>
-                  <NavigationMenuLink asChild>
-                    <Link href="#">Statistics</Link>
-                  </NavigationMenuLink>
-                </li>
+              <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
+                {categories.map((category) => (
+                  <ListItem
+                    key={category.title}
+                    title={category.title}
+                    href={category.href}
+                  ></ListItem>
+                ))}
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-        )}
-      </NavigationMenuList>
-    </NavigationMenu>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>{`Editor's Choice`}</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
+                {categories.map((category) => (
+                  <ListItem
+                    key={category.title}
+                    title={category.title}
+                    href={category.href}
+                  ></ListItem>
+                ))}
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+
+          {/* Admin Menu, only visible if user is admin */}
+          {isAdmin && (
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[200px] gap-4">
+                  <li>
+                    <NavigationMenuLink asChild>
+                      <Link href="#">Dashboard</Link>
+                    </NavigationMenuLink>
+                    <NavigationMenuLink asChild>
+                      <Link href="#">Statistics</Link>
+                    </NavigationMenuLink>
+                  </li>
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          )}
+        </NavigationMenuList>
+      </NavigationMenu>
   );
 }
 

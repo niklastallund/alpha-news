@@ -3,6 +3,8 @@ import NavbarMenu from "./NavbarMenu";
 import { getRole, getSessionData } from "@/lib/actions/sessiondata";
 import Link from "next/link";
 import { ModeToggle } from "./theme-toggle";
+import AccountMenu from "./AccountMenu";
+import MobileNav from "./MobileNav";
 
 export default async function Navbar() {
   // Session checks for the navbar menu
@@ -12,22 +14,37 @@ export default async function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 border-b-2 border-border backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center justify-center gap-5 p-2">
-        <Link
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <Image
-            src="/tmplogo.png"
-            alt="Logo"
-            width={100}
-            height={100}
-            className="w-auto mx-0 px-5"
-          />
-        </Link>
-        <NavbarMenu isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
+      <div className="container mx-auto max-w-7xl px-4">
+        <div className="flex items-center justify-between py-2">
+          <Link
+            href="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse flex-shrink-0"
+          >
+            <Image
+              src="/tmplogo.png"
+              alt="Logo"
+              width={40}
+              height={40}
+              className="h-12 w-auto"
+            />
+          </Link>
 
-        <ModeToggle />
+          {/* Desktop menu */}
+          <div className="hidden md:flex-1 md:flex items-center justify-center min-w-0">
+            <NavbarMenu isAdmin={isAdmin} />
+          </div>
+
+          {/* Desktop actions */}
+          <div className="hidden md:flex items-center gap-3">
+            <AccountMenu isLoggedIn={isLoggedIn} />
+            <ModeToggle />
+          </div>
+
+          {/* Mobile hamburger (Sheet) */}
+          <div className="md:hidden">
+            <MobileNav isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
+          </div>
+        </div>
       </div>
     </nav>
   );
