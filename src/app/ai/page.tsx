@@ -13,7 +13,7 @@ export default function page() {
         <div className="text-4xl">🤖 AI NEWS</div>
 
         <div className="mt-5">
-          <Tabs defaultValue="article" className="w-full">
+          <Tabs defaultValue="tools" className="w-full">
             <TabsList>
               <TabsTrigger value="article">Article</TabsTrigger>
               <TabsTrigger value="tools">Newest AI Tools</TabsTrigger>
