@@ -9,7 +9,7 @@ import AiArticle from "./AiArticle";
 export default function page() {
   return (
     <Page>
-      <div className="p-2 w-full text-center">
+      <div className="p-2 w-full">
         <div className="text-4xl">🤖 AI NEWS</div>
 
         <div className="mt-5">
