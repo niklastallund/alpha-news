@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -22,12 +21,11 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { SignInFormSchema } from "@/validations/betterauthforms";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { useSession } from "@/lib/SessionProvider";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
 
@@ -37,6 +35,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function SignInForm() {
   const { session } = useSession();
   const router = useRouter();
+  const [signInError, setSignInError] = useState<{ msg: string }>({ msg: "" });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -46,17 +45,16 @@ export default function SignInForm() {
     },
   });
 
-  /**
-   *
-   * @param values Values must contain email and password, based on SignInFormSchema.
-   */
   async function onSubmit(values: FormValues) {
+    setSignInError({ msg: "" }); // Clear previous errors
+
     const { error } = await authClient.signIn.email({
       email: values.email,
       password: values.password,
     });
+
     if (error) {
-      alert(error.message);
+      setSignInError({ msg: error.message || "Sign in failed." });
     } else {
       // Signed in! Reload to make sure the provider gets the session, and then be redirected.
       window.location.reload();
@@ -75,13 +73,8 @@ export default function SignInForm() {
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
         <CardDescription>
-          Enter your details below to create an Account
+          Enter your details below to sign in to your Account
         </CardDescription>
-        <CardAction>
-          <Button variant="link" asChild>
-            <Link href="/sign-up">Sign Up</Link>
-          </Button>
-        </CardAction>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -112,6 +105,10 @@ export default function SignInForm() {
                 </FormItem>
               )}
             />
+
+            <div className="text-red-600 break-all">
+              {signInError.msg && signInError.msg}
+            </div>
 
             <Button className="w-full" type="submit">
               Sign In
