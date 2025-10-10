@@ -4,6 +4,7 @@ import React from "react";
 import AiTools from "./AiTools";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AiArticle from "./AiArticle";
 
 export default function page() {
   return (
@@ -18,7 +19,7 @@ export default function page() {
               <TabsTrigger value="tools">Newest AI Tools</TabsTrigger>
             </TabsList>
             <TabsContent value="article">
-              <p>Article under construction...</p>
+              <AiArticle />
             </TabsContent>
             <TabsContent value="tools">
               <AiTools />
