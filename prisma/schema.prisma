@@ -23,6 +23,7 @@ model User {
   stripeCustomerId String?
   sessions         Session[]
   accounts         Account[]
+  article          Article[]
 
   @@unique([email])
   @@map("user")
@@ -80,11 +81,12 @@ model Article {
   summary    String?
   content    String?
   views      Int
+  author     User[]
   image      String?
+  category   Category[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  editorsChoice Boolean @default(false)
 }
 
 model Category {
