@@ -9,6 +9,7 @@ import {
 import { getRole } from "./sessiondata";
 import { notFound } from "next/navigation";
 import { prisma } from "../prisma";
+import { revalidatePath } from "next/cache";
 
 export async function createArticle(formData: CreateArticleInput) {
   const role = await getRole();
@@ -27,6 +28,7 @@ export async function createArticle(formData: CreateArticleInput) {
     },
   });
 
+  revalidatePath("/admin/article");
   return article;
 }
 
@@ -48,5 +50,19 @@ export async function updateArticle(formData: UpdateArticleInput) {
     },
   });
 
+  revalidatePath("/admin/article");
+  return article;
+}
+
+export async function deleteArticle(id: number) {
+  const role = await getRole();
+
+  if (role !== "admin") return notFound();
+
+  const article = await prisma.article.delete({
+    where: { id },
+  });
+
+  revalidatePath("/admin/article");
   return article;
 }

@@ -1,10 +1,12 @@
 import Page from "@/components/Page";
 import CreateArticleForm from "./forms/CreateArticle";
 import { prisma } from "@/lib/prisma";
+import UpdateArticleDialog from "./forms/UpdateArticleDialog";
+import { DeleteArticleButton } from "./forms/DeleteArticle";
 
 export default async function AdminArticlePage() {
   const articles = await prisma.article.findMany({
-    orderBy: { updatedAt: "asc" },
+    orderBy: { updatedAt: "desc" },
     take: 10,
   });
 
@@ -35,10 +37,14 @@ export default async function AdminArticlePage() {
                           {article.summary || "No summary"}
                         </p>
                       </div>
-                      {/*<div className="flex items-start gap-2 shrink-0">
-                        <EditGenreDialog article={article} />
-                        <DeleteGenreButton id={article.id} name={article.name} />
-                      </div>*/}
+
+                      <div className="shrink-0 flex items-center gap-2">
+                        <UpdateArticleDialog article={article} />
+                        <DeleteArticleButton
+                          articleId={article.id}
+                          articleHeadline={article.headline}
+                        />
+                      </div>
                     </li>
                   ))}
                 </ul>

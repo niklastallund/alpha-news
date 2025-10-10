@@ -18,10 +18,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { createArticle, updateArticle } from "@/lib/actions/article";
+import { updateArticle } from "@/lib/actions/article";
 import { Article } from "@/generated/prisma";
 import {
   UpdateArticleInput,
@@ -58,8 +59,8 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
   return (
     <Card className="w-full max-w-lg mx-auto">
       <CardHeader>
-        <CardTitle>Create Article</CardTitle>
-        <CardDescription>Enter details to add a new article</CardDescription>
+        <CardTitle>Article ID: {article.id}</CardTitle>
+        <CardDescription>Edit the article details here</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -77,6 +78,8 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 </FormItem>
               )}
             />
+
+            {/* Larger textarea for Summary */}
             <FormField
               control={form.control}
               name="summary"
@@ -84,12 +87,19 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Textarea
+                      {...field}
+                      rows={6}
+                      className="min-h-28 resize-y"
+                      placeholder="Write a short summary..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Larger textarea for Content */}
             <FormField
               control={form.control}
               name="content"
@@ -97,12 +107,18 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Textarea
+                      {...field}
+                      rows={12}
+                      className="min-h-40 resize-y"
+                      placeholder="Main article content..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="image"
@@ -116,6 +132,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="editorsChoice"
@@ -124,8 +141,8 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                   <FormControl>
                     <Checkbox
                       checked={field.value}
-                      onCheckedChange={(checked: boolean) =>
-                        field.onChange(checked)
+                      onCheckedChange={(checked) =>
+                        field.onChange(Boolean(checked))
                       }
                     />
                   </FormControl>
@@ -138,7 +155,10 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit">Create</Button>
+
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Updating..." : "Update"}
+            </Button>
           </form>
         </Form>
       </CardContent>
