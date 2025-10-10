@@ -23,8 +23,8 @@ export default async function Navbar() {
             <Image
               src="/tmplogo.png"
               alt="Logo"
-              width={40}
-              height={40}
+              width={240}
+              height={240}
               className="h-12 w-auto"
             />
           </Link>
