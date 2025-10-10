@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -23,7 +22,6 @@ import { authClient } from "@/lib/auth-client";
 import { SignUpFormSchema } from "@/validations/betterauthforms";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -80,11 +78,18 @@ export default function SignUpForm() {
           window.location.reload();
         }
       } else {
-        setSignUpError({ msg: result.error ?? "Signup failed." });
+        const errorMessage =
+          typeof result.error === "string"
+            ? result.error
+            : result.error?.body?.message ||
+              result.error?.message ||
+              "Signup failed.";
+        setSignUpError({ msg: errorMessage });
       }
     } catch (error) {
-      setSignUpError({ msg: String(error) });
-      //console.log("Network error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Network error occurred";
+      setSignUpError({ msg: errorMessage });
     }
   }
 
@@ -102,11 +107,6 @@ export default function SignUpForm() {
         <CardDescription>
           Enter your details below to create an Account
         </CardDescription>
-        <CardAction>
-          <Button variant="link" asChild>
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-        </CardAction>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -163,7 +163,7 @@ export default function SignUpForm() {
                 </FormItem>
               )}
             />
-            <div className="text-red-600">
+            <div className="text-red-600 break-all">
               {signUpError.msg && signUpError.msg}
             </div>
             <Button className="w-full" type="submit">
