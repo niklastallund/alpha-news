@@ -1,3 +1,10 @@
+import Page from "@/components/Page";
+import CreateArticleForm from "./forms/CreateArticle";
+
 export default function AdminPage() {
-  return <div>Admin Page</div>;
+  return (
+    <Page>
+      <CreateArticleForm />
+    </Page>
+  );
 }
