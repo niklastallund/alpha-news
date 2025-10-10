@@ -1,6 +1,6 @@
-
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -76,23 +76,29 @@ model Verification {
 }
 
 model Article {
-  id         Int      @id @default(autoincrement())
-  headline   String?
-  summary    String?
-  content    String?
-  views      Int
-  author     User[]
-  image      String?
-  category   Category[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            Int     @id @default(autoincrement())
+  headline      String?
+  summary       String?
+  content       String?
+  image         String?
   editorsChoice Boolean @default(false)
+  views         Int     @default(0)
+
+  author   User[]
+  category Category[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
+  id   Int    @id @default(autoincrement())
+  name String
+
   articles Article[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Subscription {
