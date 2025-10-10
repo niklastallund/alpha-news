@@ -18,32 +18,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  CreateArticleInput,
-  createArticleSchema,
-} from "@/validations/article-forms";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { createArticle } from "@/lib/actions/article";
+import { createArticle, updateArticle } from "@/lib/actions/article";
+import { Article } from "@/generated/prisma";
+import {
+  UpdateArticleInput,
+  updateArticleSchema,
+} from "@/validations/article-forms";
 
-export default function CreateArticleForm() {
-  const form = useForm<CreateArticleInput>({
-    resolver: zodResolver(createArticleSchema),
+interface UpdateArticleFormProps {
+  article: Article;
+}
+
+export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
+  const form = useForm<UpdateArticleInput>({
+    resolver: zodResolver(updateArticleSchema),
     defaultValues: {
-      headline: "",
-      summary: "",
-      content: "",
-      image: "",
-      editorsChoice: false,
+      id: article.id,
+      headline: article.headline ?? "",
+      summary: article.summary ?? "",
+      content: article.content ?? "",
+      image: article.image ?? "",
+      editorsChoice: article.editorsChoice ?? false,
     },
   });
 
-  async function onSubmit(data: CreateArticleInput) {
+  async function onSubmit(data: UpdateArticleInput) {
     try {
-      await createArticle(data);
+      await updateArticle(data);
       toast.success("Article updated");
-      form.reset();
     } catch (error) {
       toast.error("Failed to update article");
       console.error(error);
