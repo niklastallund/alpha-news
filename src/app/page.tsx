@@ -1,9 +1,3 @@
-// import { ModeToggle } from "@/components/theme-toggle";
-
-// export default function Home() {
-//   return <></>;
-// }
-// import { ModeToggle } from "@/components/theme-toggle";
 import Ticker from "@/components/ticker";
 
 export default function Home() {

@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,6 +27,7 @@ import {
   UpdateArticleInput,
   updateArticleSchema,
 } from "@/validations/article-forms";
+import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 
 interface UpdateArticleFormProps {
   article: Article;
@@ -57,14 +57,14 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card className="w-full mx-auto">
       <CardHeader>
         <CardTitle>Article ID: {article.id}</CardTitle>
         <CardDescription>Edit the article details here</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             <FormField
               control={form.control}
               name="headline"
@@ -72,7 +72,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Headline</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <ForwardRefEditor markdown={field.value || ""} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -87,12 +87,12 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      rows={6}
-                      className="min-h-28 resize-y"
-                      placeholder="Write a short summary..."
-                    />
+                    <div className="max-h-60 overflow-y-auto">
+                      <ForwardRefEditor
+                        markdown={field.value || ""}
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,12 +107,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      rows={12}
-                      className="min-h-40 resize-y"
-                      placeholder="Main article content..."
-                    />
+                    <ForwardRefEditor markdown={field.value || ""} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,7 +119,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image</FormLabel>
+                  <FormLabel>Image link</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

@@ -22,7 +22,7 @@ export default function UpdateArticleDialog({ article }: { article: Article }) {
           </Button>
         }
       </DialogTrigger>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl md:max-w-3xl  lg:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update article</DialogTitle>
         </DialogHeader>
