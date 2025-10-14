@@ -5,37 +5,39 @@ import { generateArticle, GeneratedArticle } from './ai';
 import Genai from './Genai';
 import { set } from 'zod';
 import Loader from '@/components/Loader';
+import Page from '@/components/Page';
+import { Button } from '@/components/ui/button';
 
-export default function Page() {
+export default function AiPage() {
 
-    const [prompt, setPrompt] = useState("ai in school");
-    const [category, setCategory] = useState("education");
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const [article, setArticle] = useState<GeneratedArticle | undefined >();
-
-
-    const testGen = async () => {
-        setLoading(true);
-        const art: GeneratedArticle = await generateArticle(prompt, category, 0.7);
-
-        setArticle(art);
-        setLoading(false);
+    const [article, setArticle] = useState<GeneratedArticle>();
+    const [importGen, setImportGen] = useState<boolean>(true);
+    const close = () => {
+        setImportGen(false);
     }
 
-
   return (
-    <div>
-        AI TEST PAGE<br/><br/>
-    prompt:
-    <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
-    <br/><br/>
-    category:
-    <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} />
-    <br/><br/>
-    <button onClick={async () => { await testGen(); }}>Test</button>
-    <br/><br/>
-    {loading ? <Loader /> : <Genai article={article} />}
-    </div>
+    <Page>
+        <div>
+
+            <Button onClick={() => setImportGen(true)}>Generate with ai</Button><br/>
+
+            {importGen && <Genai setter={setArticle} close={close} img={false}></Genai>}
+            <br/>
+
+          <br/><span className="font-bold">(Article form)</span>
+          <br/><br/>
+          Headline: {article?.headline}
+          <br/><br/>
+          Category: {article?.category}
+          <br/><br/>
+          Summery: {article?.summery}
+          <br/><br/>
+          Content: {article?.content}
+          <br/><br/>
+          Img: {article?.imageUrl}
+          
+        </div>
+    </Page>
   )
 }

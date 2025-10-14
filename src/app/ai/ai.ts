@@ -1,5 +1,7 @@
 "use server";
 
+
+
 import { google } from "@ai-sdk/google";
 import { googleTools } from "@ai-sdk/google/internal";
 import { generateObject, generateText } from "ai";
@@ -7,9 +9,12 @@ import { title } from "process";
 import { z } from "zod";
 import { ca } from "zod/v4/locales";
 
+
 // So this we need for image generation
 import { experimental_generateImage as generateImage } from 'ai';
 import { openai } from '@ai-sdk/openai';
+
+
 
 // For uploading
 import {
@@ -17,6 +22,8 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+
+
 
 const s3Client = new S3Client({
   region: "auto",
@@ -35,6 +42,8 @@ const articlePromptSchema = z.object({
     content: z.string(),
 })
 
+
+
 export type GeneratedArticleBase = {
     headline: string;
     summery: string;
@@ -42,22 +51,22 @@ export type GeneratedArticleBase = {
     category: string;
 }
 
+
+
 export type GeneratedArticle = {
     headline: string;
     summery: string;
     content: string;
     category: string;
-    imageUrl: string;
+    imageUrl?: string;
 }
 
 
 // ai npm:
 // npm install ai
 // npm install @ai-sdk/google
-
 // Se ai sdk docs https://ai-sdk.dev/docs/getting-started/installation
-
-async function genPureArticle(prompt:string, category:string, temp:number = 0.7) {
+async function genPureArticle(prompt:string, category:string, temp:number = 0.7) : Promise<{success: boolean, pureArticle?: string}> {
 
     const { text } = await generateText({
         model: google("gemini-2.5-flash"),
@@ -68,7 +77,7 @@ async function genPureArticle(prompt:string, category:string, temp:number = 0.7)
         temperature: temp,
     })
 
-    return text;
+    return {success: true, pureArticle: text};
 
 }
 
@@ -80,29 +89,38 @@ async function genPureArticle(prompt:string, category:string, temp:number = 0.7)
  * @param category 
  * @returns 
  */
-async function gererateNewsObject(prompt:string, category: string, temp:number = 0.7) : Promise<GeneratedArticleBase> {
+async function gererateNewsObject(prompt:string, category: string, temp:number = 0.7) : Promise<{success: boolean, object?: GeneratedArticleBase, msg?: string}> {
 
-    const article = await genPureArticle(prompt, category, temp);
+    
+    const getPureArticle = await genPureArticle(prompt, category, temp);
+    if (!getPureArticle.success) return {success: false, msg: "Could not generate pure article (step 1)"}
+    
+    try {
+        const { object } = await generateObject({
+            model: google("gemini-2.5-flash"),
+            // Ändra prompten till denna:
+            prompt: `Based on "${getPureArticle.pureArticle}" that is an article in the category ${category}, create three fields: title, summery och content. Title should be a good headline between 10 and 100 chars suitable for the category ${category} in a newspaper. Summery should be a brief summary of the article between 100 and 400 chars. Content should be like the article, but with MD formatting, min 800 chars and max 2500 chars. Only return JSON format with these three fields and without any other text.`,
+            schema: articlePromptSchema
+        })
 
-   const { object } = await generateObject({
-        model: google("gemini-2.5-flash"),
-        // Ändra prompten till denna:
-        prompt: `Based on "${article}" that is an article in the category ${category}, create three fields: title, summery och content. Title should be a good headline between 10 and 100 chars suitable for the category ${category} in a newspaper. Summery should be a brief summary of the article between 100 and 400 chars. Content should be like the article, but with MD formatting, min 800 chars and max 2500 chars. Only return JSON format with these three fields and without any other text.`,
+        return {success: true, object: {...object, category: category}, msg: "Generated pure article"};
 
-        schema: articlePromptSchema
-    })
+    } catch(e) {
+        return {success: false, msg: JSON.stringify(e)}
+    }
 
-
-
-    return {...object, category: category};
 }
+
+
+
+
 /**
  * Genererar en bild med DALL-E 3 baserat på artikelns rubrik och sammanfattning,
  * och laddar sedan upp den till Cloudflare R2.
  * @param article Det genererade artikelobjektet.
  * @returns URL till den uppladdade bilden.
  */
-async function generateImageForArticle(article: GeneratedArticleBase): Promise<string> {
+async function generateImageForArticle(article: GeneratedArticleBase): Promise<{success: boolean, imgUrl?: string, msg?: string}> {
 
     // // Steg 1: Generera bilden med DALL-E 3
     // console.log("Generating image...");
@@ -116,12 +134,9 @@ async function generateImageForArticle(article: GeneratedArticleBase): Promise<s
     // // Detta är det mest effektiva och korrekta sättet.
     // const imageBuffer = Buffer.from(image.base64, 'base64');
     // const contentType = 'image/png'; 
-    
     // const filename = `art${Date.now()}_${crypto.randomUUID()}.png`;
 
-
-    // // Ladda upp bild
-    
+    // // Ladda upp bild    
     // console.log("Uploading image...");
     // try {
     //     await s3Client.send(
@@ -142,7 +157,8 @@ async function generateImageForArticle(article: GeneratedArticleBase): Promise<s
     // // Skapa och returnera den publika URL:en
     // const publicUrl = `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${filename}`;
     // // OBS: Du kan behöva en anpassad domän (t.ex. `https://pub.example.com/`) om du har konfigurerat R2 med en.
-    return "publicUrl";
+    return {success: true, msg: "Inactive function for now."};
+
 }
 
 
@@ -154,10 +170,18 @@ async function generateImageForArticle(article: GeneratedArticleBase): Promise<s
  * @param category Enter the category of the article.
  * @returns An object containing the headline, summery, content, category, and an imageUrl.
  */
-export async function generateArticle(prompt:string, category: string, temp:number) : Promise<GeneratedArticle> {
+export async function generateArticle(prompt:string, category: string, temp:number, genImg:boolean = false) : Promise<{success: boolean, article?: GeneratedArticle, msg?: string}> {
+
 
     const articleBase = await gererateNewsObject(prompt, category, temp);
+    if (!articleBase.object) return {success: false, msg: "Could not generate article as obj."}
+    
+    
+    if (genImg) {
+        const img = await generateImageForArticle(articleBase.object);
+        if (!img.success) return {success: false, msg: "Could not generate image."}
+        return {success: true, article: {...articleBase.object, imageUrl: img.imgUrl}}
+    }
 
-    return {...articleBase, imageUrl: await generateImageForArticle(articleBase)}
-
+    return {success: true, article: {...articleBase.object}}
 }
