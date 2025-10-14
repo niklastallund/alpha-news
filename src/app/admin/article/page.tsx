@@ -16,12 +16,11 @@ export default async function AdminArticlePage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-6 items-start">
             {/* Left: Create form */}
-            <div className="w-full lg:w-1/3">
+            <div className="w-full lg:w-1/2">
               <CreateArticleForm />
             </div>
-
             {/* Right: Articles list */}
-            <div className="w-full lg:w-2/3">
+            <div className="w-full lg:w-1/2">
               {articles.length > 0 ? (
                 <ul className="space-y-3">
                   {articles.map((article) => (
@@ -30,10 +29,10 @@ export default async function AdminArticlePage() {
                       className="flex items-start justify-between rounded-xl border bg-card p-4 shadow-sm"
                     >
                       <div className="min-w-0 flex-1 pr-4">
-                        <h3 className="font-medium break-words">
+                        <h3 className="font-medium truncate">
                           {article.headline || "Untitled"}
                         </h3>
-                        <p className="text-sm text-muted-foreground italic break-words">
+                        <p className="text-sm text-muted-foreground italic truncate">
                           {article.summary || "No summary"}
                         </p>
                       </div>

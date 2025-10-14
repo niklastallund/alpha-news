@@ -2,7 +2,7 @@
 // ForwardRefEditor.tsx
 // This component wraps the MDXEditor with a set of default plugins and forwards refs.
 // It uses dynamic import to ensure that the MDXEditor is only loaded on the client side.
-// Use this if you need to pass a ref to the editor, for example to get the content.
+// Use this component wherever you need an MDXEditor with the predefined setup.
 
 import dynamic from "next/dynamic";
 import { forwardRef } from "react";

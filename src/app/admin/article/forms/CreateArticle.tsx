@@ -26,6 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createArticle } from "@/lib/actions/article";
+import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 
 export default function CreateArticleForm() {
   const form = useForm<CreateArticleInput>({
@@ -51,7 +52,7 @@ export default function CreateArticleForm() {
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card className="w-full mx-auto">
       <CardHeader>
         <CardTitle>Create Article</CardTitle>
         <CardDescription>Enter details to add a new article</CardDescription>
@@ -66,7 +67,7 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Headline</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <ForwardRefEditor markdown={field.value || ""} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -79,7 +80,7 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <ForwardRefEditor markdown={field.value || ""} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,7 +93,7 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <ForwardRefEditor markdown={field.value || ""} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -103,7 +104,7 @@ export default function CreateArticleForm() {
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image</FormLabel>
+                  <FormLabel>Image link</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
