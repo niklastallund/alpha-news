@@ -13,7 +13,7 @@ export default async function Navbar() {
   const isAdmin = (await getRole()) === "admin";
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 border-b-2 border-border backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 bg-background/100 border-b-2 border-border">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between py-2">
           <Link
