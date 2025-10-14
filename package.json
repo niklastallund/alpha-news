@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.20",
+    "@ai-sdk/openai": "^2.0.52",
     "@aws-sdk/client-s3": "^3.906.0",
     "@better-auth/stripe": "^1.3.27",
     "@hookform/resolvers": "^5.2.2",
@@ -23,6 +25,7 @@
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
+    "ai": "^5.0.68",
     "axios": "^1.12.2",
     "better-auth": "^1.3.27",
     "cheerio": "^1.1.2",
@@ -37,6 +40,7 @@
     "react-dom": "19.1.0",
     "react-fast-marquee": "^1.6.5",
     "react-hook-form": "^7.64.0",
+    "react-markdown": "^10.1.0",
     "sonner": "^2.0.7",
     "stripe": "^18.5.0",
     "tailwind-merge": "^3.3.1",

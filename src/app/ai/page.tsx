@@ -1,32 +1,41 @@
-import Page from "@/components/Page";
+"use client"
 
-import React from "react";
-import AiTools from "./AiTools";
+import React, { useState } from 'react'
+import { generateArticle, GeneratedArticle } from './ai';
+import Genai from './Genai';
+import { set } from 'zod';
+import Loader from '@/components/Loader';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AiArticle from "./AiArticle";
+export default function Page() {
 
-export default function page() {
+    const [prompt, setPrompt] = useState("ai in school");
+    const [category, setCategory] = useState("education");
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const [article, setArticle] = useState<GeneratedArticle | undefined >();
+
+
+    const testGen = async () => {
+        setLoading(true);
+        const art: GeneratedArticle = await generateArticle(prompt, category, 0.7);
+
+        setArticle(art);
+        setLoading(false);
+    }
+
+
   return (
-    <Page>
-      <div className="p-2 w-full">
-        <div className="text-4xl">🤖 AI NEWS</div>
-
-        <div className="mt-5">
-          <Tabs defaultValue="tools" className="w-full">
-            <TabsList>
-              <TabsTrigger value="article">Article</TabsTrigger>
-              <TabsTrigger value="tools">Newest AI Tools</TabsTrigger>
-            </TabsList>
-            <TabsContent value="article">
-              <AiArticle />
-            </TabsContent>
-            <TabsContent value="tools">
-              <AiTools />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </Page>
-  );
+    <div>
+        AI TEST PAGE<br/><br/>
+    prompt:
+    <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} />
+    <br/><br/>
+    category:
+    <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} />
+    <br/><br/>
+    <button onClick={async () => { await testGen(); }}>Test</button>
+    <br/><br/>
+    {loading ? <Loader /> : <Genai article={article} />}
+    </div>
+  )
 }
