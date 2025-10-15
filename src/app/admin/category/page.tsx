@@ -3,6 +3,7 @@ import Page from "@/components/Page";
 import { prisma } from "@/lib/prisma";
 import CreateCategoryForm from "./forms/CreateCategory";
 import UpdateCategoryDialog from "./forms/UpdateCategoryDialog";
+import { DeleteCategoryButton } from "./forms/DeleteCategory";
 
 export default async function AdminCategoryPage() {
   const categories = await prisma.category.findMany({
@@ -39,10 +40,10 @@ export default async function AdminCategoryPage() {
 
                       <div className="shrink-0 flex items-center gap-2">
                         <UpdateCategoryDialog category={category} />
-                        {/* <DeletecategoryButton
+                        <DeleteCategoryButton
                           categoryId={category.id}
-                          categoryHeadline={category.headline}
-                        /> */}
+                          categoryName={category.name}
+                        />
                       </div>
                     </li>
                   ))}

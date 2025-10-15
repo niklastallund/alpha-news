@@ -47,3 +47,16 @@ export async function updateCategory(formData: UpdateCategoryInput) {
   revalidatePath("/admin/category");
   return category;
 }
+
+export async function deleteCategory(id: number) {
+  const role = await getRole();
+
+  if (role !== "admin") return notFound();
+
+  const category = await prisma.category.delete({
+    where: { id },
+  });
+
+  revalidatePath("/admin/category");
+  return category;
+}
