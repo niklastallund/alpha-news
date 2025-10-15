@@ -16,6 +16,8 @@ export default function AiPage() {
         setImportGen(false);
     }
 
+
+
   return (
     <Page>
         <div>
@@ -25,17 +27,17 @@ export default function AiPage() {
             {importGen && <Genai setter={setArticle} close={close} img={false}></Genai>}
             <br/>
 
-          <br/><span className="font-bold">(Article form)</span>
-          <br/><br/>
-          Headline: {article?.headline}
-          <br/><br/>
-          Category: {article?.category}
-          <br/><br/>
-          Summery: {article?.summery}
-          <br/><br/>
-          Content: {article?.content}
-          <br/><br/>
-          Img: {article?.imageUrl}
+            <br/><span className="font-bold">(Article form)</span>
+            <br/><br/>
+            Headline: {article?.headline}
+            <br/><br/>
+            Category: {article?.category}
+            <br/><br/>
+            Summery: {article?.summery}
+            <br/><br/>
+            Content: {article?.content}
+            <br/><br/>
+            Img: {article?.imageUrl}
           
         </div>
     </Page>
