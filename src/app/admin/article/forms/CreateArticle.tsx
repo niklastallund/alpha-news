@@ -127,7 +127,7 @@ export default function CreateArticleForm() {
               control={form.control}
               name="editorsChoice"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3">
+                <FormItem className="flex flex-row items-start space-x-1">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
