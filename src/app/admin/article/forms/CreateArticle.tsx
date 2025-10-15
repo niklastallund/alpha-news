@@ -28,8 +28,46 @@ import { toast } from "sonner";
 import { createArticle } from "@/lib/actions/article";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useRef, useState } from "react";
+import { GeneratedArticle } from "@/app/ai/ai";
+import Genai from "@/app/ai/Genai";
+import { MDXEditor, MDXEditorMethods } from "@mdxeditor/editor";
 
 export default function CreateArticleForm() {
+  //#region From tobbe.
+  // This is for generating ai, so i added this.
+  const [importedArticle, setImportedArticle] = useState<GeneratedArticle>(); // Will hold the generated article after import.
+  const [importGen, setImportGen] = useState<boolean>(false); // This is for show/hide the import component.
+
+  const close = () => {
+    setImportGen(false);
+  };
+
+  const ref = useRef<MDXEditorMethods>(null);
+  const [editorKey, setEditorKey] = useState<string>(Math.random().toString()); // Lägg till ett state för nyckeln
+
+  // Så vi kör en useEffect här, och uppdaterar innehållet i formuläret om article blir satt.
+
+  useEffect(() => {
+    if (importedArticle) {
+      // Fyll formuläret med article-datan:
+      form.reset({
+        headline: importedArticle.headline,
+        summary: importedArticle.summery,
+        content: importedArticle.content,
+        image: importedArticle.imageUrl || form.getValues("image"),
+        editorsChoice: form.getValues("editorsChoice"),
+      });
+
+      // So lets keep all three solutions.
+      form.setValue("content", importedArticle.content);
+      ref.current?.setMarkdown(importedArticle.content);
+      setEditorKey(Math.random().toString());
+    }
+  }, [importedArticle]);
+
+  //#endregion tobbe
+
   const form = useForm<CreateArticleInput>({
     resolver: zodResolver(createArticleSchema),
     defaultValues: {
@@ -59,6 +97,22 @@ export default function CreateArticleForm() {
         <CardDescription>Enter details to add a new article</CardDescription>
       </CardHeader>
       <CardContent>
+        {!importGen && (
+          <Button onClick={() => setImportGen(true)}>Generate with ai</Button>
+        )}
+        <br />
+
+        {
+          //Importeringskomponent:
+          importGen && (
+            <Genai
+              setter={setImportedArticle}
+              close={close}
+              img={false}
+            ></Genai>
+          )
+        }
+        <br />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <FormField
@@ -104,7 +158,12 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <ForwardRefEditor markdown={field.value || ""} {...field} />
+                    <ForwardRefEditor
+                      markdown={field.value || ""}
+                      {...field}
+                      ref={ref}
+                      key={editorKey}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
