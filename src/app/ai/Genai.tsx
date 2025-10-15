@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { generateArticle, GeneratedArticle } from './ai';
+import { dbg_focusOnImage, generateArticle, GeneratedArticle } from './ai';
 import Markdown from 'react-markdown'
 import z from 'zod';
 import {
@@ -19,19 +19,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/Loader';
+import { Checkbox } from '@/components/ui/checkbox';
+import  Image  from "next/image"
 
 // This component generates an article based on a prompt and a category. You can also set temp. After generation, you can import it.
 // THe import it handled by the PASSED setter function, so that is handled by the parent, this component only passes the generated
 // article as the type GeneratedArticle.
 // The idea is that this component is visible based an a state in the parent. So pass a close function to close on import, handled here after pressing import.
 // If you also want to generate an img, this is up to the parent to tell (set img=true).
-
 // 
 
 
 
 interface Props {
-  setter: (article: GeneratedArticle) => void, // So this is the parent
+  setter: (article: GeneratedArticle) => void,
   close: () => void,
   img?: boolean
 }
@@ -43,8 +44,11 @@ interface Props {
 // Zod schema:
 const GenAiSchema = z.object({
   prompt: z.string(),
-  temp: z.string(), // numerisk sträng :) Kanske gör en regexkontroll så det följer formatet 0.0 - 1.0 som jag tror är giltigt. Formulär step 0.1 min-0 max-1 border gå
+  temp: z.string().regex(/^(?:0(?:[.,]\d+)?|1(?:[.,]0+)?)$/, {
+      message: "Temp måste vara mellan '0' och '1.0' (använd punkt eller komma)."
+  }),
   category: z.string(),
+  img: z.string(),
 })
 
 
@@ -53,13 +57,13 @@ const GenAiSchema = z.object({
 export default function Genai( { setter, close: closeFun = () => null, img = false }: Props ) {
 
 
-
   const genForm = useForm<z.infer<typeof GenAiSchema>>({
     resolver: zodResolver(GenAiSchema),
     defaultValues: {
       prompt: "",
       temp: "0.7",
-      category: "", // Maybe here we get all the cats from db?
+      category: "", // Maybe here we get all the cats from db? Yes.
+      img: "false"
     },
   });
 
@@ -70,25 +74,28 @@ export default function Genai( { setter, close: closeFun = () => null, img = fal
 
 
 
-  const generate = async (formData:FormData) : Promise<{success: boolean, msg: string}> => {
+    const generate = async (formData:FormData) : Promise<{success: boolean, msg: string}> => {
 
-      const prompt = formData.get("prompt") as string ?? "";
-      const category = formData.get("category") as string;
-      const temp = formData.get("temp") as string ?? "0.7";
-      
+    const prompt = formData.get("prompt") as string ?? "";
+    const category = formData.get("category") as string;
+    const temp = formData.get("temp") as string ?? "0.7";
+    const img : boolean = (formData.get("img") as string === "true") ? true : false;
+    setLoading(true);
 
-      setLoading(true);
-      
-      const art = await generateArticle(prompt, category, Number.parseFloat(temp));
+    // focusOnImage
+    setMsg("Generating article... Can take a while");
+    const art = await generateArticle(prompt, category, Number.parseFloat(temp.replace(",", ".")), img);
+    // const art = await dbg_focusOnImage();
 
-      if (art.article) {
-        setArticle(art.article);
-        setLoading(false);
-        return {success: true, msg: "Generated article."}
-      } else {
-        return {success: false, msg: art.msg ?? "Something went wrong"}
-      }
-      
+    if (art.success) {
+      setArticle(art.data);
+      setLoading(false);
+      return {success: true, msg: "Generated article."}
+    } else {
+      setLoading(false);
+      return {success: false, msg: art.msg ?? "Something went wrong"}
+    }
+    
 
   }
 
@@ -103,11 +110,11 @@ export default function Genai( { setter, close: closeFun = () => null, img = fal
       formData.append("prompt", values.prompt);
       formData.append("category", values.category);
       formData.append("temp", values.temp);
+      formData.append("img", values.img)
   
       const result = await generate(formData);
   
       setMsg(result.msg);
-
 
     }
   
@@ -131,7 +138,7 @@ export default function Genai( { setter, close: closeFun = () => null, img = fal
               name="prompt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prompt</FormLabel>
+                  <FormLabel>Prompt (Write an article about:)</FormLabel>
                   <FormControl>
                     <Input type="text" {...field} />
                   </FormControl>
@@ -157,13 +164,34 @@ export default function Genai( { setter, close: closeFun = () => null, img = fal
               name="temp"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>temp</FormLabel>
+                  <FormLabel>Temp (creativity: {Number.parseFloat(field.value) * 100}%)</FormLabel>
                   <FormControl>
                     <Input type="number" min={0} max={1} step={0.1} {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
+
+
+            <FormField
+              control={genForm.control}
+              name="img"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Generate image ({field.value})</FormLabel>
+                  <FormControl>
+                    <Checkbox
+                      
+                      {...field}
+                      onCheckedChange={(checked: boolean) => {
+                        field.onChange(checked ? "true" : "false"); 
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
 
             <Button
               type="submit"
@@ -173,10 +201,17 @@ export default function Genai( { setter, close: closeFun = () => null, img = fal
               Import
             </Button>
 
+
+
             {(genForm.formState.isSubmitting || loading) && <Loader/>}
           </form>
         </Form>
+<br/>
+<div className=" w-full p-2 bg-amber-200 text-black mx-auto">
 
+            <p>{msg}</p>
+
+</div>
           <br/><span className="font-bold">Preview article</span>
           <br/><br/>
           Headline: {article?.headline}
@@ -187,14 +222,18 @@ export default function Genai( { setter, close: closeFun = () => null, img = fal
           <br/><br/>
           Content: {article?.content}
           <br/><br/>
+          
           Img: {article?.imageUrl}
+          <br/>
+          {article?.imageUrl && <Image src={article?.imageUrl} width={512} height={512} alt={"poster image for " + article.headline} />}
           <br/><br/>
-          <Button onClick={() => {if (article) setter(article); closeFun()}}>Import and close</Button>
+          <Button onClick={() => {if (article) setter(article); closeFun()}}>Import</Button>
+
 
 
         </CardContent>
         <CardFooter>
-          <p>Card Footer</p>
+
         </CardFooter>
       </Card>
     </div>
