@@ -12,28 +12,15 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { Category } from "@/generated/prisma";
 
-// Temporary until we can fetch this data
-const categories: { title: string; href: string }[] = [
-  {
-    title: "Technology",
-    href: "#",
-  },
-  {
-    title: "Health",
-    href: "#",
-  },
-  {
-    title: "Finance",
-    href: "#",
-  },
-  {
-    title: "Sport",
-    href: "#",
-  },
-];
-
-export default function NavbarMenu({ isAdmin }: { isAdmin: boolean }) {
+export default function NavbarMenu({
+  isAdmin,
+  categories,
+}: {
+  isAdmin: boolean;
+  categories: Category[];
+}) {
   return (
     <NavigationMenu viewport={false}>
       <NavigationMenuList>
@@ -48,9 +35,9 @@ export default function NavbarMenu({ isAdmin }: { isAdmin: boolean }) {
             <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
               {categories.map((category) => (
                 <ListItem
-                  key={category.title}
-                  title={category.title}
-                  href={category.href}
+                  key={category.id}
+                  title={category.name}
+                  href={`/article`}
                 ></ListItem>
               ))}
             </ul>
@@ -62,9 +49,9 @@ export default function NavbarMenu({ isAdmin }: { isAdmin: boolean }) {
             <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
               {categories.map((category) => (
                 <ListItem
-                  key={category.title}
-                  title={category.title}
-                  href={category.href}
+                  key={category.id}
+                  title={category.name}
+                  href={`/article`}
                 ></ListItem>
               ))}
             </ul>
