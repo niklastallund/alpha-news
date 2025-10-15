@@ -1,32 +1,45 @@
-import Page from "@/components/Page";
+"use client"
 
-import React from "react";
-import AiTools from "./AiTools";
+import React, { useState } from 'react'
+import { generateArticle, GeneratedArticle } from './ai';
+import Genai from './Genai';
+import { set } from 'zod';
+import Loader from '@/components/Loader';
+import Page from '@/components/Page';
+import { Button } from '@/components/ui/button';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AiArticle from "./AiArticle";
+export default function AiPage() {
 
-export default function page() {
+    const [article, setArticle] = useState<GeneratedArticle>();
+    const [importGen, setImportGen] = useState<boolean>(true);
+    const close = () => {
+        setImportGen(false);
+    }
+
+
+
   return (
     <Page>
-      <div className="p-2 w-full">
-        <div className="text-4xl">🤖 AI NEWS</div>
+        <div>
 
-        <div className="mt-5">
-          <Tabs defaultValue="tools" className="w-full">
-            <TabsList>
-              <TabsTrigger value="article">Article</TabsTrigger>
-              <TabsTrigger value="tools">Newest AI Tools</TabsTrigger>
-            </TabsList>
-            <TabsContent value="article">
-              <AiArticle />
-            </TabsContent>
-            <TabsContent value="tools">
-              <AiTools />
-            </TabsContent>
-          </Tabs>
+            <Button onClick={() => setImportGen(true)}>Generate with ai</Button><br/>
+
+            {importGen && <Genai setter={setArticle} close={close} img={false}></Genai>}
+            <br/>
+
+            <br/><span className="font-bold">(Article form)</span>
+            <br/><br/>
+            Headline: {article?.headline}
+            <br/><br/>
+            Category: {article?.category}
+            <br/><br/>
+            Summery: {article?.summery}
+            <br/><br/>
+            Content: {article?.content}
+            <br/><br/>
+            Img: {article?.imageUrl}
+          
         </div>
-      </div>
     </Page>
-  );
+  )
 }
