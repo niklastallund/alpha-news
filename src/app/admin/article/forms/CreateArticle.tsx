@@ -27,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { createArticle } from "@/lib/actions/article";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CreateArticleForm() {
   const form = useForm<CreateArticleInput>({
@@ -67,7 +68,12 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Headline</FormLabel>
                   <FormControl>
-                    <ForwardRefEditor markdown={field.value || ""} {...field} />
+                    <Textarea
+                      {...field}
+                      rows={4}
+                      className="min-h-28 resize-y"
+                      placeholder="Write a headline..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -80,7 +86,12 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
-                    <ForwardRefEditor markdown={field.value || ""} {...field} />
+                    <Textarea
+                      {...field}
+                      rows={6}
+                      className="min-h-28 resize-y"
+                      placeholder="Write a short summary..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

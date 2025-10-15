@@ -28,6 +28,7 @@ import {
   updateArticleSchema,
 } from "@/validations/article-forms";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
+import { Textarea } from "@/components/ui/textarea";
 
 interface UpdateArticleFormProps {
   article: Article;
@@ -72,7 +73,12 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Headline</FormLabel>
                   <FormControl>
-                    <ForwardRefEditor markdown={field.value || ""} {...field} />
+                    <Textarea
+                      {...field}
+                      rows={4}
+                      className="min-h-28 resize-y"
+                      placeholder="Write a headline..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -88,9 +94,11 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
                     <div className="max-h-60 overflow-y-auto">
-                      <ForwardRefEditor
-                        markdown={field.value || ""}
+                      <Textarea
                         {...field}
+                        rows={6}
+                        className="min-h-28 resize-y"
+                        placeholder="Write a short summary..."
                       />
                     </div>
                   </FormControl>

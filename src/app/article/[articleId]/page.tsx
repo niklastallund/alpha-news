@@ -46,6 +46,9 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
           content={article.content ?? undefined}
           image={article.image ?? undefined}
           editorsChoice={article.editorsChoice ?? undefined}
+          createdAt={article.createdAt}
+          updatedAt={article.updatedAt}
+          author={article.author[0]?.name ?? "Unknown"}
         />
       </main>
     </Page>
