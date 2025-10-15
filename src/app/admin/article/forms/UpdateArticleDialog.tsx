@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import UpdateArticleForm from "./UpdateArticle";
 import { Article, Category } from "@/generated/prisma";
-import { Separator } from "@/components/ui/separator";
 import { EditArticleCategories } from "./EditArticleCategories";
 
 export default function UpdateArticleDialog({
