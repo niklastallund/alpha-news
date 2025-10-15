@@ -22,28 +22,34 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
-  CreateCategoryInput,
-  createCategorySchema,
+  UpdateCategoryInput,
+  updateCategorySchema,
 } from "@/validations/category-forms";
-import { createCategory } from "@/lib/actions/category";
+import { Category } from "@/generated/prisma";
+import { updateCategory } from "@/lib/actions/category";
 
+interface UpdateCategoryFormProps {
+  category: Category;
+}
 
-export default function CreateCategoryForm() {
-  const form = useForm<CreateCategoryInput>({
-    resolver: zodResolver(createCategorySchema),
+export default function UpdateCategoryForm({
+  category,
+}: UpdateCategoryFormProps) {
+  const form = useForm<UpdateCategoryInput>({
+    resolver: zodResolver(updateCategorySchema),
     defaultValues: {
-      name: "",
-      onNavbar: false,
+      id: category.id,
+      name: category.name || "",
+      onNavbar: category.onNavbar || false,
     },
   });
 
-  async function onSubmit(data: CreateCategoryInput) {
+  async function onSubmit(data: UpdateCategoryInput) {
     try {
-      await createCategory(data);
-      toast.success("Category created!");
-      form.reset();
+      await updateCategory(data);
+      toast.success("Category updated!");
     } catch (error) {
-      toast.error("Failed to create category.");
+      toast.error("Failed to update category.");
       console.error(error);
     }
   }
@@ -51,8 +57,8 @@ export default function CreateCategoryForm() {
   return (
     <Card className="w-full mx-auto">
       <CardHeader>
-        <CardTitle>Create Category</CardTitle>
-        <CardDescription>Enter details to add a new category</CardDescription>
+        <CardTitle>Update Category</CardTitle>
+        <CardDescription>Enter details to update the category</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -92,7 +98,9 @@ export default function CreateCategoryForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Updating..." : "Update"}
+            </Button>
           </form>
         </Form>
       </CardContent>
