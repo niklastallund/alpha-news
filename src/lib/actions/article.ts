@@ -3,6 +3,7 @@
 import {
   CreateArticleInput,
   createArticleSchema,
+  updateArticleCategoriesSchema,
   UpdateArticleInput,
   updateArticleSchema,
 } from "@/validations/article-forms";
@@ -65,4 +66,36 @@ export async function deleteArticle(id: number) {
 
   revalidatePath("/admin/article");
   return article;
+}
+
+
+export async function updateArticleCategories(formData: FormData) {
+  const role = await getRole();
+
+  if (role !== "admin") return notFound();
+
+  const articleIdRaw = formData.get("articleId");
+  const selected = formData.getAll("categoryIds");
+
+  // Convert to numbers
+  const articleId = Number(articleIdRaw);
+  const categoryIds = selected.map((v) => Number(v));
+
+  // Validate with Zod
+  const validated = await updateArticleCategoriesSchema.parseAsync({
+    articleId,
+    categoryIds,
+  });
+  
+  await prisma.article.update({
+    where: { id: validated.articleId },
+    data: {
+      category: {
+        set: validated.categoryIds.map((id) => ({ id })),
+      },
+    },
+  });
+
+  revalidatePath("/admin/article");
+  return;
 }

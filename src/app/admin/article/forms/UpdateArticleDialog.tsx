@@ -10,9 +10,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import UpdateArticleForm from "./UpdateArticle";
-import { Article } from "@/generated/prisma";
+import { Article, Category } from "@/generated/prisma";
+import { Separator } from "@/components/ui/separator";
+import { EditArticleCategories } from "./EditArticleCategories";
 
-export default function UpdateArticleDialog({ article }: { article: Article }) {
+export default function UpdateArticleDialog({
+  article,
+  currentCategories,
+  allCategories,
+}: {
+  article: Article;
+  currentCategories: Category[];
+  allCategories: Category[];
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -22,11 +32,22 @@ export default function UpdateArticleDialog({ article }: { article: Article }) {
           </Button>
         }
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl md:max-w-3xl  lg:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl md:max-w-6xl  lg:max-w-7xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update article</DialogTitle>
         </DialogHeader>
-        <UpdateArticleForm article={article} />
+        <div className="flex flex-col md:flex-row justify-center gap-4">
+          <div className="flex-1">
+            <UpdateArticleForm article={article} />
+          </div>
+          <div className="flex-1">
+            <EditArticleCategories
+              articleId={article.id}
+              currentCategoryIds={currentCategories.map((c) => c.id)}
+              allCategories={allCategories}
+            />
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -1,5 +1,4 @@
 import Page from "@/components/Page";
-
 import { prisma } from "@/lib/prisma";
 import CreateCategoryForm from "./forms/CreateCategory";
 import UpdateCategoryDialog from "./forms/UpdateCategoryDialog";

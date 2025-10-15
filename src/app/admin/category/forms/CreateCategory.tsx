@@ -27,7 +27,6 @@ import {
 } from "@/validations/category-forms";
 import { createCategory } from "@/lib/actions/category";
 
-
 export default function CreateCategoryForm() {
   const form = useForm<CreateCategoryInput>({
     resolver: zodResolver(createCategorySchema),
@@ -92,7 +91,9 @@ export default function CreateCategoryForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Creating..." : "Create"}
+            </Button>
           </form>
         </Form>
       </CardContent>

@@ -9,7 +9,7 @@ export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 
 export const updateCategorySchema = z.object({
   id: z.number(),
-  name: z.string().min(1).max(50).optional(),
+  name: z.string().min(1).max(30).optional(),
   onNavbar: z.boolean().optional(),
 });
 

@@ -145,7 +145,9 @@ export default function CreateArticleForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "Creating..." : "Create"}
+            </Button>
           </form>
         </Form>
       </CardContent>

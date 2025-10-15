@@ -20,3 +20,14 @@ export const updateArticleSchema = z.object({
 });
 
 export type UpdateArticleInput = z.infer<typeof updateArticleSchema>;
+
+export const updateArticleCategoriesSchema = z.object({
+  articleId: z.number().int().positive(),
+  categoryIds: z
+    .array(z.number().int().positive())
+    .min(1, "Select at least one category."),
+});
+
+export type UpdateArticleCategoriesInput = z.infer<
+  typeof updateArticleCategoriesSchema
+>;

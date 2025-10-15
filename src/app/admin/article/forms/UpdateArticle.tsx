@@ -84,8 +84,6 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 </FormItem>
               )}
             />
-
-            {/* Larger textarea for Summary */}
             <FormField
               control={form.control}
               name="summary"
@@ -93,21 +91,17 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Summary</FormLabel>
                   <FormControl>
-                    <div className="max-h-60 overflow-y-auto">
-                      <Textarea
-                        {...field}
-                        rows={6}
-                        className="min-h-28 resize-y"
-                        placeholder="Write a short summary..."
-                      />
-                    </div>
+                    <Textarea
+                      {...field}
+                      rows={4}
+                      className="min-h-28 resize-y"
+                      placeholder="Write a summary..."
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* Larger textarea for Content */}
             <FormField
               control={form.control}
               name="content"
@@ -121,7 +115,6 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="image"
@@ -135,7 +128,6 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="editorsChoice"

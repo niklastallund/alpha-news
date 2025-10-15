@@ -7,7 +7,11 @@ import { DeleteArticleButton } from "./forms/DeleteArticle";
 export default async function AdminArticlePage() {
   const articles = await prisma.article.findMany({
     orderBy: { updatedAt: "desc" },
-    take: 10,
+    include: { category: true },
+  });
+
+  const allCategories = await prisma.category.findMany({
+    orderBy: { name: "asc" },
   });
 
   return (
@@ -38,7 +42,7 @@ export default async function AdminArticlePage() {
                       </div>
 
                       <div className="shrink-0 flex items-center gap-2">
-                        <UpdateArticleDialog article={article} />
+                        <UpdateArticleDialog article={article} currentCategories={article.category} allCategories={allCategories} />
                         <DeleteArticleButton
                           articleId={article.id}
                           articleHeadline={article.headline}
