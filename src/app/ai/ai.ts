@@ -17,6 +17,8 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  CopyObjectCommand,
+  CopyObjectCommandInput,
 } from "@aws-sdk/client-s3";
 
 const s3Client = new S3Client({
@@ -141,7 +143,7 @@ async function generateImageForArticle(
 
     const imageBuffer = Buffer.from(image.base64, "base64");
     const contentType = "image/png";
-    const filename = `art_${crypto.randomUUID()}.png`;
+    const filename = `tmp/art_${crypto.randomUUID()}.png`;
 
     // Ladda upp bild
     console.log("Uploading image...");
@@ -154,7 +156,10 @@ async function generateImageForArticle(
         ContentType: contentType,
       })
     );
-    console.log(`Image uploaded successfully to R2: ${filename}`);
+
+    console.log(
+      `Image uploaded successfully to R2: ${filename} with 1 hour cache`
+    );
 
     const imageUrl = `${process.env.R2_PUBLIC_URL}/${filename}`;
 
