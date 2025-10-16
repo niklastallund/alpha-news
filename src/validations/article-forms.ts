@@ -6,6 +6,7 @@ export const createArticleSchema = z.object({
   content: z.string().optional(),
   image: z.string().optional(),
   editorsChoice: z.boolean().optional(),
+  categories: z.array(z.string()).min(1, "Please add at least one category."),
 });
 
 export type CreateArticleInput = z.infer<typeof createArticleSchema>;
