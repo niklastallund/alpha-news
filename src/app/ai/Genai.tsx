@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import Loader from "@/components/Loader";
 import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
+import MultiselectWithAdd from "./MultiselectBox";
 
 // This component generates an article based on a prompt and a category. You can also set temp. After generation, you can import it.
 // THe import it handled by the PASSED setter function, so that is handled by the parent, this component only passes the generated
@@ -48,7 +49,7 @@ const GenAiSchema = z.object({
     message: "Temp måste vara mellan '0' och '1.0' (använd punkt eller komma).",
   }),
   words: z.string(),
-  category: z.string(),
+  category: z.array(z.string()).optional(),
   img: z.string(),
 });
 
@@ -65,7 +66,7 @@ export default function Genai({
       prompt: "",
       temp: "0.7",
       words: "1000",
-      category: "", // Maybe here we get all the cats from db? Yes.
+      category: [], // Maybe here we get all the cats from db? Yes.
       img: "true",
     },
   });
@@ -112,7 +113,7 @@ export default function Genai({
   async function genSub(values: z.infer<typeof GenAiSchema>) {
     const formData = new FormData();
     formData.append("prompt", values.prompt);
-    formData.append("category", values.category);
+    formData.append("category", values.category?.join(",") ?? "");
     formData.append("temp", values.temp);
     formData.append("img", values.img);
 
@@ -153,7 +154,14 @@ export default function Genai({
                   <FormItem>
                     <FormLabel>Category</FormLabel>
                     <FormControl>
-                      <Input type="text" {...field} />
+                      {/* <Input type="text" {...field} /> */}
+
+                      <MultiselectWithAdd
+                        {...field}
+                        data={["1", "2"]}
+                        values={["Sport", "Somethingelse"]}
+                        placeholder="Category"
+                      />
                     </FormControl>
                   </FormItem>
                 )}
