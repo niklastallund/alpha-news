@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ModeToggle } from "./theme-toggle";
 import AccountMenu from "./AccountMenu";
 import MobileNav from "./MobileNav";
+import { prisma } from "@/lib/prisma";
+import { Category } from "@/generated/prisma/wasm";
 
 export default async function Navbar() {
   // Session checks for the navbar menu
@@ -12,8 +14,13 @@ export default async function Navbar() {
   const isLoggedIn = !!session;
   const isAdmin = (await getRole()) === "admin";
 
+  const categories: Category[] = await prisma.category.findMany({
+    where: { onNavbar: true },
+    orderBy: { name: "asc" },
+  });
+
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 border-b-2 border-border backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 bg-background/100 border-b-2 border-border">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between py-2">
           <Link
@@ -31,7 +38,7 @@ export default async function Navbar() {
 
           {/* Desktop menu */}
           <div className="hidden md:flex-1 md:flex items-center justify-center min-w-0">
-            <NavbarMenu isAdmin={isAdmin} />
+            <NavbarMenu isAdmin={isAdmin} categories={categories} />
           </div>
 
           {/* Desktop actions */}
