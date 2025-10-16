@@ -13,6 +13,7 @@ import { prisma } from "../prisma";
 import { revalidatePath } from "next/cache";
 
 // Normalize category names: trim, collapse spaces, dedupe case-insensitive
+// Parsing is already done on the front end, but just to be sure we don't get duplicates
 function normalizeCategoryNames(names?: string[]) {
   if (!names?.length) return [];
   const seen = new Set<string>();
