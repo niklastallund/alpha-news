@@ -93,7 +93,7 @@ model Article {
 
 model Category {
   id       Int     @id @default(autoincrement())
-  name     String
+  name     String  @unique
   onNavbar Boolean @default(false)
 
   articles Article[]

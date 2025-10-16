@@ -12,12 +12,43 @@ import { notFound } from "next/navigation";
 import { prisma } from "../prisma";
 import { revalidatePath } from "next/cache";
 
+// Normalize category names: trim, collapse spaces, dedupe case-insensitive
+function normalizeCategoryNames(names?: string[]) {
+  if (!names?.length) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  names.forEach((n) => {
+    const cleaned = (n || "").trim().replace(/\s+/g, " ");
+    if (!cleaned) return;
+    const key = cleaned.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      out.push(cleaned);
+    }
+  });
+  return out;
+}
+
 export async function createArticle(formData: CreateArticleInput) {
   const role = await getRole();
 
   if (role !== "admin") return notFound();
 
   const validated = await createArticleSchema.parseAsync(formData);
+
+  // Normalize incoming category names, is already done on the front end but just to be sure.
+  const categories = normalizeCategoryNames(validated.categories);
+
+  // Build connectOrCreate payload if there are categories
+  const categoryConnectOrCreate =
+    categories.length > 0
+      ? categories.map((name) => ({
+          where: { name },
+          create: { name },
+        }))
+      : undefined;
+
+  console.log(categoryConnectOrCreate);
 
   const article = await prisma.article.create({
     data: {
@@ -26,6 +57,10 @@ export async function createArticle(formData: CreateArticleInput) {
       content: validated.content,
       image: validated.image,
       editorsChoice: validated.editorsChoice,
+      // Attach categories if provided. If the list is empty or undefined, do nothing.
+      ...(categoryConnectOrCreate
+        ? { category: { connectOrCreate: categoryConnectOrCreate } }
+        : {}),
     },
   });
 
@@ -68,7 +103,6 @@ export async function deleteArticle(id: number) {
   return article;
 }
 
-
 export async function updateArticleCategories(formData: FormData) {
   const role = await getRole();
 
@@ -86,7 +120,7 @@ export async function updateArticleCategories(formData: FormData) {
     articleId,
     categoryIds,
   });
-  
+
   await prisma.article.update({
     where: { id: validated.articleId },
     data: {

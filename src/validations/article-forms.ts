@@ -6,6 +6,7 @@ export const createArticleSchema = z.object({
   content: z.string().optional(),
   image: z.string().optional(),
   editorsChoice: z.boolean().optional(),
+  categories: z.array(z.string()).optional(),
 });
 
 export type CreateArticleInput = z.infer<typeof createArticleSchema>;

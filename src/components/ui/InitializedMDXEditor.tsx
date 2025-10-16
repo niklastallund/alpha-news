@@ -16,7 +16,9 @@ import {
   UndoRedo,
   BoldItalicUnderlineToggles,
   ListsToggle,
-  BlockTypeSelect,
+  linkPlugin,
+  linkDialogPlugin,
+  tablePlugin,
 } from "@mdxeditor/editor";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 
@@ -28,6 +30,7 @@ export default function InitializedMDXEditor({
   return (
     <div className="border rounded-md">
       <MDXEditor
+        contentEditableClassName="prose"
         plugins={[
           toolbarPlugin({
             toolbarClassName: "my-classname",
@@ -39,15 +42,17 @@ export default function InitializedMDXEditor({
                 <Separator />
                 <ListsToggle options={["bullet", "number"]} />
                 <Separator />
-                <BlockTypeSelect />
               </>
             ),
           }),
           headingsPlugin(),
           listsPlugin(),
           quotePlugin(),
+          linkPlugin(),
+          linkDialogPlugin(),
           thematicBreakPlugin(),
           markdownShortcutPlugin(),
+          tablePlugin(),
         ]}
         {...props}
         ref={editorRef}

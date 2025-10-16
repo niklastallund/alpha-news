@@ -31,9 +31,43 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useRef, useState } from "react";
 import { GeneratedArticle } from "@/app/ai/ai";
 import Genai from "@/app/ai/Genai";
-import { MDXEditor, MDXEditorMethods } from "@mdxeditor/editor";
+import { MDXEditorMethods } from "@mdxeditor/editor";
+
+// Helper to parse CSV from form into a list of unique, trimmed category names.
+function parseCategories(csv: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+
+  csv
+    .split(/[,\n]/g) // allow commas or newlines
+    .map((s) => s.trim().replace(/\s+/g, " ")) // trim and collapse internal spaces
+    .filter(Boolean)
+    .forEach((val) => {
+      const key = val.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        out.push(val);
+      }
+    });
+
+  return out;
+}
 
 export default function CreateArticleForm() {
+  const [categoriesCsv, setCategoriesCsv] = useState<string>(""); //categories as CSV string
+
+  const form = useForm<CreateArticleInput>({
+    resolver: zodResolver(createArticleSchema),
+    defaultValues: {
+      headline: "",
+      summary: "",
+      content: "",
+      image: "",
+      editorsChoice: false,
+      categories: [],
+    },
+  });
+
   //#region From tobbe.
   // This is for generating ai, so i added this.
   const [importedArticle, setImportedArticle] = useState<GeneratedArticle>(); // Will hold the generated article after import.
@@ -63,27 +97,20 @@ export default function CreateArticleForm() {
       form.setValue("content", importedArticle.content);
       ref.current?.setMarkdown(importedArticle.content);
       setEditorKey(Math.random().toString());
+      // Optionally hydrate categoriesCsv from importedArticle if available:
+      // setCategoriesCsv((importedArticle.categories ?? []).join(", "));
     }
-  }, [importedArticle]);
+  }, [form, importedArticle]);
 
   //#endregion tobbe
-
-  const form = useForm<CreateArticleInput>({
-    resolver: zodResolver(createArticleSchema),
-    defaultValues: {
-      headline: "",
-      summary: "",
-      content: "",
-      image: "",
-      editorsChoice: false,
-    },
-  });
 
   async function onSubmit(data: CreateArticleInput) {
     try {
       await createArticle(data);
+
       toast.success("Article created");
       form.reset();
+      setCategoriesCsv("");
     } catch (error) {
       toast.error("Failed to create article");
       console.error(error);
@@ -169,6 +196,27 @@ export default function CreateArticleForm() {
                 </FormItem>
               )}
             />
+            {/* Categories (CSV) */}
+            <FormItem>
+              <FormLabel>Categories (comma separated)</FormLabel>
+              <FormControl>
+                <Input
+                  value={categoriesCsv}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setCategoriesCsv(v);
+                    // update form's categories array immediately for validation/submission
+                    form.setValue("categories", parseCategories(v), {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  }}
+                  placeholder="e.g. News, Sports, Technology"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+            {/* Image URL */}
             <FormField
               control={form.control}
               name="image"
