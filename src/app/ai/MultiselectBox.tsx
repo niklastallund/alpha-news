@@ -23,6 +23,7 @@ interface Props {
   placeholder?: string;
   checkAll?: boolean;
   preValues?: string[];
+  adder: boolean;
 }
 
 export default function MultiselectWithAdd({
@@ -41,6 +42,7 @@ export default function MultiselectWithAdd({
   placeholder,
   id,
   preValues,
+  adder,
 }: Props) {
   //console.log("Component received value:", value);
   //console.log("Component received data:", data);
@@ -75,6 +77,9 @@ export default function MultiselectWithAdd({
 
   return (
     <div id={id} className="cursor-pointer">
+      <div id="adder" className="w-full p-2 bg-blue-200">
+        Adder
+      </div>
       <input className="hidden" id={id} />
       <div
         id="container"

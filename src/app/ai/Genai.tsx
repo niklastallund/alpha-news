@@ -159,7 +159,7 @@ export default function Genai({
                       <MultiselectWithAdd
                         {...field}
                         data={["1", "2"]}
-                        values={["Sport", "Somethingelse"]}
+                        values={["Sport", "Somethingelse"]} // So we get from db ofc
                         placeholder="Category"
                       />
                     </FormControl>
