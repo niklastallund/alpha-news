@@ -50,6 +50,7 @@ export function DeleteArticleButton({
               const id = Number(formData.get("id"));
               await deleteArticle(id);
               toast.success("Article deleted");
+              setUpd(true);
               router.refresh();
             } catch (e) {
               console.error(e);

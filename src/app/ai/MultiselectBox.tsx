@@ -7,7 +7,7 @@ import { PanelTopOpen } from "lucide-react";
 import React, { MouseEventHandler, useEffect, useState } from "react";
 import { Form, useForm } from "react-hook-form";
 import z from "zod";
-import { addCat } from "@/lib/actions/createarticle";
+import { addCat } from "@/lib/actions/article";
 import {
   FormControl,
   FormField,

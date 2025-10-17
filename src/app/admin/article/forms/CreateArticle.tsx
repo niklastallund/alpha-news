@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,14 +37,16 @@ import {
   useRef,
   useState,
 } from "react";
-import { GeneratedArticle } from "@/app/ai/ai";
-import { addCat } from "@/lib/actions/createarticle";
+import { GeneratedArticle } from "@/lib/actions/ai";
+import { addCat } from "@/lib/actions/article";
 import Genai from "@/app/ai/Genai";
 import { MDXEditorMethods } from "@mdxeditor/editor";
 import MultiselectWithAdd, {
   normalizeCategoryName,
 } from "@/app/ai/MultiselectBox";
 import { Category } from "@/generated/prisma/wasm";
+import { useRouter } from "next/navigation";
+import ImageInput from "./ImageInput";
 
 // Helper to parse CSV from form into a list of unique, trimmed category names.
 // Will remove duplicates (case-insensitive) and ignore empty entries.
@@ -74,6 +77,7 @@ interface Props {
 }
 
 export default function CreateArticleForm({ categories, setUpd }: Props) {
+  const router = useRouter();
   // const [categoriesCsv, setCategoriesCsv] = useState<string>(""); // categories as CSV string
 
   const form = useForm<CreateArticleInput>({
@@ -117,7 +121,9 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
         summary: importedArticle.summery,
         content: importedArticle.content,
         image: importedArticle.imageUrl || form.getValues("image"),
-        categories: importedArticle.category.split(","),
+        categories: importedArticle.category
+          ? importedArticle.category.split(",")
+          : [],
         editorsChoice: form.getValues("editorsChoice"),
       });
 
@@ -169,6 +175,10 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
 
       toast.success("Article created");
       form.reset();
+
+      setUpd(true);
+
+      router.refresh();
       // setCategoriesCsv("");
     } catch (error) {
       toast.error("Failed to create article");
@@ -297,9 +307,19 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image link</FormLabel>
+                  <FormLabel>Image</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <ImageInput
+                      showGenerate={true}
+                      articleData={{
+                        headline: form.getValues().headline ?? "",
+                        category: form.getValues().categories.join(",") ?? "", // I guess this is ok? yes it is.
+                        content: form.getValues().content ?? "",
+                        summery: form.getValues().summary ?? "", // ok so e or a... fix
+                      }}
+                      showUploader={true}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -5,8 +5,8 @@ import UpdateArticleDialog from "./UpdateArticleDialog";
 import { DeleteArticleButton } from "./DeleteArticle";
 import { useEffect, useState } from "react";
 import { Category } from "@/generated/prisma/wasm";
-import { getCats } from "@/lib/actions/createarticle";
-import { ArticleWithCat, getArticles } from "@/lib/actions/createarticle";
+import { getCats } from "@/lib/actions/article";
+import { ArticleWithCat, getArticles } from "@/lib/actions/article";
 
 export default function ArticleForms() {
   const [categories, setCategories] = useState<Category[]>();

@@ -92,7 +92,7 @@ export async function dbg_focusOnImage(): Promise<
  * @param article Det genererade artikelobjektet.
  * @returns URL till den uppladdade bilden.
  */
-async function generateImageForArticle(
+export async function generateImageForArticle(
   article: GeneratedArticleBase
 ): Promise<ResultPatternType<string>> {
   // // Creating the azure
@@ -142,37 +142,68 @@ async function generateImageForArticle(
 
     const image = result.image;
 
-    const imageBuffer = Buffer.from(image.base64, "base64");
-    const contentType = "image/png";
-    const filename = `tmp/art_${crypto.randomUUID()}.png`;
+    //
+    const base64Image = image.base64;
 
-    // Ladda upp bild
-    console.log("Uploading image...");
+    // ⚠️ CRITICAL CHANGE: DO NOT UPLOAD TO R2 HERE.
+    // Comment out or remove the S3Client/PutObjectCommand code.
 
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME,
-        Key: filename,
-        Body: imageBuffer,
-        ContentType: contentType,
-      })
-    );
+    // Return the Base64 string as a data URL for client-side use
+    const dataUrl = `data:image/png;base64,${base64Image}`;
 
-    console.log(
-      `Image uploaded successfully to R2: ${filename} with 1 hour cache`
-    );
+    // dataUrl is what the client will use for preview, acting as a local "cache"
+    return { success: true, data: dataUrl };
 
-    const imageUrl = `${process.env.R2_PUBLIC_URL}/${filename}`;
+    // ******************************* Detta blir en egen funktion som körs om man verkligen laddar upp bilden.
+
+    // // Ladda upp bild
+
+    // const imageBuffer = Buffer.from(image.base64, "base64");
+    // const contentType = "image/png";
+    // const filename = `tmp/art_${crypto.randomUUID()}.png`;
+    // console.log("Uploading image...");
+
+    // await s3Client.send(
+    //   new PutObjectCommand({
+    //     Bucket: process.env.R2_BUCKET_NAME,
+    //     Key: filename,
+    //     Body: imageBuffer,
+    //     ContentType: contentType,
+    //   })
+    // );
+
+    // console.log(
+    //   `Image uploaded successfully to R2: ${filename} with 1 hour cache`
+    // );
+
+    // const imageUrl = `${process.env.R2_PUBLIC_URL}/${filename}`;
 
     // OBS: Du kan behöva en anpassad domän (t.ex. `https://pub.example.com/`) om du har konfigurerat R2 med en.
 
-    return { success: true, data: imageUrl };
+    // return { success: true, data: imageUrl };
   } catch (e) {
     console.log(JSON.stringify(e));
     const errorMsg = e instanceof Error ? e.message : String(e);
 
     return { success: false, msg: "Pure article failed. " + JSON.stringify(e) };
   }
+}
+
+export async function uploadImg() {
+  // // Ladda upp bild
+  // console.log("Uploading image...");
+  // await s3Client.send(
+  //   new PutObjectCommand({
+  //     Bucket: process.env.R2_BUCKET_NAME,
+  //     Key: filename,
+  //     Body: imageBuffer,
+  //     ContentType: contentType,
+  //   })
+  // );
+  // console.log(
+  //   `Image uploaded successfully to R2: ${filename} with 1 hour cache`
+  // );
+  // const imageUrl = `${process.env.R2_PUBLIC_URL}/${filename}`;
 }
 
 // ai npm:

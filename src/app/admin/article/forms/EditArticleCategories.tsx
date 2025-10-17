@@ -61,6 +61,7 @@ export function EditArticleCategories({
         }
         await updateArticleCategories(fd);
         toast.success("Categories updated!");
+        setUpd(true);
       } catch (err) {
         console.error(err);
         toast.error("Failed to update categories.");

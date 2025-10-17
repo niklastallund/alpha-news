@@ -27,6 +27,7 @@ import {
 } from "@/validations/category-forms";
 import { Category } from "@/generated/prisma";
 import { updateCategory } from "@/lib/actions/category";
+import { normalizeCategoryName } from "@/app/ai/MultiselectBox";
 
 interface UpdateCategoryFormProps {
   category: Category;
@@ -46,8 +47,13 @@ export default function UpdateCategoryForm({
 
   async function onSubmit(data: UpdateCategoryInput) {
     try {
-      await updateCategory(data);
-      toast.success("Category updated!");
+      const name = data.name?.trim();
+      if (name) {
+        await updateCategory({ ...data, name });
+        toast.success("Category updated!");
+      } else {
+        toast.error("Name is empty.");
+      }
     } catch (error) {
       toast.error("Failed to update category.");
       console.error(error);
@@ -70,7 +76,15 @@ export default function UpdateCategoryForm({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      onChange={(e) =>
+                        form.setValue(
+                          field.name,
+                          normalizeCategoryName(e.target.value)
+                        )
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

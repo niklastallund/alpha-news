@@ -7,8 +7,13 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-import { generateArticle, GeneratedArticle } from "./ai";
-import { addCat, getCats } from "@/lib/actions/createarticle";
+import {
+  generateArticle,
+  GeneratedArticle,
+  GeneratedArticleBase,
+  generateImageForArticle,
+} from "@/lib/actions/ai";
+import { addCat } from "@/lib/actions/article";
 import Markdown from "react-markdown";
 import z from "zod";
 import {
@@ -89,7 +94,7 @@ export default function Genai({
   const [loading, setLoading] = useState<boolean>(false);
   const [msg, setMsg] = useState<string>("");
 
-  const [generatedArticle, setArticle] = useState<
+  const [generatedArticle, setGeneratedArticle] = useState<
     GeneratedArticle | undefined
   >();
 
@@ -118,7 +123,7 @@ export default function Genai({
     // const art = await dbg_focusOnImage();
 
     if (art.success) {
-      setArticle(art.data);
+      setGeneratedArticle(art.data);
       setLoading(false);
       return { success: true, msg: "Generated article." };
     } else {
@@ -165,6 +170,43 @@ export default function Genai({
           " to databse. \n" +
           result.msg
       );
+    }
+  }, []);
+
+  const [regenMsg, setregenMsg] = useState("");
+
+  const generateImg = useCallback(async () => {
+    setregenMsg("Re-generating image...");
+
+    if (typeof generatedArticle === "undefined") {
+      setregenMsg("");
+      return;
+    }
+
+    const asTheRightType: GeneratedArticleBase = {
+      headline: generatedArticle.headline,
+      category: generatedArticle.category,
+      content: generatedArticle.content,
+      summery: generatedArticle.summery,
+    };
+
+    const newImg = await generateImageForArticle(asTheRightType);
+    setregenMsg("Generated!");
+    if (newImg.success) {
+      setGeneratedArticle((prev) => {
+        if (!prev) {
+          return undefined;
+        }
+        return {
+          ...prev,
+          imageUrl: newImg.data ?? "",
+        };
+      });
+      setregenMsg("Updated generated article.");
+      setUpd(true);
+      setregenMsg("");
+    } else {
+      setregenMsg("Failed");
     }
   }, []);
 
@@ -315,15 +357,29 @@ export default function Genai({
               <Markdown>{generatedArticle?.content}</Markdown>
               <br />
               <br />
-              Img: {generatedArticle?.imageUrl}
+              Img preview:
               <br />
               {generatedArticle?.imageUrl && (
-                <Image
-                  src={generatedArticle?.imageUrl}
-                  width={512}
-                  height={512}
-                  alt={"poster image for " + generatedArticle.headline}
-                />
+                <div>
+                  <Image
+                    src={generatedArticle?.imageUrl}
+                    width={512}
+                    height={512}
+                    alt={"poster image for " + generatedArticle.headline}
+                  />
+                  <br />
+                  <div className="flex gap-1">
+                    <Button
+                      disabled={!!regenMsg}
+                      onClick={async () => generateImg()}
+                    >
+                      Re-generate
+                    </Button>
+                    <div className="p-2 bg-amber-200 text-black rounded-lg">
+                      {regenMsg}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -331,7 +387,10 @@ export default function Genai({
           <div className="w-full flex justify-between">
             <Button
               className="bg-red-300 text-black"
-              onClick={() => closeFun()}
+              onClick={() => {
+                genForm.reset();
+                closeFun();
+              }}
             >
               Discard
             </Button>
