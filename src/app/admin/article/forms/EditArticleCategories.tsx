@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
+import { Dispatch, SetStateAction, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -35,10 +35,12 @@ export function EditArticleCategories({
   articleId,
   allCategories,
   currentCategoryIds,
+  setUpd,
 }: {
   articleId: number;
   allCategories: Category[];
   currentCategoryIds: number[];
+  setUpd: Dispatch<SetStateAction<boolean>>;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -64,6 +66,7 @@ export function EditArticleCategories({
         toast.error("Failed to update categories.");
       }
     });
+    setUpd(true);
   }
 
   return (

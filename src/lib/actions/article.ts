@@ -37,8 +37,11 @@ export async function createArticle(formData: CreateArticleInput) {
 
   const validated = await createArticleSchema.parseAsync(formData);
 
+  // Tobbe edits.
   // Normalize incoming category names, is already done on the front end but just to be sure.
-  const categories = normalizeCategoryNames(validated.categories);
+  // const categories = normalizeCategoryNames(validated.categories);
+
+  const categories = validated.categories;
 
   // Build connectOrCreate payload if there are categories
   const categoryConnectOrCreate =

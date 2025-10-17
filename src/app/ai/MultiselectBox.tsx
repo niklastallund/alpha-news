@@ -1,7 +1,36 @@
 // So this a custom made form input for multiselect, made mainly because we did not find something in shadcn that would look like this, and also a great way to learn deeper about how user-form-hook and Form wooks.
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PanelTopOpen } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
+import { Form, useForm } from "react-hook-form";
+import z from "zod";
+import { addCat } from "@/lib/actions/createarticle";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { addCategorySchema } from "@/validations/article-forms";
+import { Label } from "@/components/ui/label";
+
+// Tobbe här. Okej aa men lika bra att ha den här. Lägg till trim i efterhand, så man kan skriva space.
+export function normalizeCategoryName(name?: string) {
+  let cleaned = (name || "").replace(/\s+/g, " ");
+  cleaned = cleaned.replace(/[^a-öA-Ö\s0-9]/g, "");
+
+  if (cleaned.length > 0) {
+    const first = cleaned.substring(0, 1).toUpperCase();
+    const rest = cleaned.substring(1).toLowerCase();
+
+    cleaned = first + rest;
+  }
+
+  return cleaned;
+}
 
 interface Props {
   value: string[] | undefined; // The selected items
@@ -24,6 +53,7 @@ interface Props {
   checkAll?: boolean;
   preValues?: string[];
   adder: boolean;
+  adderFun: (s: string) => void;
 }
 
 export default function MultiselectWithAdd({
@@ -40,6 +70,7 @@ export default function MultiselectWithAdd({
   textfieldClassName,
   dropdownClassName,
   placeholder,
+  adderFun,
   id,
   preValues,
   adder,
@@ -75,11 +106,49 @@ export default function MultiselectWithAdd({
       </div>
     );
 
+  const [adderStr, setadderStr] = useState("");
+
+  async function adderSub() {
+    const res = addCategorySchema.safeParse({ name: adderStr });
+    adderFun(adderStr);
+  }
+
   return (
     <div id={id} className="cursor-pointer">
-      <div id="adder" className="w-full p-2 bg-blue-200">
-        Adder
-      </div>
+      {adder && (
+        <div>
+          <div
+            id="adder"
+            className="w-full bg-card text-card-foreground p-2 flex gap-1 items-center"
+          >
+            <div className="text-sm">
+              <Label htmlFor="addr">New:</Label>
+            </div>
+            <Input
+              type="text"
+              id="addr"
+              value={adderStr}
+              onChange={(e) =>
+                setadderStr(normalizeCategoryName(e.target.value))
+              }
+            ></Input>
+            <Button
+              type="button"
+              disabled={!(adderStr.trim().length > 0)}
+              onClick={() => {
+                adderSub();
+                setadderStr("");
+              }}
+            >
+              Add
+            </Button>
+          </div>
+          <div className="p-1 text-sm">
+            <Label htmlFor="container">Select:</Label>
+          </div>
+        </div>
+      )}
+
       <input className="hidden" id={id} />
       <div
         id="container"

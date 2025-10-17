@@ -15,14 +15,17 @@ import { Button } from "@/components/ui/button";
 import { deleteArticle } from "@/lib/actions/article";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 
 // This does not use react-hook-form because it's a simple confirmation dialog
 export function DeleteArticleButton({
   articleId,
   articleHeadline,
+  setUpd,
 }: {
   articleId: number;
   articleHeadline?: string | null;
+  setUpd: Dispatch<SetStateAction<boolean>>;
 }) {
   const router = useRouter();
 

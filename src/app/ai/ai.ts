@@ -20,6 +20,7 @@ import {
   CopyObjectCommand,
   CopyObjectCommandInput,
 } from "@aws-sdk/client-s3";
+import { prisma } from "@/lib/prisma";
 
 const s3Client = new S3Client({
   region: "auto",

@@ -1,5 +1,10 @@
 import z from "zod";
 
+// Just the name of a new category, used by MultiselectBox when adding a new category.
+export const addCategorySchema = z.object({
+  name: z.string().min(1).max(50),
+});
+
 export const createArticleSchema = z.object({
   headline: z.string().optional(),
   summary: z.string().optional(),

@@ -17,10 +17,12 @@ export default function UpdateArticleDialog({
   article,
   currentCategories,
   allCategories,
+  setUpd,
 }: {
   article: Article;
   currentCategories: Category[];
   allCategories: Category[];
+  setUpd: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <Dialog>
@@ -44,6 +46,7 @@ export default function UpdateArticleDialog({
               articleId={article.id}
               currentCategoryIds={currentCategories.map((c) => c.id)}
               allCategories={allCategories}
+              setUpd={setUpd}
             />
           </div>
         </div>

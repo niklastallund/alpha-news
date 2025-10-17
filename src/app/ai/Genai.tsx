@@ -1,7 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { dbg_focusOnImage, generateArticle, GeneratedArticle } from "./ai";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import { generateArticle, GeneratedArticle } from "./ai";
+import { addCat, getCats } from "@/lib/actions/createarticle";
 import Markdown from "react-markdown";
 import z from "zod";
 import {
@@ -29,6 +36,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 import MultiselectWithAdd from "./MultiselectBox";
 
+import { Category } from "@/generated/prisma/wasm";
+import { toast } from "sonner";
+import { normalizeCategoryName } from "./MultiselectBox";
+
 // This component generates an article based on a prompt and a category. You can also set temp. After generation, you can import it.
 // THe import it handled by the PASSED setter function, so that is handled by the parent, this component only passes the generated
 // article as the type GeneratedArticle.
@@ -40,6 +51,8 @@ interface Props {
   setter: (article: GeneratedArticle) => void;
   close: () => void;
   img?: boolean;
+  setUpd: Dispatch<SetStateAction<boolean>>;
+  categories: Category[];
 }
 
 // Zod schema:
@@ -59,13 +72,15 @@ export default function Genai({
   setter,
   close: closeFun = () => null,
   img = false,
+  setUpd,
+  categories,
 }: Props) {
   const genForm = useForm<z.infer<typeof GenAiSchema>>({
     resolver: zodResolver(GenAiSchema),
     defaultValues: {
       prompt: "",
       temp: "0.7",
-      words: "1000",
+      words: "800",
       category: [], // Maybe here we get all the cats from db? Yes.
       img: "true",
     },
@@ -74,7 +89,9 @@ export default function Genai({
   const [loading, setLoading] = useState<boolean>(false);
   const [msg, setMsg] = useState<string>("");
 
-  const [article, setArticle] = useState<GeneratedArticle | undefined>();
+  const [generatedArticle, setArticle] = useState<
+    GeneratedArticle | undefined
+  >();
 
   const generate = async (
     formData: FormData
@@ -122,6 +139,35 @@ export default function Genai({
     setMsg(result.msg);
   }
 
+  const addCategory = useCallback(async (s: string) => {
+    // FIrst normalizeCategoryName. Then trim, just in case.
+    const newCategory = await normalizeCategoryName(s).trim();
+
+    const result = await addCat(newCategory);
+    if (result.success) {
+      setUpd(true);
+
+      // Try to add it to the value;
+      const newVal = [
+        ...(genForm.getValues("category") ?? []),
+        result.data.name,
+      ];
+
+      genForm.setValue(
+        "category",
+        newVal.map((v) => v.toString())
+      );
+      toast("Added category " + newCategory + " to databse. 👍");
+    } else {
+      toast(
+        "ℹ️ Failed adding category " +
+          newCategory +
+          " to databse. \n" +
+          result.msg
+      );
+    }
+  }, []);
+
   return (
     <div>
       <Card>
@@ -158,9 +204,11 @@ export default function Genai({
 
                       <MultiselectWithAdd
                         {...field}
-                        data={["1", "2"]}
-                        values={["Sport", "Somethingelse"]} // So we get from db ofc
-                        placeholder="Category"
+                        data={categories?.map((c) => c.name)}
+                        // values={categories?.map((c) => c.name)}
+                        placeholder="Select categories"
+                        adder={true}
+                        adderFun={addCategory}
                       />
                     </FormControl>
                   </FormItem>
@@ -244,33 +292,37 @@ export default function Genai({
               <p>{msg}</p>
             </div>
           )}
-          {article && (
+          {generatedArticle && (
             <div>
               <br />
               <span className="font-bold">Preview article</span>
               <br />
               <br />
-              <span className="text-2xl">Headline: {article?.headline}</span>
+              <span className="text-2xl">
+                Headline: {generatedArticle?.headline}
+              </span>
               <br />
               <br />
-              Category: {article?.category}
+              Category: {generatedArticle?.category}
               <br />
               <br />
-              <span className="italic">Summery: {article?.summery}</span>
+              <span className="italic">
+                Summery: {generatedArticle?.summery}
+              </span>
               <br />
               <br />
               Content:
-              <Markdown>{article?.content}</Markdown>
+              <Markdown>{generatedArticle?.content}</Markdown>
               <br />
               <br />
-              Img: {article?.imageUrl}
+              Img: {generatedArticle?.imageUrl}
               <br />
-              {article?.imageUrl && (
+              {generatedArticle?.imageUrl && (
                 <Image
-                  src={article?.imageUrl}
+                  src={generatedArticle?.imageUrl}
                   width={512}
                   height={512}
-                  alt={"poster image for " + article.headline}
+                  alt={"poster image for " + generatedArticle.headline}
                 />
               )}
             </div>
@@ -285,9 +337,9 @@ export default function Genai({
             </Button>
             <Button
               className="bg-green-500 "
-              disabled={!article}
+              disabled={!generatedArticle}
               onClick={() => {
-                if (article) setter(article);
+                if (generatedArticle) setter(generatedArticle);
                 closeFun();
               }}
             >
