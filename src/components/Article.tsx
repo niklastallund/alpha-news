@@ -15,9 +15,11 @@ interface ArticleProps {
   editorsChoice?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  author: string;
+  categories?: string[];
+  authors?: string[];
 }
 
+// Extend the default sanitize schema to allow <u> tags
 const sanitizeSchema = {
   ...defaultSchema,
   tagNames: [...(defaultSchema.tagNames || []), "u"],
@@ -44,7 +46,8 @@ export default function Article({
   editorsChoice,
   createdAt,
   updatedAt,
-  author,
+  categories = [],
+  authors = [],
 }: ArticleProps) {
   return (
     <div className="flex my-10">
@@ -63,6 +66,7 @@ export default function Article({
 
         <h1>{headline}</h1>
 
+        {/* Created and updated timestamps */}
         {(createdAt || updatedAt) && (
           <div className="flex items-center text-sm space-x-3">
             {createdAt && (
@@ -88,6 +92,17 @@ export default function Article({
         )}
         {/* Summary in bold */}
         <p className="font-bold whitespace-pre-line">{summary || ""}</p>
+        {/* Categories */}
+        {categories.length > 0 && (
+          <p className="mt-4 text-sm italic text-muted-foreground">
+            {categories.join(", ")}
+          </p>
+        )}
+        {authors.length > 0 && (
+          <p className="mt-4 text-sm italic text-muted-foreground">{`Written by ${authors.join(
+            ", "
+          )}`}</p>
+        )}
         <Separator className="my-4" />
 
         {/* Render markdown content */}
@@ -96,12 +111,9 @@ export default function Article({
         >
           {content || ""}
         </ReactMarkdown>
-        {author && (
-          <p className="mt-4 text-sm italic text-muted-foreground">{`By ${author}`}</p>
-        )}
         {editorsChoice && (
           <p className="mt-4 text-sm italic text-green-600">
-            {`This article has been marked as exceptional by the editors.`}
+            {`Editor's choice.`}
           </p>
         )}
       </article>

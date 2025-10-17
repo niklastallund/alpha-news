@@ -7,7 +7,7 @@ import {
   UpdateArticleInput,
   updateArticleSchema,
 } from "@/validations/article-forms";
-import { getRole } from "./sessiondata";
+import { getRole, getSessionData } from "./sessiondata";
 import { notFound } from "next/navigation";
 import { prisma } from "../prisma";
 import { revalidatePath } from "next/cache";
@@ -31,7 +31,9 @@ function normalizeCategoryNames(names?: string[]) {
 }
 
 export async function createArticle(formData: CreateArticleInput) {
-  const role = await getRole();
+  const session = await getSessionData();
+  const role = session?.user?.role;
+  const authorId = session?.user?.id;
 
   if (role !== "admin") return notFound();
 
@@ -62,6 +64,8 @@ export async function createArticle(formData: CreateArticleInput) {
       ...(categoryConnectOrCreate
         ? { category: { connectOrCreate: categoryConnectOrCreate } }
         : {}),
+      // Attach author to article if authorId is available (should always be)
+      ...(authorId ? { author: { connect: { id: authorId } } } : {}),
     },
   });
 
@@ -70,7 +74,9 @@ export async function createArticle(formData: CreateArticleInput) {
 }
 
 export async function updateArticle(formData: UpdateArticleInput) {
-  const role = await getRole();
+  const session = await getSessionData();
+  const role = session?.user?.role;
+  const authorId = session?.user?.id;
 
   if (role !== "admin") return notFound();
 
@@ -84,6 +90,8 @@ export async function updateArticle(formData: UpdateArticleInput) {
       content: validated.content,
       image: validated.image,
       editorsChoice: validated.editorsChoice,
+      // Attach author to article if authorId is available (should always be)
+      ...(authorId ? { author: { connect: { id: authorId } } } : {}),
     },
   });
 

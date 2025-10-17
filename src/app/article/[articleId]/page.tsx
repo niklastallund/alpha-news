@@ -25,6 +25,11 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
   const article = await prisma.article.findUnique({
     where: { id: articleId },
     include: {
+      category: {
+        select: {
+          name: true,
+        },
+      },
       author: {
         select: {
           name: true,
@@ -48,7 +53,8 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
           editorsChoice={article.editorsChoice ?? undefined}
           createdAt={article.createdAt}
           updatedAt={article.updatedAt}
-          author={article.author[0]?.name ?? "Unknown"}
+          categories={article.category.map((cat) => cat.name)}
+          authors={article.author.map((auth) => auth.name)}
         />
       </main>
     </Page>
