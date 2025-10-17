@@ -37,7 +37,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { GeneratedArticle } from "@/lib/actions/ai";
+import { GeneratedArticle, uploadBase64ToR2 } from "@/lib/actions/ai";
 import { addCat } from "@/lib/actions/article";
 import Genai from "@/app/ai/Genai";
 import { MDXEditorMethods } from "@mdxeditor/editor";
@@ -161,24 +161,48 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
     }
   }, []);
 
+  const watchedArticleData = form.watch([
+    "headline",
+    "categories",
+    "content",
+    "summary",
+  ]);
+
   //#endregion tobbe
 
   async function onSubmit(data: CreateArticleInput) {
+    let image = "";
+
+    // So first we try to upload the image!
+    if (data.image) {
+      const upload = await uploadBase64ToR2(data.image);
+
+      if (upload.success) {
+        image = upload.data;
+        toast("Bild uppladdad!");
+      } else {
+        toast.error("Gick inte att ladda upp bild. Fel:\n" + upload.msg);
+        return;
+      }
+    }
+
     try {
       // Re-parse just before submit, in case user made changes and didn't blur the input
       // const parsedCategories = parseCategories(categoriesCsv);
 
       // parsedCategories is guaranteed to be non-empty at this point due to form validation
-      await createArticle({
+      const newArt = await createArticle({
         ...data,
+        image,
       });
 
       toast.success("Article created");
-      form.reset();
 
+      form.reset();
       setUpd(true);
 
-      router.refresh();
+      router.push("/article/" + newArt.id.toString());
+
       // setCategoriesCsv("");
     } catch (error) {
       toast.error("Failed to create article");
@@ -194,7 +218,12 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
       </CardHeader>
       <CardContent>
         {!importGen && (
-          <Button onClick={() => setImportGen(true)}>Generate with ai</Button>
+          <Button
+            className="bg-blue-400 text-black"
+            onClick={() => setImportGen(true)}
+          >
+            Generate aticle with ai
+          </Button>
         )}
         <br />
 
@@ -312,10 +341,10 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
                     <ImageInput
                       showGenerate={true}
                       articleData={{
-                        headline: form.getValues().headline ?? "",
-                        category: form.getValues().categories.join(",") ?? "", // I guess this is ok? yes it is.
-                        content: form.getValues().content ?? "",
-                        summery: form.getValues().summary ?? "", // ok so e or a... fix
+                        headline: watchedArticleData[0] ?? "",
+                        category: watchedArticleData[1].join(",") ?? "", // I guess this is ok? yes it is.
+                        content: watchedArticleData[2] ?? "",
+                        summery: watchedArticleData[3] ?? "", // ok so e or a... fix
                       }}
                       showUploader={true}
                       {...field}

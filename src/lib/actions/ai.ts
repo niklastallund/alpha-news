@@ -7,6 +7,7 @@ import { generateObject, generateText, experimental_generateImage } from "ai";
 import { title } from "process";
 import { success, z } from "zod";
 import { ca } from "zod/v4/locales";
+import { fileTypeFromBuffer } from "file-type"; // Import from 'file-type'
 
 // So this we need for image generation
 import { experimental_generateImage as generateImage } from "ai";
@@ -67,6 +68,99 @@ export type ResultPatternType<T, Err = string> =
       success: false;
       msg: Err;
     };
+
+// Steg 1: Separera Base64-data och MIME-typ från Data URL
+function decodeBase64DataURL(
+  dataUrl: string
+): { buffer: Buffer; contentType: string } | null {
+  if (!dataUrl.startsWith("data:")) return null;
+
+  const parts = dataUrl.split(";base64,");
+  if (parts.length !== 2) return null;
+
+  const [mimePart, base64Data] = parts;
+  const contentType = mimePart.split(":")[1];
+
+  // VIKTIG SÄKERHETSKONTROLL (Se Steg B nedan)
+  if (!contentType.startsWith("image/")) {
+    // Logga felet: Försök till uppladdning av icke-bild.
+    return null;
+  }
+
+  try {
+    const buffer = Buffer.from(base64Data, "base64");
+    return { buffer, contentType };
+  } catch (error) {
+    // Logga Base64 avkodningsfel
+    return null;
+  }
+}
+
+// Ok så den här tar en sån där Base64URL och läser av det some base64 och laddar upp till R2.
+export async function uploadBase64ToR2(
+  base64DataUrl: string
+): Promise<ResultPatternType<string>> {
+  const decoded = decodeBase64DataURL(base64DataUrl);
+
+  const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"]; // Definiera tillåtna typer
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // Max 5 MB i byte
+
+  if (!decoded) {
+    return { success: false, msg: "Ogiltigt eller skadligt filformat." };
+  }
+
+  const { buffer: imageBuffer, contentType } = decoded;
+
+  // 1. Storlekskontroll (Tänk på DoS-skydd)
+  if (imageBuffer.length > 5 * 1024 * 1024) {
+    // Max 5 MB
+    return { success: false, msg: "Filen är för stor (max 5 MB)." };
+  }
+
+  // 1. Verifiera filtyp genom att läsa de första byten (Magic Bytes)
+  const fileType = await fileTypeFromBuffer(imageBuffer);
+
+  if (!fileType) {
+    // Filen kunde inte identifieras som en känd filtyp.
+    return {
+      success: false,
+      msg: "Kunde inte identifiera filens innehåll som en bild. Avbrutet av säkerhetsskäl.",
+    };
+  }
+
+  // 2. Kontrollera att den identifierade typen är tillåten
+  if (!ALLOWED_MIME_TYPES.includes(fileType.mime)) {
+    // Filen är en känd typ, men inte tillåten (t.ex. en .zip eller .exe)
+    return {
+      success: false,
+      msg: `Filtypen ${fileType.ext} är inte tillåten.`,
+    };
+  }
+
+  // Nu vet vi med hög säkerhet att filen är en äkta bild av en tillåten typ.
+  const fileContentType = fileType.mime;
+  const fileExtension = fileType.ext;
+
+  const filename = `articles/${crypto.randomUUID()}.${fileExtension}`;
+
+  try {
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: filename,
+        Body: imageBuffer,
+        ContentType: fileContentType,
+        CacheControl: "max-age=3600", // 1 timmes cache
+      })
+    );
+
+    const imageUrl = `${process.env.R2_PUBLIC_URL}/${filename}`;
+    return { success: true, data: imageUrl };
+  } catch (e) {
+    console.error("R2 Upload Error:", e);
+    return { success: false, msg: "Misslyckades med att ladda upp till R2." };
+  }
+}
 
 // För att snabbt felsöka image-generation, anropa denna istället.
 export async function dbg_focusOnImage(): Promise<
@@ -130,9 +224,27 @@ export async function generateImageForArticle(
     // Antar att den hämtar modellen baserat på "deploymentName" och att deploymentName är 'dall-e-3' och inte bar amodellnamnet?
     const imageModel = azure.image("dall-e-3");
 
-    const imagePrompt = `A detailed, cinematic digital illustration for a news article with the headline: "${article.headline}" and the summary: "${article.summery}". The image should be visually engaging and relevant to the topic.`;
+    console.log("GOT DATA: " + JSON.stringify(article));
+
+    let imagePrompt =
+      "A detailed, cinematic digital illustration for a news article ";
+    if (article.headline.length < 3) {
+      imagePrompt += " with no headline ";
+    } else {
+      imagePrompt += " with the headline " + article.headline;
+    }
+
+    if (article.summery.length > 0) {
+      imagePrompt += " and the summery: " + article.summery + ". ";
+    }
+    imagePrompt += " The image should be realistic.";
+
+    if (article.category.length > 0) {
+      imagePrompt += " and be relevant to the categories " + article.category;
+    }
 
     console.log("Generating image...");
+    console.log("WITH PROMPT" + imagePrompt);
 
     const result = await generateImage({
       model: imageModel,
@@ -145,65 +257,15 @@ export async function generateImageForArticle(
     //
     const base64Image = image.base64;
 
-    // ⚠️ CRITICAL CHANGE: DO NOT UPLOAD TO R2 HERE.
-    // Comment out or remove the S3Client/PutObjectCommand code.
-
-    // Return the Base64 string as a data URL for client-side use
     const dataUrl = `data:image/png;base64,${base64Image}`;
 
-    // dataUrl is what the client will use for preview, acting as a local "cache"
     return { success: true, data: dataUrl };
-
-    // ******************************* Detta blir en egen funktion som körs om man verkligen laddar upp bilden.
-
-    // // Ladda upp bild
-
-    // const imageBuffer = Buffer.from(image.base64, "base64");
-    // const contentType = "image/png";
-    // const filename = `tmp/art_${crypto.randomUUID()}.png`;
-    // console.log("Uploading image...");
-
-    // await s3Client.send(
-    //   new PutObjectCommand({
-    //     Bucket: process.env.R2_BUCKET_NAME,
-    //     Key: filename,
-    //     Body: imageBuffer,
-    //     ContentType: contentType,
-    //   })
-    // );
-
-    // console.log(
-    //   `Image uploaded successfully to R2: ${filename} with 1 hour cache`
-    // );
-
-    // const imageUrl = `${process.env.R2_PUBLIC_URL}/${filename}`;
-
-    // OBS: Du kan behöva en anpassad domän (t.ex. `https://pub.example.com/`) om du har konfigurerat R2 med en.
-
-    // return { success: true, data: imageUrl };
   } catch (e) {
     console.log(JSON.stringify(e));
     const errorMsg = e instanceof Error ? e.message : String(e);
 
     return { success: false, msg: "Pure article failed. " + JSON.stringify(e) };
   }
-}
-
-export async function uploadImg() {
-  // // Ladda upp bild
-  // console.log("Uploading image...");
-  // await s3Client.send(
-  //   new PutObjectCommand({
-  //     Bucket: process.env.R2_BUCKET_NAME,
-  //     Key: filename,
-  //     Body: imageBuffer,
-  //     ContentType: contentType,
-  //   })
-  // );
-  // console.log(
-  //   `Image uploaded successfully to R2: ${filename} with 1 hour cache`
-  // );
-  // const imageUrl = `${process.env.R2_PUBLIC_URL}/${filename}`;
 }
 
 // ai npm:

@@ -43,6 +43,13 @@ export default function ImageInput({
       return;
     }
 
+    if (
+      articleData.headline.trim().length < 1 &&
+      articleData.summery.trim().length < 1 &&
+      articleData.category.trim().length < 1
+    )
+      return;
+
     setgenMsg("Generating image...");
 
     const asTheRightType: GeneratedArticleBase = {
@@ -52,6 +59,8 @@ export default function ImageInput({
       summery: articleData.summery,
     };
 
+    alert("Generating based on " + JSON.stringify(asTheRightType));
+
     const newImg = await generateImageForArticle(asTheRightType);
 
     if (newImg.success) {
@@ -60,34 +69,46 @@ export default function ImageInput({
     }
 
     setgenMsg("");
-  }, []);
+  }, [articleData, onChange, onBlur]);
 
-  const fileImg = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
-    // Check that its a valid image (png or jpg)
-    const file = e.target.files?.[0];
+  const fileImg = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      // Check that its a valid image (png or jpg)
+      const file = e.target.files?.[0];
 
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        alert("Endast bildfiler är tillåtna."); // Vi kör en säkrare validering i server-action.
-        e.target.value = "";
-        return;
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+      if (file) {
+        if (!file.type.startsWith("image/")) {
+          alert("Endast bildfiler är tillåtna."); // Vi kör en säkrare validering i server-action.
+          e.target.value = "";
+          return;
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+          const maxSizeMB = MAX_FILE_SIZE / (1024 * 1024);
+          alert(`Max 5 MB`);
+          e.target.value = ""; // Återställ input
+          return;
+        }
+        // 1. Initialize FileReader
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+
+          onChange(dataUrl);
+          onBlur();
+        };
+
+        // 4. Starta läsningen av filen som en Data URL (Base64)
+        reader.readAsDataURL(file);
       }
-      // 1. Initialize FileReader
-      const reader = new FileReader();
 
-      reader.onload = () => {
-        const dataUrl = reader.result as string;
-
-        onChange(dataUrl);
-        onBlur();
-      };
-
-      // 4. Starta läsningen av filen som en Data URL (Base64)
-      reader.readAsDataURL(file);
-    }
-
-    // read the file as base64 and set it as value
-  }, []);
+      // read the file as base64 and set it as value
+    },
+    [onChange, onBlur]
+  );
 
   return (
     <div className="p-2 border-2 rounded-lg">
@@ -104,16 +125,28 @@ export default function ImageInput({
         {showGenerate && articleData && (
           <div className="flex justify-between sm:justify-around">
             <div>
-              {!genMsg && (
-                <Button
-                  type="button"
-                  className="bg-green-400 text-black"
-                  disabled={!!genMsg}
-                  onClick={() => generateImg()}
-                >
-                  {value ? "Regenerate" : "Generate"} image
-                </Button>
-              )}
+              {!genMsg &&
+                !(
+                  articleData.headline.trim().length < 1 &&
+                  articleData.summery.trim().length < 1 &&
+                  articleData.category.trim().length < 1
+                ) && (
+                  <Button
+                    type="button"
+                    className="bg-green-400 text-black"
+                    disabled={!!genMsg}
+                    onClick={() => generateImg()}
+                  >
+                    {value ? "Regenerate" : "Generate"} image
+                  </Button>
+                )}
+              {articleData.headline.trim().length < 1 &&
+                articleData.summery.trim().length < 1 &&
+                articleData.category.trim().length < 1 && (
+                  <div className="bg-amber-200 p-2 rounded-lg text-sm">
+                    Enter a headline or summery, or add a category to generate.
+                  </div>
+                )}
               {genMsg && (
                 <div className="p-2 bg-amber-200 text-black rounded-lg">
                   {genMsg}

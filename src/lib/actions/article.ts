@@ -68,7 +68,6 @@ export async function createArticle(formData: CreateArticleInput) {
     },
   });
 
-  revalidatePath("/admin/article");
   return article;
 }
 
