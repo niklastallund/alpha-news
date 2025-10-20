@@ -1,7 +1,5 @@
-import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getRole, getSessionData } from "@/lib/actions/sessiondata";
 import Article from "@/components/Article";
 import Page from "@/components/Page";
 
@@ -10,10 +8,6 @@ export type Params = {
 };
 
 export default async function ArticleDetailsPage(props: { params: Params }) {
-  const session = await getSessionData();
-  const isLoggedIn = !!session;
-  const isAdmin = (await getRole()) === "admin";
-
   const params = await props.params;
   const articleId = parseInt(params.articleId);
 

@@ -17,7 +17,7 @@ export default async function ArticlePage({
   const selectedCategory = params.cat || "";
   const editorsOnly = params.editors === "1";
 
-  // Fetch articles from the database based on the search query
+  // Fetch articles from the database based on the search query and filters
   const articles = await prisma.article.findMany({
     orderBy: { createdAt: "desc" },
     where: {
@@ -36,6 +36,7 @@ export default async function ArticlePage({
     },
   });
 
+  // Fetch all categories for the category filter
   const categories = await prisma.category.findMany({
     orderBy: { name: "asc" },
   });

@@ -144,7 +144,7 @@ export default function ImageInput({
                 articleData.summery.trim().length < 1 &&
                 articleData.category.trim().length < 1 && (
                   <div className="bg-amber-200 p-2 rounded-lg text-sm">
-                    Enter a headline or summery, or add a category to generate.
+                    Enter a headline/summary, or add a category to generate.
                   </div>
                 )}
               {genMsg && (

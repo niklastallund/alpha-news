@@ -48,29 +48,6 @@ import { Category } from "@/generated/prisma/wasm";
 import { useRouter } from "next/navigation";
 import ImageInput from "./ImageInput";
 
-// Helper to parse CSV from form into a list of unique, trimmed category names.
-// Will remove duplicates (case-insensitive) and ignore empty entries.
-// You can check this by trying to for example add "News, news,  , Sports,,sports"
-// -> will result in ["News", "Sports"]
-// function parseCategories(csv: string): string[] {
-//   const seen = new Set<string>();
-//   const out: string[] = [];
-
-//   csv
-//     .split(/[,\n]/g) // allow commas or newlines
-//     .map((s) => s.trim().replace(/\s+/g, " ")) // trim and collapse internal spaces
-//     .filter(Boolean)
-//     .forEach((val) => {
-//       const key = val.toLowerCase();
-//       if (!seen.has(key)) {
-//         seen.add(key);
-//         out.push(val);
-//       }
-//     });
-
-//   return out;
-// }
-
 interface Props {
   categories: Category[];
 }
@@ -132,31 +109,34 @@ export default function CreateArticleForm({ categories }: Props) {
     }
   }, [form, importedArticle]);
 
-  const addCategory = useCallback(async (s: string) => {
-    const newCategory = await normalizeCategoryName(s).trim();
+  const addCategory = useCallback(
+    async (s: string) => {
+      const newCategory = await normalizeCategoryName(s).trim();
 
-    const result = await addCat(newCategory);
-    if (result.success) {
-      // Try to add it to the value;
-      const newVal = [
-        ...(form.getValues("categories") ?? []),
-        result.data.name,
-      ];
+      const result = await addCat(newCategory);
+      if (result.success) {
+        // Try to add it to the value;
+        const newVal = [
+          ...(form.getValues("categories") ?? []),
+          result.data.name,
+        ];
 
-      form.setValue(
-        "categories",
-        newVal.map((v) => v.toString())
-      );
-      toast("Added category " + newCategory + " to databse. 👍");
-    } else {
-      toast(
-        "ℹ️ Failed adding category " +
-          newCategory +
-          " to databse. \n" +
-          result.msg
-      );
-    }
-  }, []);
+        form.setValue(
+          "categories",
+          newVal.map((v) => v.toString())
+        );
+        toast("Added category " + newCategory + " to databse. 👍");
+      } else {
+        toast(
+          "ℹ️ Failed adding category " +
+            newCategory +
+            " to databse. \n" +
+            result.msg
+        );
+      }
+    },
+    [form]
+  );
 
   const watchedArticleData = form.watch([
     "headline",
@@ -218,7 +198,7 @@ export default function CreateArticleForm({ categories }: Props) {
             className="bg-blue-400 text-black"
             onClick={() => setImportGen(true)}
           >
-            Generate aticle with ai
+            Generate article with AI
           </Button>
         )}
         <br />
