@@ -73,10 +73,9 @@ import ImageInput from "./ImageInput";
 
 interface Props {
   categories: Category[];
-  setUpd: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function CreateArticleForm({ categories, setUpd }: Props) {
+export default function CreateArticleForm({ categories }: Props) {
   const router = useRouter();
   // const [categoriesCsv, setCategoriesCsv] = useState<string>(""); // categories as CSV string
 
@@ -138,8 +137,6 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
 
     const result = await addCat(newCategory);
     if (result.success) {
-      setUpd(true); // So this will trigger ref of categories. the dream would maybe be to have this awaited? No, its ok if its added after the value i think.
-
       // Try to add it to the value;
       const newVal = [
         ...(form.getValues("categories") ?? []),
@@ -179,9 +176,9 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
 
       if (upload.success) {
         image = upload.data;
-        toast("Bild uppladdad!");
+        toast("Uploaded picture");
       } else {
-        toast.error("Gick inte att ladda upp bild. Fel:\n" + upload.msg);
+        toast.error("Could not upload picture.\n" + upload.msg);
         return;
       }
     }
@@ -199,7 +196,6 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
       toast.success("Article created");
 
       form.reset();
-      setUpd(true);
 
       router.push("/article/" + newArt.id.toString());
 
@@ -235,7 +231,6 @@ export default function CreateArticleForm({ categories, setUpd }: Props) {
               setter={setImportedArticle}
               close={close}
               img={false}
-              setUpd={setUpd}
             ></Genai>
           )
         }

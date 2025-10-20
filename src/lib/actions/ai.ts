@@ -69,7 +69,69 @@ export type ResultPatternType<T, Err = string> =
       msg: Err;
     };
 
-// Steg 1: Separera Base64-data och MIME-typ från Data URL
+// SO I AM HERE. FIXING... Okej, men vi har ju redan en funktion för det här?
+export async function deleteImage(imageURL: string) {
+  try {
+    const key = getFileKeyFromUrl(imageURL);
+  } catch (e) {}
+}
+
+function getFileKeyFromUrl(fullUrl: string): string | null {
+  const publicUrl = process.env.R2_PUBLIC_URL;
+
+  if (!publicUrl || !fullUrl.startsWith(publicUrl)) {
+    console.log("URL does not match expected public R2 domain:", fullUrl);
+    return null;
+  }
+
+  // Safely extract the key by removing the public URL prefix.
+  const key = fullUrl.substring(publicUrl.length);
+
+  // Basic check to ensure the key isn't empty after removal.
+  if (key.length === 0) {
+    return null;
+  }
+
+  return key;
+}
+
+/*
+ * Deletes a file from the configured Cloudflare R2 bucket.
+ * @param fileKey The full key (path/filename) of the object to delete (like "articles/123-xyz.png").
+ * @returns An object indicating success or failure.
+ */
+export async function deleteFileFromR2(
+  fileKey: string
+): Promise<ResultPatternType<string>> {
+  // 1. Basic Input Validation
+  if (!fileKey || typeof fileKey !== "string") {
+    return { success: false, msg: "Invalid file key provided." };
+  }
+
+  // **SECURITY NOTE:** Always validate or sanitize the key,
+  // especially if it comes from user input, to prevent path traversal issues.
+  // Ensure the key starts with the expected prefix (e.g., "articles/").
+
+  try {
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: fileKey, // The unique identifier/path of the object in the bucket
+      })
+    );
+
+    console.log(`Successfully deleted object: ${fileKey}`);
+    return { success: true, data: `Removed ${fileKey}` };
+  } catch (error) {
+    console.error(`Error deleting file ${fileKey} from R2:`, error);
+
+    // Handle common S3 errors (like object not found) gracefully
+    // The DeleteObjectCommand typically returns a success status even if the object doesn't exist,
+    // but this depends on the specific R2 setup. We handle general errors here.
+    return { success: false, msg: "Failed to delete file from storage." };
+  }
+}
+
 function decodeBase64DataURL(
   dataUrl: string
 ): { buffer: Buffer; contentType: string } | null {
@@ -81,9 +143,7 @@ function decodeBase64DataURL(
   const [mimePart, base64Data] = parts;
   const contentType = mimePart.split(":")[1];
 
-  // VIKTIG SÄKERHETSKONTROLL (Se Steg B nedan)
   if (!contentType.startsWith("image/")) {
-    // Logga felet: Försök till uppladdning av icke-bild.
     return null;
   }
 
@@ -91,7 +151,6 @@ function decodeBase64DataURL(
     const buffer = Buffer.from(base64Data, "base64");
     return { buffer, contentType };
   } catch (error) {
-    // Logga Base64 avkodningsfel
     return null;
   }
 }
@@ -224,7 +283,7 @@ export async function generateImageForArticle(
     // Antar att den hämtar modellen baserat på "deploymentName" och att deploymentName är 'dall-e-3' och inte bar amodellnamnet?
     const imageModel = azure.image("dall-e-3");
 
-    console.log("GOT DATA: " + JSON.stringify(article));
+    // console.log("GOT DATA: " + JSON.stringify(article));
 
     let imagePrompt =
       "A detailed, cinematic digital illustration for a news article ";
@@ -243,8 +302,8 @@ export async function generateImageForArticle(
       imagePrompt += " and be relevant to the categories " + article.category;
     }
 
-    console.log("Generating image...");
-    console.log("WITH PROMPT" + imagePrompt);
+    // console.log("Generating image...");
+    // console.log("WITH PROMPT" + imagePrompt);
 
     const result = await generateImage({
       model: imageModel,
@@ -261,7 +320,7 @@ export async function generateImageForArticle(
 
     return { success: true, data: dataUrl };
   } catch (e) {
-    console.log(JSON.stringify(e));
+    // console.log(JSON.stringify(e));
     const errorMsg = e instanceof Error ? e.message : String(e);
 
     return { success: false, msg: "Pure article failed. " + JSON.stringify(e) };
@@ -349,7 +408,7 @@ export async function generateArticle(
     if (!articleBase.success)
       return { success: false, msg: "Could not generate article as obj." };
 
-    console.log("IMG?" + genImg);
+    // console.log("IMG?" + genImg);
 
     if (genImg) {
       const img = await generateImageForArticle(articleBase.data);

@@ -35,12 +35,10 @@ export function EditArticleCategories({
   articleId,
   allCategories,
   currentCategoryIds,
-  setUpd,
 }: {
   articleId: number;
   allCategories: Category[];
   currentCategoryIds: number[];
-  setUpd: Dispatch<SetStateAction<boolean>>;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -61,13 +59,11 @@ export function EditArticleCategories({
         }
         await updateArticleCategories(fd);
         toast.success("Categories updated!");
-        setUpd(true);
       } catch (err) {
         console.error(err);
         toast.error("Failed to update categories.");
       }
     });
-    setUpd(true);
   }
 
   return (

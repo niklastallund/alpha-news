@@ -56,7 +56,6 @@ interface Props {
   setter: (article: GeneratedArticle) => void;
   close: () => void;
   img?: boolean;
-  setUpd: Dispatch<SetStateAction<boolean>>;
   categories: Category[];
 }
 
@@ -77,7 +76,6 @@ export default function Genai({
   setter,
   close: closeFun = () => null,
   img = false,
-  setUpd,
   categories,
 }: Props) {
   const genForm = useForm<z.infer<typeof GenAiSchema>>({
@@ -150,8 +148,6 @@ export default function Genai({
 
     const result = await addCat(newCategory);
     if (result.success) {
-      setUpd(true);
-
       // Try to add it to the value;
       const newVal = [
         ...(genForm.getValues("category") ?? []),
@@ -203,7 +199,6 @@ export default function Genai({
         };
       });
       setregenMsg("Updated generated article.");
-      setUpd(true);
       setregenMsg("");
     } else {
       setregenMsg("Failed");
@@ -371,13 +366,16 @@ export default function Genai({
                   <div className="flex gap-1">
                     <Button
                       disabled={!!regenMsg}
+                      className="bg-blue-400 text-black"
                       onClick={async () => generateImg()}
                     >
                       Re-generate
                     </Button>
-                    <div className="p-2 bg-amber-200 text-black rounded-lg">
-                      {regenMsg}
-                    </div>
+                    {regenMsg && (
+                      <div className="p-2 bg-amber-200 text-black rounded-lg">
+                        {regenMsg}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

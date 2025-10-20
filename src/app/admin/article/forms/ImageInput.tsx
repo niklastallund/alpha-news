@@ -59,7 +59,7 @@ export default function ImageInput({
       summery: articleData.summery,
     };
 
-    alert("Generating based on " + JSON.stringify(asTheRightType));
+    // alert("Generating based on " + JSON.stringify(asTheRightType));
 
     const newImg = await generateImageForArticle(asTheRightType);
 
@@ -80,7 +80,7 @@ export default function ImageInput({
 
       if (file) {
         if (!file.type.startsWith("image/")) {
-          alert("Endast bildfiler är tillåtna."); // Vi kör en säkrare validering i server-action.
+          alert("Only images are allowed."); // Vi kör en säkrare validering i server-action.
           e.target.value = "";
           return;
         }

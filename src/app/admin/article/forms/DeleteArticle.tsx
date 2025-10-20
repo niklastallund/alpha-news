@@ -21,11 +21,9 @@ import { Dispatch, SetStateAction } from "react";
 export function DeleteArticleButton({
   articleId,
   articleHeadline,
-  setUpd,
 }: {
   articleId: number;
   articleHeadline?: string | null;
-  setUpd: Dispatch<SetStateAction<boolean>>;
 }) {
   const router = useRouter();
 
@@ -50,7 +48,6 @@ export function DeleteArticleButton({
               const id = Number(formData.get("id"));
               await deleteArticle(id);
               toast.success("Article deleted");
-              setUpd(true);
               router.refresh();
             } catch (e) {
               console.error(e);

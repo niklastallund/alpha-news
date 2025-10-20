@@ -220,6 +220,8 @@ export async function addCat(
       },
     });
 
+    revalidatePath("/admin/article");
+
     return { success: true, data: addedCat };
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : String(e);
