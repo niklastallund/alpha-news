@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
-import { CheckCheck, ThumbsUp } from "lucide-react";
+import { ThumbsUp } from "lucide-react";
 
 interface ArticleCardProps {
   id: number;
