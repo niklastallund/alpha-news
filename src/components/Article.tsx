@@ -6,6 +6,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import { defaultSchema } from "hast-util-sanitize";
 import { Separator } from "./ui/separator";
+import { ChartColumnStacked, LibraryBig, ThumbsUp } from "lucide-react";
 
 interface ArticleProps {
   headline?: string;
@@ -64,6 +65,23 @@ export default function Article({
 
         <h1>{headline}</h1>
 
+        {categories.length > 0 && (
+          <p className="mt-4 text-sm italic text-muted-foreground">
+            <span className="flex items-center">
+              <LibraryBig size={16} className="mr-1" />
+              {categories.join(", ")}
+            </span>
+          </p>
+        )}
+        {editorsChoice && (
+          <p className="text-sm italic text-green-600">
+            <span className="flex items-center">
+              <ThumbsUp size={16} className="mr-1" />
+              {`Editor's choice.`}
+            </span>
+          </p>
+        )}
+
         {/* Created and updated timestamps */}
         {(createdAt || updatedAt) && (
           <div className="flex items-center text-sm space-x-3">
@@ -91,11 +109,7 @@ export default function Article({
         {/* Summary in bold */}
         <p className="font-bold whitespace-pre-line">{summary || ""}</p>
         {/* Categories */}
-        {categories.length > 0 && (
-          <p className="mt-4 text-sm italic text-muted-foreground">
-            {categories.join(", ")}
-          </p>
-        )}
+
         {authors.length > 0 && (
           <p className="mt-4 text-sm italic text-muted-foreground">{`Written by ${authors.join(
             ", "
@@ -109,11 +123,6 @@ export default function Article({
         >
           {content || ""}
         </ReactMarkdown>
-        {editorsChoice && (
-          <p className="mt-4 text-sm italic text-green-600">
-            {`Editor's choice.`}
-          </p>
-        )}
       </article>
     </div>
   );
