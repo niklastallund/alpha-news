@@ -6,28 +6,21 @@ import { useEffect, useState } from "react";
  * @param {number} delay - Delay in milliseconds before updating
  * @returns {string | undefined} The debounced value
  * @example
- * const debouncedSearch = useBounce(searchInput, 500);
+ * const debouncedSearch = useDebounce(searchInput, 500);
  * // searchInput could be from useState or an input field's onChange event
  */
-export default function Baunce(value: string, delay: number) {
+export default function useDebounce(value: string, delay: number): string | undefined {
   const [bValue, setBValue] = useState<string>();
 
   useEffect(() => {
-    const baunce = setTimeout(() => {
+    const debounce = setTimeout(() => {
       setBValue(value);
     }, delay);
 
     return () => {
-      clearTimeout(baunce);
+      clearTimeout(debounce);
     };
   }, [value, delay]);
 
   return bValue;
 }
-
-/* 
-Example how to use this:
-
-
-
-*/

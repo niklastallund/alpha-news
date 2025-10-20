@@ -34,7 +34,7 @@ export default async function AdminArticlePage() {
                           {article.headline || "Untitled"}
                         </h3>
                         <p className="text-sm text-muted-foreground italic truncate">
-                          {article.summary || "No summary"}
+                          {`Editor's choice: ${article.editorsChoice}`}
                         </p>
                       </div>
 

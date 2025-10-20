@@ -33,11 +33,12 @@ export default function NavbarMenu({
           <NavigationMenuTrigger>News</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
+              <ListItem key="all" title="All" href={`/article`} />
               {categories.map((category) => (
                 <ListItem
                   key={category.id}
                   title={category.name}
-                  href={`/article`}
+                  href={`/article?cat=${encodeURIComponent(category.name)}`}
                 ></ListItem>
               ))}
             </ul>
@@ -47,12 +48,22 @@ export default function NavbarMenu({
           <NavigationMenuTrigger>{`Editor's Choice`}</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[100px] gap-2 md:w-[200px] md:grid-cols-2 lg:w-[300px]">
+              {/* Link to all editor's choice articles */}
+              <ListItem
+                key="editors-all"
+                title="All"
+                href={`/article?editors=1`}
+              />
+
+              {/* Per-category editor's choice links */}
               {categories.map((category) => (
                 <ListItem
                   key={category.id}
                   title={category.name}
-                  href={`/article`}
-                ></ListItem>
+                  href={`/article?editors=1&cat=${encodeURIComponent(
+                    category.name
+                  )}`}
+                />
               ))}
             </ul>
           </NavigationMenuContent>

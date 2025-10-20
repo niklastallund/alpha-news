@@ -1,10 +1,77 @@
+import ArticleCard from "@/components/ArticleCard";
+import CategoryFilter from "@/components/filtering/CategoryFilter";
+import EditorsChoiceToggle from "@/components/filtering/EditorsChoiceToggle";
 import Page from "@/components/Page";
+import SearchBar from "@/components/filtering/SearchBar";
+import { prisma } from "@/lib/prisma";
 
-export default async function ArticlePage() {
+// This page displays the all the articles according to the search query and filters.
+export default async function ArticlePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; cat?: string; editors?: string }>;
+}) {
+  // Get the search params to filter articles
+  const params = await searchParams;
+  const query = params.q || "";
+  const selectedCategory = params.cat || "";
+  const editorsOnly = params.editors === "1";
+
+  // Fetch articles from the database based on the search query
+  const articles = await prisma.article.findMany({
+    orderBy: { createdAt: "desc" },
+    where: {
+      headline: {
+        contains: query,
+        mode: "insensitive",
+      },
+      ...(selectedCategory
+        ? {
+            category: {
+              some: { name: selectedCategory },
+            },
+          }
+        : {}),
+      ...(editorsOnly ? { editorsChoice: true } : {}),
+    },
+  });
+
+  const categories = await prisma.category.findMany({
+    orderBy: { name: "asc" },
+  });
+
   return (
     <Page>
-      <div className="flex justify-center items-center">
-        Articles will soon™ be displayed here
+      {/* Controls row — same width as ArticleCard */}
+      <div className="mx-auto w-full max-w-3xl mb-4">
+        {/* Stack on small screens, row on sm+ */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          {/* Search should be full width on small screens, take remaining space on larger */}
+          <div className="w-full sm:flex-1">
+            <SearchBar />
+          </div>
+
+          {/* Keep filters from shrinking too small */}
+          <div className="flex items-center gap-2 sm:flex-shrink-0">
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+            />
+            <EditorsChoiceToggle />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center gap-4">
+        {articles.map((article) => (
+          <ArticleCard
+            key={article.id}
+            id={article.id}
+            image={article.image ?? undefined}
+            headline={article.headline ?? undefined}
+            editorsChoice={article.editorsChoice}
+          />
+        ))}
       </div>
     </Page>
   );

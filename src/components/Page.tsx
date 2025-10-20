@@ -7,7 +7,7 @@ interface Props {
 export default function Page({ children }: Props) {
   return (
     <div className="w-full mt-2">
-      <div className="container mx-auto bg-card text-card-foreground rounded-xl max-w-7xl">
+      <div className="container mx-auto rounded-xl lg:max-w-7xl max-w-xl">
         {children}
       </div>
     </div>

@@ -6,6 +6,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import { defaultSchema } from "hast-util-sanitize";
 import { Separator } from "./ui/separator";
+import { ChartColumnStacked, LibraryBig, ThumbsUp } from "lucide-react";
 
 interface ArticleProps {
   headline?: string;
@@ -50,21 +51,36 @@ export default function Article({
   authors = [],
 }: ArticleProps) {
   return (
-    <div className="flex my-10">
+    <div className="flex">
       <article className="prose lg:prose-lg">
-        <div className="mr-4">
-          {image && (
-            <Image
-              src={image}
-              alt={"null"}
-              width={1000}
-              height={1000}
-              className="min-w-xl"
-            />
-          )}
-        </div>
+        {image && (
+          <Image
+            src={image}
+            alt={"null"}
+            width={1000}
+            height={1000}
+            className="min-w-xl *:object-cover rounded-xs"
+          />
+        )}
 
         <h1>{headline}</h1>
+
+        {categories.length > 0 && (
+          <p className="mt-4 text-sm italic text-muted-foreground">
+            <span className="flex items-center">
+              <LibraryBig size={16} className="mr-1" />
+              {categories.join(", ")}
+            </span>
+          </p>
+        )}
+        {editorsChoice && (
+          <p className="text-sm italic text-green-600">
+            <span className="flex items-center">
+              <ThumbsUp size={16} className="mr-1" />
+              {`Editor's choice.`}
+            </span>
+          </p>
+        )}
 
         {/* Created and updated timestamps */}
         {(createdAt || updatedAt) && (
@@ -93,11 +109,7 @@ export default function Article({
         {/* Summary in bold */}
         <p className="font-bold whitespace-pre-line">{summary || ""}</p>
         {/* Categories */}
-        {categories.length > 0 && (
-          <p className="mt-4 text-sm italic text-muted-foreground">
-            {categories.join(", ")}
-          </p>
-        )}
+
         {authors.length > 0 && (
           <p className="mt-4 text-sm italic text-muted-foreground">{`Written by ${authors.join(
             ", "
@@ -111,11 +123,6 @@ export default function Article({
         >
           {content || ""}
         </ReactMarkdown>
-        {editorsChoice && (
-          <p className="mt-4 text-sm italic text-green-600">
-            {`Editor's choice.`}
-          </p>
-        )}
       </article>
     </div>
   );
