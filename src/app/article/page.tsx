@@ -1,11 +1,36 @@
 import Page from "@/components/Page";
+import SearchBar from "@/components/SearchBar";
+import { prisma } from "@/lib/prisma";
 
-export default async function ArticlePage() {
+// This page displays the all the articles according to the search query and filters.
+export default async function ArticlePage({
+  searchParams,
+}: {
+  searchParams: { q?: string };
+}) {
+  // Get the search params to filter articles
+  const params = await searchParams;
+  const query = params.q || "";
+
+  // Fetch articles from the database based on the search query
+  const articles = await prisma.article.findMany({
+    where: {
+      headline: {
+        contains: query,
+        mode: "insensitive",
+      },
+    },
+  });
+
   return (
     <Page>
-      <div className="flex justify-center items-center">
-        Articles will soon™ be displayed here
-      </div>
+      <SearchBar />
+      <ul>
+        {/*TODO: Replace this list with actual article rendering */}
+        {articles.map((article) => (
+          <li key={article.id}>{article.headline}</li>
+        ))}
+      </ul>
     </Page>
   );
 }
