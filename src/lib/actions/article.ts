@@ -52,7 +52,7 @@ export async function createArticle(formData: CreateArticleInput) {
         }))
       : undefined;
 
-  console.log(categoryConnectOrCreate);
+  // console.log(categoryConnectOrCreate);
 
   const article = await prisma.article.create({
     data: {

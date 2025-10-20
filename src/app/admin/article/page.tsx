@@ -9,7 +9,7 @@ export default async function AdminArticlePage() {
   const articles = await getArticles();
   const categories = await getCats();
 
-  console.log(JSON.stringify(categories));
+  // console.log(JSON.stringify(categories));
 
   return (
     <Page>
