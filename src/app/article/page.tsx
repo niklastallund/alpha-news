@@ -1,3 +1,4 @@
+import ArticleCard from "@/components/ArticleCard";
 import Page from "@/components/Page";
 import SearchBar from "@/components/SearchBar";
 import { prisma } from "@/lib/prisma";
@@ -28,7 +29,11 @@ export default async function ArticlePage({
       <ul>
         {/*TODO: Replace this list with actual article rendering */}
         {articles.map((article) => (
-          <li key={article.id}>{article.headline}</li>
+          <ArticleCard
+            key={article.id}
+            image={article.image ?? undefined}
+            headline={article.headline ?? undefined}
+          />
         ))}
       </ul>
     </Page>

@@ -54,13 +54,13 @@ export default function Article({
       <article className="prose lg:prose-lg">
         <div className="mr-4">
           {image && (
-            <Image
+           <Image
               src={image}
               alt={"null"}
               width={1000}
               height={1000}
               className="min-w-xl"
-            />
+            /> 
           )}
         </div>
 
