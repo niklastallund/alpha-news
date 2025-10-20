@@ -29,6 +29,13 @@ import {
 } from "@/validations/article-forms";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import { Textarea } from "@/components/ui/textarea";
+import ImageInput from "./ImageInput";
+import { useState } from "react";
+import {
+  deleteFileFromR2,
+  deleteImage,
+  uploadBase64ToR2,
+} from "@/lib/actions/ai";
 
 interface UpdateArticleFormProps {
   article: Article;
@@ -49,7 +56,39 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
 
   async function onSubmit(data: UpdateArticleInput) {
     try {
-      await updateArticle(data);
+      let image = data.image;
+
+      if (data.image !== article.image) {
+        image = ""; // If the user deleted it.
+
+        // So image has changed!
+        // We need to delete the old, and upload the new.
+
+        if (article.image) {
+          const deleted = await deleteFileFromR2(article.image);
+          // alert("Deleted " + deleted);
+        }
+
+        // Upload the new image, and set variable image to that image.
+        if (data.image) {
+          const upload = await uploadBase64ToR2(data.image); // Returns the URL.
+
+          if (upload.success) {
+            image = upload.data;
+            toast("Uploaded picture.");
+          } else {
+            toast.error("Could not upload picture.\n" + upload.msg);
+
+            return;
+          }
+        }
+      }
+
+      // Ersätt image med den uppladdade urlen:
+      const datWithImg = { ...data, image: image };
+
+      await updateArticle(datWithImg);
+      // alert(JSON.stringify(datWithImg));
       toast.success("Article updated");
     } catch (error) {
       toast.error("Failed to update article");
@@ -57,6 +96,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
     }
   }
 
+  const watchedArticleData = form.watch(["headline", "content", "summary"]);
   return (
     <Card className="w-full mx-auto">
       <CardHeader>
@@ -122,7 +162,17 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                 <FormItem>
                   <FormLabel>Image link</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <ImageInput
+                      showGenerate={true}
+                      articleData={{
+                        headline: watchedArticleData[0] ?? "",
+                        category: "", // So here we dont use category. maybe fix later, but it will still work.
+                        content: watchedArticleData[1] ?? "",
+                        summery: watchedArticleData[2] ?? "", // ok so e or a... fix
+                      }}
+                      showUploader={true}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

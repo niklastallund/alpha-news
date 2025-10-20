@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,36 +29,55 @@ import { toast } from "sonner";
 import { createArticle } from "@/lib/actions/article";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useRef, useState } from "react";
-import { GeneratedArticle } from "@/app/ai/ai";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { GeneratedArticle, uploadBase64ToR2 } from "@/lib/actions/ai";
+import { addCat } from "@/lib/actions/article";
 import Genai from "@/app/ai/Genai";
 import { MDXEditorMethods } from "@mdxeditor/editor";
+import MultiselectWithAdd, {
+  normalizeCategoryName,
+} from "@/app/ai/MultiselectBox";
+import { Category } from "@/generated/prisma/wasm";
+import { useRouter } from "next/navigation";
+import ImageInput from "./ImageInput";
 
 // Helper to parse CSV from form into a list of unique, trimmed category names.
 // Will remove duplicates (case-insensitive) and ignore empty entries.
 // You can check this by trying to for example add "News, news,  , Sports,,sports"
 // -> will result in ["News", "Sports"]
-function parseCategories(csv: string): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
+// function parseCategories(csv: string): string[] {
+//   const seen = new Set<string>();
+//   const out: string[] = [];
 
-  csv
-    .split(/[,\n]/g) // allow commas or newlines
-    .map((s) => s.trim().replace(/\s+/g, " ")) // trim and collapse internal spaces
-    .filter(Boolean)
-    .forEach((val) => {
-      const key = val.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        out.push(val);
-      }
-    });
+//   csv
+//     .split(/[,\n]/g) // allow commas or newlines
+//     .map((s) => s.trim().replace(/\s+/g, " ")) // trim and collapse internal spaces
+//     .filter(Boolean)
+//     .forEach((val) => {
+//       const key = val.toLowerCase();
+//       if (!seen.has(key)) {
+//         seen.add(key);
+//         out.push(val);
+//       }
+//     });
 
-  return out;
+//   return out;
+// }
+
+interface Props {
+  categories: Category[];
 }
 
-export default function CreateArticleForm() {
-  const [categoriesCsv, setCategoriesCsv] = useState<string>(""); // categories as CSV string
+export default function CreateArticleForm({ categories }: Props) {
+  const router = useRouter();
+  // const [categoriesCsv, setCategoriesCsv] = useState<string>(""); // categories as CSV string
 
   const form = useForm<CreateArticleInput>({
     resolver: zodResolver(createArticleSchema),
@@ -87,19 +107,22 @@ export default function CreateArticleForm() {
 
   useEffect(() => {
     if (importedArticle) {
+      // EDits by Tobbe.
       // Trim whitespace from category string and parse, probably unecessary but just to be sure.
-      importedArticle.category = `${importedArticle.category}`.trim();
-      const parsedCategories = parseCategories(importedArticle.category);
+      // importedArticle.category = `${importedArticle.category}`.trim();
+      // const parsedCategories = parseCategories(importedArticle.category);
 
-      // Update the CSV state to reflect parsed categories
-      setCategoriesCsv(parsedCategories.join(", "));
+      // // Update the CSV state to reflect parsed categories
+      // setCategoriesCsv(parsedCategories.join(", "));
 
       form.reset({
         headline: importedArticle.headline,
         summary: importedArticle.summery,
         content: importedArticle.content,
         image: importedArticle.imageUrl || form.getValues("image"),
-        categories: parsedCategories,
+        categories: importedArticle.category
+          ? importedArticle.category.split(",")
+          : [],
         editorsChoice: form.getValues("editorsChoice"),
       });
 
@@ -109,22 +132,74 @@ export default function CreateArticleForm() {
     }
   }, [form, importedArticle]);
 
+  const addCategory = useCallback(async (s: string) => {
+    const newCategory = await normalizeCategoryName(s).trim();
+
+    const result = await addCat(newCategory);
+    if (result.success) {
+      // Try to add it to the value;
+      const newVal = [
+        ...(form.getValues("categories") ?? []),
+        result.data.name,
+      ];
+
+      form.setValue(
+        "categories",
+        newVal.map((v) => v.toString())
+      );
+      toast("Added category " + newCategory + " to databse. 👍");
+    } else {
+      toast(
+        "ℹ️ Failed adding category " +
+          newCategory +
+          " to databse. \n" +
+          result.msg
+      );
+    }
+  }, []);
+
+  const watchedArticleData = form.watch([
+    "headline",
+    "categories",
+    "content",
+    "summary",
+  ]);
+
   //#endregion tobbe
 
   async function onSubmit(data: CreateArticleInput) {
+    let image = "";
+
+    // So first we try to upload the image!
+    if (data.image) {
+      const upload = await uploadBase64ToR2(data.image);
+
+      if (upload.success) {
+        image = upload.data;
+        toast("Uploaded picture");
+      } else {
+        toast.error("Could not upload picture.\n" + upload.msg);
+        return;
+      }
+    }
+
     try {
       // Re-parse just before submit, in case user made changes and didn't blur the input
-      const parsedCategories = parseCategories(categoriesCsv);
+      // const parsedCategories = parseCategories(categoriesCsv);
 
       // parsedCategories is guaranteed to be non-empty at this point due to form validation
-      await createArticle({
+      const newArt = await createArticle({
         ...data,
-        categories: parsedCategories,
+        image,
       });
 
       toast.success("Article created");
+
       form.reset();
-      setCategoriesCsv("");
+
+      router.push("/article/" + newArt.id.toString());
+
+      // setCategoriesCsv("");
     } catch (error) {
       toast.error("Failed to create article");
       console.error(error);
@@ -139,7 +214,12 @@ export default function CreateArticleForm() {
       </CardHeader>
       <CardContent>
         {!importGen && (
-          <Button onClick={() => setImportGen(true)}>Generate with ai</Button>
+          <Button
+            className="bg-blue-400 text-black"
+            onClick={() => setImportGen(true)}
+          >
+            Generate aticle with ai
+          </Button>
         )}
         <br />
 
@@ -147,6 +227,7 @@ export default function CreateArticleForm() {
           //Importeringskomponent:
           importGen && (
             <Genai
+              categories={categories}
               setter={setImportedArticle}
               close={close}
               img={false}
@@ -218,7 +299,15 @@ export default function CreateArticleForm() {
                 <FormItem>
                   <FormLabel>Categories (CSV)</FormLabel>
                   <FormControl>
-                    <Input
+                    <MultiselectWithAdd
+                      {...field}
+                      data={categories?.map((c) => c.name)}
+                      // values={categories?.map((c) => c.name)}
+                      placeholder="Select categories"
+                      adder={true}
+                      adderFun={addCategory}
+                    />
+                    {/* <Input
                       value={categoriesCsv}
                       onChange={(e) => {
                         setCategoriesCsv(e.target.value);
@@ -229,7 +318,7 @@ export default function CreateArticleForm() {
                         setCategoriesCsv(parsed.join(", "));
                       }}
                       placeholder="e.g. News, Sports, Technology"
-                    />
+                    /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -242,9 +331,19 @@ export default function CreateArticleForm() {
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image link</FormLabel>
+                  <FormLabel>Image</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <ImageInput
+                      showGenerate={true}
+                      articleData={{
+                        headline: watchedArticleData[0] ?? "",
+                        category: watchedArticleData[1].join(",") ?? "", // I guess this is ok? yes it is.
+                        content: watchedArticleData[2] ?? "",
+                        summery: watchedArticleData[3] ?? "", // ok so e or a... fix
+                      }}
+                      showUploader={true}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

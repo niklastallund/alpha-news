@@ -26,6 +26,7 @@ import {
   createCategorySchema,
 } from "@/validations/category-forms";
 import { createCategory } from "@/lib/actions/category";
+import { normalizeCategoryName } from "@/app/ai/MultiselectBox";
 
 export default function CreateCategoryForm() {
   const form = useForm<CreateCategoryInput>({
@@ -38,9 +39,14 @@ export default function CreateCategoryForm() {
 
   async function onSubmit(data: CreateCategoryInput) {
     try {
-      await createCategory(data);
-      toast.success("Category created!");
-      form.reset();
+      const name = data.name.trim(); // So lets just do this i guess.
+      if (name) {
+        await createCategory({ ...data, name });
+        toast.success("Category created!");
+        form.reset();
+      } else {
+        toast.error("Name is empty.");
+      }
     } catch (error) {
       toast.error("Failed to create category.");
       console.error(error);
@@ -63,7 +69,15 @@ export default function CreateCategoryForm() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      onChange={(e) =>
+                        form.setValue(
+                          field.name,
+                          normalizeCategoryName(e.target.value)
+                        )
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

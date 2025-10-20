@@ -1,18 +1,15 @@
 import Page from "@/components/Page";
+
+import { getArticles, getCats } from "@/lib/actions/article";
 import CreateArticleForm from "./forms/CreateArticle";
-import { prisma } from "@/lib/prisma";
 import UpdateArticleDialog from "./forms/UpdateArticleDialog";
 import { DeleteArticleButton } from "./forms/DeleteArticle";
 
 export default async function AdminArticlePage() {
-  const articles = await prisma.article.findMany({
-    orderBy: { updatedAt: "desc" },
-    include: { category: true },
-  });
+  const articles = await getArticles();
+  const categories = await getCats();
 
-  const allCategories = await prisma.category.findMany({
-    orderBy: { name: "asc" },
-  });
+  // console.log(JSON.stringify(categories));
 
   return (
     <Page>
@@ -21,11 +18,11 @@ export default async function AdminArticlePage() {
           <div className="flex flex-col lg:flex-row gap-6 items-start">
             {/* Left: Create form */}
             <div className="w-full lg:w-1/2">
-              <CreateArticleForm />
+              <CreateArticleForm categories={categories} />
             </div>
             {/* Right: Articles list */}
             <div className="w-full lg:w-1/2">
-              {articles.length > 0 ? (
+              {articles && articles.length > 0 ? (
                 <ul className="space-y-3">
                   {articles.map((article) => (
                     <li
@@ -42,7 +39,11 @@ export default async function AdminArticlePage() {
                       </div>
 
                       <div className="shrink-0 flex items-center gap-2">
-                        <UpdateArticleDialog article={article} currentCategories={article.category} allCategories={allCategories} />
+                        <UpdateArticleDialog
+                          article={article}
+                          currentCategories={article.category}
+                          allCategories={categories ?? []}
+                        />
                         <DeleteArticleButton
                           articleId={article.id}
                           articleHeadline={article.headline}

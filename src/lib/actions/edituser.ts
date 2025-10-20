@@ -35,7 +35,7 @@ const s3Client = new S3Client({
 export async function uploadUserImageToCloud(
   formData: FormData
 ): Promise<{ success: boolean; msg: string }> {
-  console.log("uploadUserImageToCloud called");
+  // console.log("uploadUserImageToCloud called");
 
   try {
     const userId = formData.get("userId") as string;
@@ -91,7 +91,7 @@ export async function uploadUserImageToCloud(
               Key: oldFileName,
             })
           );
-          console.log(`Deleted old image: ${oldFileName}`);
+          // console.log(`Deleted old image: ${oldFileName}`);
         } catch (e) {
           console.log("Could not delete old image:", e);
           // Continue anyway ✌️ =)
@@ -160,9 +160,9 @@ export async function uploadUserImageToCloud(
 export async function uploadUserImage(
   formData: FormData
 ): Promise<{ success: boolean; msg: string }> {
-  console.log(
-    "uploadUserImage called with formdata:\n" + JSON.stringify(formData)
-  );
+  // console.log(
+  //   "uploadUserImage called with formdata:\n" + JSON.stringify(formData)
+  // );
 
   try {
     const userId = formData.get("userId") as string;
@@ -281,7 +281,6 @@ export async function changeUserPw(
       if (!data) return { success: false, msg: "Failed" };
       return { success: true, msg: "Password changed." };
     } catch (e: unknown) {
-      console.log(JSON.stringify(e));
       return { success: false, msg: "Failed." };
     }
   } else {
@@ -344,7 +343,6 @@ export async function changeUserName(
 
       return { success: true, msg: "Name and email saved." };
     } catch (e: unknown) {
-      console.log(JSON.stringify(e));
       return { success: false, msg: "Failed." + JSON.stringify(e) };
     }
   } else {
