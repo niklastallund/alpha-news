@@ -50,19 +50,17 @@ export default function Article({
   authors = [],
 }: ArticleProps) {
   return (
-    <div className="flex my-10">
+    <div className="flex">
       <article className="prose lg:prose-lg">
-        <div className="mr-4">
-          {image && (
-           <Image
-              src={image}
-              alt={"null"}
-              width={1000}
-              height={1000}
-              className="min-w-xl"
-            /> 
-          )}
-        </div>
+        {image && (
+          <Image
+            src={image}
+            alt={"null"}
+            width={1000}
+            height={1000}
+            className="min-w-xl *:object-cover rounded-xs"
+          />
+        )}
 
         <h1>{headline}</h1>
 

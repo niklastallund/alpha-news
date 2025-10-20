@@ -25,17 +25,19 @@ export default async function ArticlePage({
 
   return (
     <Page>
-      <SearchBar />
-      <ul>
-        {/*TODO: Replace this list with actual article rendering */}
+      <div className="flex mb-4">
+        <SearchBar />
+      </div>
+      <div className="flex flex-col items-center gap-4">
         {articles.map((article) => (
           <ArticleCard
             key={article.id}
+            id={article.id}
             image={article.image ?? undefined}
             headline={article.headline ?? undefined}
           />
         ))}
-      </ul>
+      </div>
     </Page>
   );
 }

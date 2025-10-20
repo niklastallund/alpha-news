@@ -37,12 +37,16 @@ export default async function AdminArticlePage() {
                           {article.headline || "Untitled"}
                         </h3>
                         <p className="text-sm text-muted-foreground italic truncate">
-                          {article.summary || "No summary"}
+                          {`Editor's choice: ${article.editorsChoice}`}
                         </p>
                       </div>
 
                       <div className="shrink-0 flex items-center gap-2">
-                        <UpdateArticleDialog article={article} currentCategories={article.category} allCategories={allCategories} />
+                        <UpdateArticleDialog
+                          article={article}
+                          currentCategories={article.category}
+                          allCategories={allCategories}
+                        />
                         <DeleteArticleButton
                           articleId={article.id}
                           articleHeadline={article.headline}
