@@ -6,6 +6,7 @@ import { SessionProvider } from "@/lib/SessionProvider";
 import { getSessionData } from "@/lib/actions/sessiondata";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,10 +48,10 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {/* Also put navbar inside here! */}
             <Navbar />
             {children}
             <Toaster richColors position="top-center" />
+            <CookieConsent />
           </ThemeProvider>
         </SessionProvider>
       </body>

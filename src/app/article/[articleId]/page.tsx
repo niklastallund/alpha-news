@@ -15,7 +15,7 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
     return redirect("/articles");
   }
 
-  // Fetch the article and include the genres and crew
+  // Fetch the article and include the related category and author names
   const article = await prisma.article.findUnique({
     where: { id: articleId },
     include: {
