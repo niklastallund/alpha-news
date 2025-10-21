@@ -13,6 +13,10 @@ import {
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 
+// Niklas: Not sure if we really need anything more complex than this for cookie consent
+// Could use next/headers cookies of course for SSR, but that would add complexity and
+// since we don't really use the cookies for anything related to the server it feels unnecessary.
+// This implementation uses localStorage and document.cookie on the client side only.
 export function CookieConsent() {
   // isMounted is used to avoid SSR mismatch (hydration issues)
   const [isMounted, setIsMounted] = useState(false);
@@ -38,7 +42,8 @@ export function CookieConsent() {
     try {
       localStorage.setItem("cookie_consent", value ? "true" : "false");
       const expires = new Date();
-      expires.setFullYear(expires.getFullYear() + 1);
+      // Set cookie to expire in 1 month
+      expires.setMonth(expires.getMonth() + 1);
       document.cookie = `cookie_consent=${
         value ? "true" : "false"
       }; path=/; expires=${expires.toUTCString()}; SameSite=Lax;`;
