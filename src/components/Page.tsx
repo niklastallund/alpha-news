@@ -6,7 +6,7 @@ interface Props {
 
 export default function Page({ children }: Props) {
   return (
-    <div className="w-full mt-2">
+    <div className="w-full">
       <div className="container mx-auto rounded-xl lg:max-w-7xl max-w-xl">
         {children}
       </div>

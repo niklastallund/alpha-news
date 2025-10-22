@@ -7,6 +7,7 @@ import { getSessionData } from "@/lib/actions/sessiondata";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { CookieConsent } from "@/components/CookieConsent";
+import { Footer } from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,6 +51,7 @@ export default async function RootLayout({
           >
             <Navbar />
             {children}
+            <Footer />
             <Toaster richColors position="top-center" />
             <CookieConsent />
           </ThemeProvider>
