@@ -6,7 +6,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import { defaultSchema } from "hast-util-sanitize";
 import { Separator } from "./ui/separator";
-import { ChartColumnStacked, LibraryBig, ThumbsUp } from "lucide-react";
+import { LibraryBig, ThumbsUp } from "lucide-react";
 
 interface ArticleProps {
   headline?: string;
@@ -52,14 +52,14 @@ export default function Article({
 }: ArticleProps) {
   return (
     <div className="flex">
-      <article className="prose lg:prose-lg">
+      <article className="prose dark:prose-invert lg:prose-lg">
         {image && (
           <Image
             src={image}
             alt={"null"}
             width={1000}
             height={1000}
-            className="min-w-xl *:object-cover rounded-xs"
+            className="min-w-xl object-cover rounded-xs"
           />
         )}
 

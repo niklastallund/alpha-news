@@ -38,7 +38,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-2">
                 <Building2 />{" "}
-                <span>In a random datacenter somewhere in Germany</span>
+                <span>In a random datacenter somewhere in the world</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4" /> <span>(555) FACTS-333</span>
