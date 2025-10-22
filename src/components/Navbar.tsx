@@ -20,7 +20,7 @@ export default async function Navbar() {
   });
 
   return (
-    <nav className="sticky top-0 mb-5 z-50 bg-background/100 border-b-2 border-border">
+    <nav className="sticky top-0 mb-2 z-50 bg-background/100 border-b-2 border-border">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between py-2">
           <Link

@@ -32,8 +32,8 @@ export default async function Home() {
           ))}
         </div>
 
-        {/* Aside: fixed width on md+, full width on small screens */}
-        <aside className="w-full md:w-sm flex flex-col justify-center items-end gap-4">
+        {/* Aside */}
+        <aside className="w-sm flex flex-col justify-center items-end gap-4">
           <Weather />
           <Currency />
         </aside>

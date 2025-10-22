@@ -38,7 +38,7 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
 
   return (
     <Page>
-      <main className="relative flex items-center justify-center">
+      <main className="relative flex items-center justify-center mt-5">
         <Article
           headline={article.headline ?? undefined}
           summary={article.summary ?? undefined}
