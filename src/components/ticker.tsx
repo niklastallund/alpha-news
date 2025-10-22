@@ -12,10 +12,17 @@ const Ticker = () => (
       gradient={false} // ingen gradient i kanterna
       direction="left" // riktning: 'left' eller 'right'
     >
-      <div className="flex gap-12 text-lg font-medium tracking-wide">
-        <span> React Fast Marquee är enkel ticker!</span>
-        <span> Lägg till flera meddelanden med mellanrum.</span>
-        <span> Lägg till flera meddelanden här.</span>
+      <div className="flex gap-24 text-lg font-medium tracking-wide pr-24">
+        <span>
+          {" "}
+          BREAKING: Cats are unable to fly because they lack the necessary wing
+          structure.
+        </span>
+        <span>
+          Just Now: The Beatles announce reunion tour hours after John Lennon
+          resurrection.
+        </span>
+        <span> {`WARNING: Do not drink bleach, it is dangerous.`} </span>
       </div>
     </Marquee>
   </div>

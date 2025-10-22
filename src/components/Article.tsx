@@ -6,7 +6,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import { defaultSchema } from "hast-util-sanitize";
 import { Separator } from "./ui/separator";
-import { LibraryBig, ThumbsUp } from "lucide-react";
+import { LibraryBig, PencilLine, ThumbsUp } from "lucide-react";
 
 interface ArticleProps {
   headline?: string;
@@ -111,9 +111,12 @@ export default function Article({
         {/* Categories */}
 
         {authors.length > 0 && (
-          <p className="mt-4 text-sm italic text-muted-foreground">{`Written by ${authors.join(
-            ", "
-          )}`}</p>
+          <p className="mt-4 text-sm italic text-muted-foreground">
+            <span className="flex items-center">
+              <PencilLine size={16} className="mr-1" />
+              {`Written by ${authors.join(", ")}`}
+            </span>
+          </p>
         )}
         <Separator className="my-4" />
 
