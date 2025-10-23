@@ -7,6 +7,8 @@ import rehypeSanitize from "rehype-sanitize";
 import { defaultSchema } from "hast-util-sanitize";
 import { Separator } from "./ui/separator";
 import { LibraryBig, PencilLine, ThumbsUp } from "lucide-react";
+import { Comment } from "@/generated/prisma";
+import CommentSection from "./comments/CommentSection";
 
 interface ArticleProps {
   headline?: string;
@@ -18,6 +20,7 @@ interface ArticleProps {
   updatedAt?: Date;
   categories?: string[];
   authors?: string[];
+  comments?: Comment[];
 }
 
 // Extend the default sanitize schema to allow <u> tags
@@ -49,9 +52,10 @@ export default function Article({
   updatedAt,
   categories = [],
   authors = [],
+  comments = [],
 }: ArticleProps) {
   return (
-    <div className="flex">
+    <div className="flex flex-col">
       <article className="prose dark:prose-invert lg:prose-lg">
         {image && (
           <Image
@@ -127,6 +131,9 @@ export default function Article({
           {content || ""}
         </ReactMarkdown>
       </article>
+      <Separator className="my-6" />
+      <h1 className="text-2xl">Comments</h1>
+      <CommentSection />
     </div>
   );
 }
