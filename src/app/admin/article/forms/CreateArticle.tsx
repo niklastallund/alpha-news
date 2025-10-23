@@ -94,7 +94,7 @@ export default function CreateArticleForm({ categories }: Props) {
 
       form.reset({
         headline: importedArticle.headline,
-        summary: importedArticle.summery,
+        summary: importedArticle.summary,
         content: importedArticle.content,
         image: importedArticle.imageUrl || form.getValues("image"),
         categories: importedArticle.category
@@ -319,7 +319,7 @@ export default function CreateArticleForm({ categories }: Props) {
                         headline: watchedArticleData[0] ?? "",
                         category: watchedArticleData[1].join(",") ?? "", // I guess this is ok? yes it is.
                         content: watchedArticleData[2] ?? "",
-                        summery: watchedArticleData[3] ?? "", // ok so e or a... fix
+                        summary: watchedArticleData[3] ?? "", // ok so e or a... fix
                       }}
                       showUploader={true}
                       {...field}

@@ -183,7 +183,7 @@ export default function Genai({
       headline: generatedArticle.headline,
       category: generatedArticle.category,
       content: generatedArticle.content,
-      summery: generatedArticle.summery,
+      summary: generatedArticle.summary,
     };
 
     const newImg = await generateImageForArticle(asTheRightType);
@@ -344,7 +344,7 @@ export default function Genai({
               <br />
               <br />
               <span className="italic">
-                Summery: {generatedArticle?.summery}
+                Summary: {generatedArticle?.summary}
               </span>
               <br />
               <br />

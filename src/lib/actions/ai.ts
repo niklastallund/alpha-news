@@ -35,20 +35,20 @@ const s3Client = new S3Client({
 // This is only for the ai how to form the object, so img is not here it is its own function.
 const articlePromptSchema = z.object({
   headline: z.string(),
-  summery: z.string(),
+  summary: z.string(),
   content: z.string(),
 });
 
 export type GeneratedArticleBase = {
   headline: string;
-  summery: string;
+  summary: string;
   content: string;
   category: string;
 };
 
 export type GeneratedArticle = {
   headline: string;
-  summery: string;
+  summary: string;
   content: string;
   category: string;
   imageUrl?: string;
@@ -229,7 +229,7 @@ export async function dbg_focusOnImage(): Promise<
     category: "test",
     content: "Test article",
     headline: "Lexicon programming school",
-    summery: "a school in Linköping teaching adults about programming.",
+    summary: "a school in Linköping teaching adults about programming.",
   };
 
   const img = await generateImageForArticle(fakeNews);
@@ -293,8 +293,8 @@ export async function generateImageForArticle(
       imagePrompt += " with the headline " + article.headline;
     }
 
-    if (article.summery.length > 0) {
-      imagePrompt += " and the summery: " + article.summery + ". ";
+    if (article.summary.length > 0) {
+      imagePrompt += " and the summary: " + article.summary + ". ";
     }
     imagePrompt += " The image should be realistic.";
 
@@ -375,7 +375,7 @@ async function gererateNewsObject(
     const { object } = await generateObject({
       model: google("gemini-2.5-flash"),
       // Ändra prompten till denna:
-      prompt: `Based on "${getPureArticle.data}" that is an article in the category ${category}, create three fields: title, summery och content. Title should be a good headline between 10 and 100 chars suitable for the category ${category} in a newspaper. Summery should be a brief summary of the article between 100 and 400 chars. NO MD formatting in other fields that content. Content can be the article as it is, adjust if needd. It is important that you split the content into paragraphs, and add MD formatting to the content, the length of content should be ${words} words long. Content should not have a headline so no h1 there. Only return JSON format with these three fields and without any other text, and only MD formatting in content. Not so much bold in content.`,
+      prompt: `Based on "${getPureArticle.data}" that is an article in the category ${category}, create three fields: title, summary och content. Title should be a good headline between 10 and 100 chars suitable for the category ${category} in a newspaper. Summary should be a brief summary of the article between 100 and 400 chars. NO MD formatting in other fields that content. Content can be the article as it is, adjust if needd. It is important that you split the content into paragraphs, and add MD formatting to the content, the length of content should be ${words} words long. Content should not have a headline so no h1 there. Only return JSON format with these three fields and without any other text, and only MD formatting in content. Not so much bold in content.`,
       schema: articlePromptSchema,
     });
 
@@ -394,7 +394,7 @@ async function gererateNewsObject(
  * Generates a news article based on the provided prompt and category.
  * @param prompt Enter what the articlas is about, example ai in school.
  * @param category Enter the category of the article.
- * @returns An object containing the headline, summery, content, category, and an imageUrl.
+ * @returns An object containing the headline, summary, content, category, and an imageUrl.
  */
 export async function generateArticle(
   prompt: string,

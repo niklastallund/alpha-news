@@ -168,7 +168,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                         headline: watchedArticleData[0] ?? "",
                         category: "", // So here we dont use category. maybe fix later, but it will still work.
                         content: watchedArticleData[1] ?? "",
-                        summery: watchedArticleData[2] ?? "", // ok so e or a... fix
+                        summary: watchedArticleData[2] ?? "", // ok so e or a... fix
                       }}
                       showUploader={true}
                       {...field}

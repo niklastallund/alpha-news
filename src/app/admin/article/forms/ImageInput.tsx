@@ -45,7 +45,7 @@ export default function ImageInput({
 
     if (
       articleData.headline.trim().length < 1 &&
-      articleData.summery.trim().length < 1 &&
+      articleData.summary.trim().length < 1 &&
       articleData.category.trim().length < 1
     )
       return;
@@ -56,7 +56,7 @@ export default function ImageInput({
       headline: articleData.headline,
       category: articleData.category,
       content: articleData.content,
-      summery: articleData.summery,
+      summary: articleData.summary,
     };
 
     // alert("Generating based on " + JSON.stringify(asTheRightType));
@@ -128,7 +128,7 @@ export default function ImageInput({
               {!genMsg &&
                 !(
                   articleData.headline.trim().length < 1 &&
-                  articleData.summery.trim().length < 1 &&
+                  articleData.summary.trim().length < 1 &&
                   articleData.category.trim().length < 1
                 ) && (
                   <Button
@@ -141,7 +141,7 @@ export default function ImageInput({
                   </Button>
                 )}
               {articleData.headline.trim().length < 1 &&
-                articleData.summery.trim().length < 1 &&
+                articleData.summary.trim().length < 1 &&
                 articleData.category.trim().length < 1 && (
                   <div className="bg-amber-200 p-2 rounded-lg text-sm">
                     Enter a headline/summary, or add a category to generate.
