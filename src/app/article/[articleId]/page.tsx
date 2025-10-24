@@ -31,6 +31,7 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
         },
       },
       comments: {
+        orderBy: { createdAt: "asc" },
         include: {
           author: true,
         },

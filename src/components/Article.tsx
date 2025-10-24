@@ -7,6 +7,7 @@ import { Separator } from "./ui/separator";
 import { LibraryBig, PencilLine, ThumbsUp } from "lucide-react";
 import { Prisma } from "@/generated/prisma";
 import CommentSection from "./comments/CommentSection";
+import { wasEdited } from "@/lib/date";
 
 // Export type for comments with author info, used in child components
 export type CommentWithAuthor = Prisma.CommentGetPayload<{
@@ -103,29 +104,16 @@ export default function Article({
         )}
 
         {/* Created and updated timestamps */}
-        {(createdAt || updatedAt) && (
-          <div className="flex items-center text-sm space-x-3">
-            {createdAt && (
-              <time
-                dateTime={new Date(createdAt).toISOString()}
-                className="inline"
-              >
-                {`Created: ${formatDateTime(createdAt)}`}
-              </time>
-            )}
-            {createdAt && updatedAt && (
-              <span className="text-muted-foreground">•</span>
-            )}
-            {updatedAt && (
-              <time
-                dateTime={new Date(updatedAt).toISOString()}
-                className="inline text-muted-foreground"
-              >
-                {`Updated: ${formatDateTime(updatedAt)}`}
-              </time>
-            )}
-          </div>
-        )}
+        <div className="flex items-center text-sm space-x-3">
+          {createdAt && (
+            <p className="inline">{`Created: ${formatDateTime(createdAt)}`}</p>
+          )}
+          {wasEdited(createdAt, updatedAt) && (
+            <p className="inline text-muted-foreground">
+              {`Updated: ${formatDateTime(updatedAt)}`}
+            </p>
+          )}
+        </div>
 
         {/* Summary in bold */}
         <p className="font-bold whitespace-pre-line">{summary || ""}</p>

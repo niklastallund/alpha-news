@@ -19,7 +19,8 @@ interface CreateCommentFormProps {
   userId: string;
 }
 
-export default function AddCommentForm({
+// This component renders a form to add a new comment to an article.
+export default function CreateCommentForm({
   articleId,
   userId,
 }: CreateCommentFormProps) {
