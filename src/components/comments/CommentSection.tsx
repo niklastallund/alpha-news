@@ -1,73 +1,36 @@
-import React, { useState } from "react";
+import React from "react";
 import { CommentItem } from "./CommentItem";
 import AddCommentForm from "./AddCommentForm";
+import { getSessionData } from "@/lib/actions/sessiondata";
+import { CommentWithAuthor } from "../Article";
 
-type TempUser = {
-  id: string;
-  name: string;
-  image?: string;
-  role?: string;
-};
+interface CommentSectionProps {
+  comments: CommentWithAuthor[];
+  articleId: number;
+}
 
-type TempComment = {
-  id: number;
-  content: string;
-  createdAt: Date;
-  user: TempUser;
-};
-
-const TEMP_COMMENTS: TempComment[] = [
-  {
-    id: 1,
-    content: "Great article — learned a lot. Thanks!",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
-    user: { id: "u1", name: "Alice Johnson", image: "", role: "Reader" },
-  },
-  {
-    id: 2,
-    content:
-      "I disagree with some points, but overall well written.I disagree with some points, but overall well written. I disagree with some points, but overall well written.I disagree with some points, but overall well written. I disagree with some points, but overall well written. ",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
-    user: { id: "u2", name: "Bob Smith", image: "", role: "Subscriber" },
-  },
-  {
-    id: 3,
-    content: "Can someone explain the second paragraph?",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    user: { id: "u3", name: "Charlie", image: "", role: "" },
-  },
-  {
-    id: 4,
-    content: "Nice write-up. Saved for later.",
-    createdAt: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
-    user: { id: "u4", name: "Dana K", image: "", role: "Editor" },
-  },
-  {
-    id: 5,
-    content: "Proofreading note: a typo in the last sentence.",
-    createdAt: new Date(),
-    user: { id: "u5", name: "Eve", image: "", role: "Contributor" },
-  },
-];
-
-export default function CommentSection() {
-  const [comments] = useState(TEMP_COMMENTS);
+export default async function CommentSection({
+  comments,
+  articleId,
+}: CommentSectionProps) {
+  const session = await getSessionData();
 
   return (
-    <div className="flex flex-col mt-8 space-y-3 max-w-2xl">
-      <AddCommentForm />
-      {comments.map((c) => (
-        <CommentItem
-          key={c.id}
-          comment={{
-            id: c.id,
-            content: c.content,
-            createdAt: c.createdAt,
-          }}
-          user={c.user}
-          onLike={(id) => console.log("like:", id)}
-        />
-      ))}
+    <div className="flex flex-col space-y-3 max-w-2xl">
+      <h1 className="text-2xl">Comments</h1>
+      {session && (
+        <AddCommentForm userId={session.user.id} articleId={articleId} />
+      )}
+      {comments.map((comment) => {
+        return (
+          <CommentItem
+            key={comment.id}
+            comment={comment}
+            user={comment.author}
+            isAuthor={session?.user.id === comment.author?.id}
+          />
+        );
+      })}
     </div>
   );
 }

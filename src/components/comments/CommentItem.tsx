@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
+import { Button } from "@/components/ui/button";
 
 // Background colors for avatar placeholders
 const AVATAR_BG = [
@@ -51,18 +52,45 @@ interface CommentProps {
   user: {
     id: string;
     name: string;
-    image?: string;
-    role?: string;
+    image: string | null;
+    role: string | null;
   };
 
-  onLike?: (id: number) => void;
+  isAuthor: boolean;
+
+  // TODO: optional callback when the comment is edited?
+  onEdit?: (id: number, newContent: string) => Promise<void> | void;
 }
 
 export function CommentItem({
   comment: { id, content, createdAt },
   user,
-  onLike,
+  isAuthor,
+  onEdit,
 }: CommentProps) {
+  // local state so we can optimistically show edits
+  const [isEditing, setIsEditing] = useState(false);
+  const [localContent, setLocalContent] = useState(content);
+  const [editedContent, setEditedContent] = useState(content);
+
+  useEffect(() => {
+    setLocalContent(content);
+    setEditedContent(content);
+  }, [content]);
+
+  //TODO add toasts for success / error
+  async function handleSave() {
+    try {
+      if (onEdit) {
+        await onEdit(id, editedContent);
+      }
+      setLocalContent(editedContent);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Failed to save comment edit", err);
+    }
+  }
+
   return (
     <Card className="shadow-sm">
       <CardContent className="px-5 py-2">
@@ -81,20 +109,67 @@ export function CommentItem({
 
           {/* Commenter name and role */}
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-medium">{user.name}</span>
-              {user.role && (
-                <span className="text-xs text-muted-foreground">
-                  {user.role}
-                </span>
+            {/* changed: allow a control area to the right for Edit / Save / Cancel */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-medium">{user.name}</span>
+                {user.role && (
+                  <span className="text-xs text-muted-foreground">
+                    {user.role}
+                  </span>
+                )}
+              </div>
+
+              {/* show Edit button only for the comment author */}
+              {isAuthor && (
+                <div>
+                  {isEditing ? (
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={handleSave}>
+                        Save
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setIsEditing(false);
+                          setEditedContent(localContent);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
 
-            {/* Comment content */}
-            <ReactMarkdown>{content}</ReactMarkdown>
+            {/* Comment content (editable when isEditing) */}
+            <div className="my-2">
+              {isEditing ? (
+                <textarea
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  className="w-full rounded border p-2"
+                  rows={4}
+                />
+              ) : (
+                <ReactMarkdown>{localContent}</ReactMarkdown>
+              )}
+            </div>
 
             {/* Comment metadata */}
-            <div className="mt-1 block text-xs text-muted-foreground">
+            <div className=" block text-xs text-muted-foreground">
               {formatDateTime(createdAt)}
             </div>
           </div>

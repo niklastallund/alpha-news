@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -7,10 +5,18 @@ import rehypeSanitize from "rehype-sanitize";
 import { defaultSchema } from "hast-util-sanitize";
 import { Separator } from "./ui/separator";
 import { LibraryBig, PencilLine, ThumbsUp } from "lucide-react";
-import { Comment } from "@/generated/prisma";
+import { Prisma } from "@/generated/prisma";
 import CommentSection from "./comments/CommentSection";
 
+// Export type for comments with author info, used in child components
+export type CommentWithAuthor = Prisma.CommentGetPayload<{
+  include: {
+    author: { select: { id: true; name: true; image: true; role: true } };
+  };
+}>;
+
 interface ArticleProps {
+  id: number;
   headline?: string;
   summary?: string;
   content?: string;
@@ -20,7 +26,7 @@ interface ArticleProps {
   updatedAt?: Date;
   categories?: string[];
   authors?: string[];
-  comments?: Comment[];
+  comments?: CommentWithAuthor[];
 }
 
 // Extend the default sanitize schema to allow <u> tags
@@ -43,6 +49,7 @@ function formatDateTime(d?: Date) {
 }
 
 export default function Article({
+  id,
   headline,
   summary,
   content,
@@ -57,6 +64,8 @@ export default function Article({
   return (
     <div className="flex flex-col">
       <article className="prose dark:prose-invert lg:prose-lg">
+        <h1>{headline}</h1>
+
         {image && (
           <Image
             src={image}
@@ -67,23 +76,30 @@ export default function Article({
           />
         )}
 
-        <h1>{headline}</h1>
+        {/* Categories and editor's choice, show on one line if both exist */}
+        {(categories.length > 0 || editorsChoice) && (
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm italic text-muted-foreground min-w-0">
+              <span className="flex items-center min-w-0">
+                <LibraryBig size={16} className="mr-1 flex-shrink-0" />
+                <span
+                  className="truncate"
+                  title={categories.join(", ")} // hover shows full list (if truncated)
+                >
+                  {categories.join(", ")}
+                </span>
+              </span>
+            </p>
 
-        {categories.length > 0 && (
-          <p className="mt-4 text-sm italic text-muted-foreground">
-            <span className="flex items-center">
-              <LibraryBig size={16} className="mr-1" />
-              {categories.join(", ")}
-            </span>
-          </p>
-        )}
-        {editorsChoice && (
-          <p className="text-sm italic text-green-600">
-            <span className="flex items-center">
-              <ThumbsUp size={16} className="mr-1" />
-              {`Editor's choice.`}
-            </span>
-          </p>
+            {editorsChoice && (
+              <p className="text-sm italic text-green-600 flex-shrink-0">
+                <span className="flex items-center">
+                  <ThumbsUp size={16} className="mr-1" />
+                  {`Editor's choice.`}
+                </span>
+              </p>
+            )}
+          </div>
         )}
 
         {/* Created and updated timestamps */}
@@ -110,10 +126,11 @@ export default function Article({
             )}
           </div>
         )}
+
         {/* Summary in bold */}
         <p className="font-bold whitespace-pre-line">{summary || ""}</p>
-        {/* Categories */}
 
+        {/* Authors */}
         {authors.length > 0 && (
           <p className="mt-4 text-sm italic text-muted-foreground">
             <span className="flex items-center">
@@ -132,8 +149,7 @@ export default function Article({
         </ReactMarkdown>
       </article>
       <Separator className="my-6" />
-      <h1 className="text-2xl">Comments</h1>
-      <CommentSection />
+      <CommentSection comments={comments} articleId={id} />
     </div>
   );
 }

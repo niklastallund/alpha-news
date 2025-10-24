@@ -5,23 +5,42 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { ForwardRefEditor } from "../ForwardRefEditor";
 import { Button } from "../ui/button";
+import { CreateCommentInput } from "@/validations/comment-forms";
+import { createComment } from "@/lib/actions/comment";
+import { useRouter } from "next/navigation";
 
-export default function AddCommentForm() {
-  const form = useForm({
+interface CreateCommentFormProps {
+  articleId: number;
+  userId: string;
+}
+
+export default function AddCommentForm({
+  articleId,
+  userId,
+}: CreateCommentFormProps) {
+  const form = useForm<CreateCommentInput>({
     defaultValues: {
-      comment: "",
+      content: "",
+      articleId: articleId,
+      userId: userId,
     },
   });
 
-  function onSubmit() {
-    //TODO
-    return;
+  const router = useRouter();
+
+  async function onSubmit(values: CreateCommentInput) {
+    try {
+      await createComment(values);
+      form.reset();
+      router.refresh();
+    } catch (err) {
+      console.error("Failed to create comment", err);
+    }
   }
 
   return (
@@ -30,21 +49,21 @@ export default function AddCommentForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           <FormField
             control={form.control}
-            name="comment"
+            name="content"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <ForwardRefEditor markdown={field.value || ""} {...field} />
+                  <ForwardRefEditor
+                    markdown={field.value || ""}
+                    {...field}
+                    placeholder="Write a comment..."
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button
-            variant="outline"
-            type="submit"
-            disabled={form.formState.isSubmitting}
-          >
+          <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Adding comment..." : "Comment"}
           </Button>
         </form>

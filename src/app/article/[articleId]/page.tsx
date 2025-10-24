@@ -16,6 +16,7 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
   }
 
   // Fetch the article and include the related category and author names
+  // plus any comments written on the article.
   const article = await prisma.article.findUnique({
     where: { id: articleId },
     include: {
@@ -29,6 +30,11 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
           name: true,
         },
       },
+      comments: {
+        include: {
+          author: true,
+        },
+      },
     },
   });
 
@@ -40,6 +46,7 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
     <Page>
       <main className="relative flex items-center justify-center mt-5">
         <Article
+          id={article.id}
           headline={article.headline ?? undefined}
           summary={article.summary ?? undefined}
           content={article.content ?? undefined}
@@ -49,6 +56,7 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
           updatedAt={article.updatedAt}
           categories={article.category.map((cat) => cat.name)}
           authors={article.author.map((auth) => auth.name)}
+          comments={article.comments}
         />
       </main>
     </Page>

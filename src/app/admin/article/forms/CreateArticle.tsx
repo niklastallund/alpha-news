@@ -265,6 +265,7 @@ export default function CreateArticleForm({ categories }: Props) {
                       {...field}
                       ref={ref}
                       key={editorKey}
+                      placeholder="Write the content using markdown..."
                     />
                   </FormControl>
                   <FormMessage />
