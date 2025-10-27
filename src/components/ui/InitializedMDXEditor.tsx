@@ -2,6 +2,7 @@
 
 import type { ForwardedRef } from "react";
 import "@mdxeditor/editor/style.css";
+import { useTheme } from "next-themes";
 
 import {
   headingsPlugin,
@@ -19,6 +20,7 @@ import {
   linkPlugin,
   linkDialogPlugin,
   tablePlugin,
+  BlockTypeSelect,
 } from "@mdxeditor/editor";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 
@@ -27,10 +29,13 @@ export default function InitializedMDXEditor({
   editorRef,
   ...props
 }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+  const { theme } = useTheme();
+
   return (
     <div className="border rounded-md">
       <MDXEditor
-        contentEditableClassName="prose"
+        contentEditableClassName={`prose dark:prose-invert`}
+        className={`${theme}-theme ${theme}-editor`}
         plugins={[
           toolbarPlugin({
             toolbarClassName: "my-classname",

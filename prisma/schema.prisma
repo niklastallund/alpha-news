@@ -21,9 +21,11 @@ model User {
   banReason        String?
   banExpires       DateTime?
   stripeCustomerId String?
-  sessions         Session[]
-  accounts         Account[]
-  article          Article[]
+
+  sessions Session[]
+  accounts Account[]
+  article  Article[]
+  comments Comment[]
 
   @@unique([email])
   @@map("user")
@@ -86,6 +88,7 @@ model Article {
 
   author   User[]
   category Category[]
+  comments Comment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -117,4 +120,16 @@ model Subscription {
   seats                Int?
 
   @@map("subscription")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  authorId  String
+  articleId Int
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -7,8 +5,19 @@ import rehypeSanitize from "rehype-sanitize";
 import { defaultSchema } from "hast-util-sanitize";
 import { Separator } from "./ui/separator";
 import { LibraryBig, PencilLine, ThumbsUp } from "lucide-react";
+import { Prisma } from "@/generated/prisma";
+import CommentSection from "./comments/CommentSection";
+import { wasEdited } from "@/lib/date";
+
+// Export type for comments with author info, used in child components
+export type CommentWithAuthor = Prisma.CommentGetPayload<{
+  include: {
+    author: { select: { id: true; name: true; image: true; role: true } };
+  };
+}>;
 
 interface ArticleProps {
+  id: number;
   headline?: string;
   summary?: string;
   content?: string;
@@ -18,6 +27,7 @@ interface ArticleProps {
   updatedAt?: Date;
   categories?: string[];
   authors?: string[];
+  comments?: CommentWithAuthor[];
 }
 
 // Extend the default sanitize schema to allow <u> tags
@@ -40,6 +50,7 @@ function formatDateTime(d?: Date) {
 }
 
 export default function Article({
+  id,
   headline,
   summary,
   content,
@@ -49,67 +60,65 @@ export default function Article({
   updatedAt,
   categories = [],
   authors = [],
+  comments = [],
 }: ArticleProps) {
   return (
-    <div className="flex">
+    <div className="flex flex-col">
       <article className="prose dark:prose-invert lg:prose-lg">
+        <h1 className="!mb-4">{headline}</h1>
+
+        {/* Categories and editor's choice, show on one line if both exist */}
+        {(categories.length > 0 || editorsChoice) && (
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm italic text-muted-foreground min-w-0">
+              <span className="flex items-center min-w-0">
+                <LibraryBig size={16} className="mr-1 flex-shrink-0" />
+                <span
+                  className="truncate"
+                  title={categories.join(", ")} // hover shows full list (if truncated)
+                >
+                  {categories.join(", ")}
+                </span>
+              </span>
+            </p>
+
+            {editorsChoice && (
+              <p className="text-sm italic text-green-600 flex-shrink-0">
+                <span className="flex items-center">
+                  <ThumbsUp size={16} className="mr-1" />
+                  {`Editor's choice.`}
+                </span>
+              </p>
+            )}
+          </div>
+        )}
+
         {image && (
           <Image
             src={image}
             alt={"null"}
             width={1000}
             height={1000}
-            className="min-w-xl object-cover rounded-xs"
+            className="!mt-4 min-w-xl object-cover rounded-xs"
           />
         )}
 
-        <h1>{headline}</h1>
-
-        {categories.length > 0 && (
-          <p className="mt-4 text-sm italic text-muted-foreground">
-            <span className="flex items-center">
-              <LibraryBig size={16} className="mr-1" />
-              {categories.join(", ")}
-            </span>
-          </p>
-        )}
-        {editorsChoice && (
-          <p className="text-sm italic text-green-600">
-            <span className="flex items-center">
-              <ThumbsUp size={16} className="mr-1" />
-              {`Editor's choice.`}
-            </span>
-          </p>
-        )}
-
-        {/* Created and updated timestamps */}
-        {(createdAt || updatedAt) && (
-          <div className="flex items-center text-sm space-x-3">
-            {createdAt && (
-              <time
-                dateTime={new Date(createdAt).toISOString()}
-                className="inline"
-              >
-                {`Created: ${formatDateTime(createdAt)}`}
-              </time>
-            )}
-            {createdAt && updatedAt && (
-              <span className="text-muted-foreground">•</span>
-            )}
-            {updatedAt && (
-              <time
-                dateTime={new Date(updatedAt).toISOString()}
-                className="inline text-muted-foreground"
-              >
-                {`Updated: ${formatDateTime(updatedAt)}`}
-              </time>
-            )}
-          </div>
-        )}
         {/* Summary in bold */}
         <p className="font-bold whitespace-pre-line">{summary || ""}</p>
-        {/* Categories */}
 
+        {/* Created and updated timestamps */}
+        <div className="flex items-center text-sm space-x-3">
+          {createdAt && (
+            <p className="inline">{`Created: ${formatDateTime(createdAt)}`}</p>
+          )}
+          {wasEdited(createdAt, updatedAt) && (
+            <p className="inline text-muted-foreground">
+              {`Updated: ${formatDateTime(updatedAt)}`}
+            </p>
+          )}
+        </div>
+
+        {/* Authors */}
         {authors.length > 0 && (
           <p className="mt-4 text-sm italic text-muted-foreground">
             <span className="flex items-center">
@@ -118,6 +127,7 @@ export default function Article({
             </span>
           </p>
         )}
+
         <Separator className="my-4" />
 
         {/* Render markdown content */}
@@ -127,6 +137,8 @@ export default function Article({
           {content || ""}
         </ReactMarkdown>
       </article>
+      <Separator className="my-6" />
+      <CommentSection comments={comments} articleId={id} />
     </div>
   );
 }
