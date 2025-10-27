@@ -63,7 +63,8 @@ export function CommentItem({
 
   return (
     <Card className="shadow-sm">
-      <CardContent className="px-5 py-2">
+      {/* make CardContent relative so we can absolutely position the controls */}
+      <CardContent className="px-5 py-2 relative">
         <div className="flex gap-5">
           <Avatar className="h-9 w-9">
             {user.image ? (
@@ -79,32 +80,13 @@ export function CommentItem({
 
           {/* Commenter name and role */}
           <div className="flex-1">
-            {/* control area to the right for Edit button */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-md font-medium">{user.name}</span>
-                {user.role && (
-                  <span className="text-xs text-muted-foreground">
-                    {user.role}
-                  </span>
-                )}
-              </div>
-
-              {/* show Edit button only for the comment author and when not editing */}
-              {isAuthor && !isEditing && (
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setIsEditing(true);
-                    }}
-                  >
-                    Edit
-                  </Button>
-
-                  <DeleteCommentButton commentId={id} userId={user.id} />
-                </div>
+            {/* name + role (no justify-between) */}
+            <div className="flex items-center gap-2">
+              <span className="text-md font-medium">{user.name}</span>
+              {user.role && (
+                <span className="text-xs text-muted-foreground">
+                  {user.role}
+                </span>
               )}
             </div>
 
@@ -146,6 +128,23 @@ export function CommentItem({
             </div>
           </div>
         </div>
+
+        {/* bottom-right controls for author (absolute to CardContent) */}
+        {isAuthor && !isEditing && (
+          <div className="absolute right-4 bottom-3 flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsEditing(true);
+              }}
+            >
+              Edit
+            </Button>
+
+            <DeleteCommentButton commentId={id} userId={user.id} />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

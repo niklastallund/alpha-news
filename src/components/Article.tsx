@@ -65,17 +65,7 @@ export default function Article({
   return (
     <div className="flex flex-col">
       <article className="prose dark:prose-invert lg:prose-lg">
-        <h1>{headline}</h1>
-
-        {image && (
-          <Image
-            src={image}
-            alt={"null"}
-            width={1000}
-            height={1000}
-            className="min-w-xl object-cover rounded-xs"
-          />
-        )}
+        <h1 className="!mb-4">{headline}</h1>
 
         {/* Categories and editor's choice, show on one line if both exist */}
         {(categories.length > 0 || editorsChoice) && (
@@ -103,6 +93,19 @@ export default function Article({
           </div>
         )}
 
+        {image && (
+          <Image
+            src={image}
+            alt={"null"}
+            width={1000}
+            height={1000}
+            className="!mt-4 min-w-xl object-cover rounded-xs"
+          />
+        )}
+
+        {/* Summary in bold */}
+        <p className="font-bold whitespace-pre-line">{summary || ""}</p>
+
         {/* Created and updated timestamps */}
         <div className="flex items-center text-sm space-x-3">
           {createdAt && (
@@ -115,9 +118,6 @@ export default function Article({
           )}
         </div>
 
-        {/* Summary in bold */}
-        <p className="font-bold whitespace-pre-line">{summary || ""}</p>
-
         {/* Authors */}
         {authors.length > 0 && (
           <p className="mt-4 text-sm italic text-muted-foreground">
@@ -127,6 +127,7 @@ export default function Article({
             </span>
           </p>
         )}
+
         <Separator className="my-4" />
 
         {/* Render markdown content */}
