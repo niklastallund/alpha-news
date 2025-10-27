@@ -20,8 +20,8 @@ export default async function Home() {
 
       {/* Container: stacks on small screens, side-by-side on md+ */}
       <div className="mt-5 flex flex-col lg:flex-row items-start justify-center gap-6">
-        {/* Articles column: constrained width and centered on the page */}
-        <div className="w-full md:max-w-3xl flex flex-col items-center md:items-start gap-4">
+        {/* Articles column: constrained width and aligned to start */}
+        <div className="w-full md:max-w-3xl flex flex-col items-start gap-4">
           {frontPageArticles.map((article) => (
             <ArticleCard
               key={article.id}
@@ -33,13 +33,12 @@ export default async function Home() {
           ))}
         </div>
 
-        {/* Aside */}
-        <aside className="w-sm flex flex-col justify-center items-end gap-4">
+        {/* Aside: give it a sensible max width and left-align items */}
+        <aside className="w-full max-w-sm flex flex-col justify-center items-start gap-4">
           <Weather />
           <Currency />
           <ContactCard />
         </aside>
-        
       </div>
     </main>
   );

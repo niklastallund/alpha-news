@@ -55,7 +55,7 @@ export default function Currency() {
   };
 
   return (
-    <Card className="w-full max-w-md bg-card text-card-foreground border border-gray-400 dark:border-gray-600 border-t-4 border-t-red-500">
+    <Card className="w-full max-w-md bg-card text-card-foreground border border-t-4 border-t-red-500">
       <CardHeader>
         <CardTitle className="text-2xl font-extrabold text-center text-primary">
           Currency Converter
@@ -76,10 +76,10 @@ export default function Currency() {
 
         {/* Från / Till + Swap */}
         <div className="grid grid-cols-5 gap-1 items-end">
-          <div className="col-span-2 space-y-2 -ml-1">
+          <div className="col-span-2 space-y-2 min-w-0">
             <Label>From</Label>
             <UiSelect value={from} onValueChange={setFrom}>
-              <SelectTrigger className="bg-background text-foreground border border-gray-400 dark:border-gray-400 w-[180px] h-10 justify-between rounded-xl hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring transition-all duration-200 shadow-sm">
+              <SelectTrigger className="w-full bg-background text-foreground border border-gray-400 dark:border-gray-400 h-10 justify-between rounded-xl hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring transition-all duration-200 shadow-sm">
                 <SelectValue placeholder="Välj" />
               </SelectTrigger>
               <SelectContent>
@@ -102,10 +102,10 @@ export default function Currency() {
             </Button>
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-2 space-y-2 min-w-0">
             <Label>To</Label>
             <UiSelect value={to} onValueChange={setTo}>
-              <SelectTrigger className="bg-background text-foreground border border-gray-400 dark:border-gray-400 w-[180px] h-10 -ml-5 justify-between rounded-xl hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring transition-all duration-200 shadow-sm">
+              <SelectTrigger className="w-full bg-background text-foreground border border-gray-400 dark:border-gray-400 h-10 justify-between rounded-xl hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring transition-all duration-200 shadow-sm">
                 <SelectValue placeholder="Välj valuta" />
               </SelectTrigger>
               <SelectContent>

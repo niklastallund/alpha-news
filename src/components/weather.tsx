@@ -64,7 +64,7 @@ export default function Weather() {
   }
 
   return (
-    <div className="bg-card text-foreground p-8 sm:p-10 w-full max-w-md border border-gray-400 dark:border-gray-600 border-t-4 border-t-red-500 transition-all duration-300 mt-4 ">
+    <div className="bg-card text-foreground p-8 sm:p-10 w-full max-w-md border rounded-sm border-t-4 border-t-red-500 transition-all duration-300 ">
       <h1 className="text-2xl font-extrabold text-center text-primary mb-8">
         Weather Forecast
       </h1>
