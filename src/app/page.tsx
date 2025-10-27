@@ -3,6 +3,7 @@ import Weather from "../components/weather";
 import Currency from "@/components/currency";
 import { prisma } from "@/lib/prisma";
 import ArticleCard from "@/components/ArticleCard";
+import ContactCard from "@/components/contact";
 
 export default async function Home() {
   const frontPageArticles = await prisma.article.findMany({
@@ -36,7 +37,9 @@ export default async function Home() {
         <aside className="w-sm flex flex-col justify-center items-end gap-4">
           <Weather />
           <Currency />
+          <ContactCard />
         </aside>
+        
       </div>
     </main>
   );
