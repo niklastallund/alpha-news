@@ -1,6 +1,7 @@
 import Ticker from "@/components/ticker";
 import Weather from "../components/weather";
 import Currency from "@/components/currency";
+import ContactCard from "@/components/contact";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <div className="flex flex-col justify-center items-end gap-2">
         <Weather />
         <Currency />
+        <ContactCard />
       </div>
     </main>
   );

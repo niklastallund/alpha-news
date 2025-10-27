@@ -55,94 +55,99 @@ export default function Currency() {
   };
 
   return (
-      <Card className="w-full max-w-md bg-gradient-to-br from-sky-100 to-blue-200 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center text-blue-900 text-2xl">
-            Currency Converter
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Belopp */}
-          <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              inputMode="decimal"
-              className="bg-white/70"
-            />
+    <Card className="w-full max-w-md bg-card text-card-foreground border border-gray-400 dark:border-gray-600 border-t-4 border-t-red-500">
+      <CardHeader>
+        <CardTitle className="text-2xl font-extrabold text-center text-primary">
+          Currency Converter
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Belopp */}
+        <div className="space-y-2">
+          <Label htmlFor="amount">Amount</Label>
+          <Input
+            id="amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            inputMode="decimal"
+            className="bg-background text-foreground border border-gray-400 dark:border-gray-400 rounded-xl p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-gray-500 transition-all duration-200 shadow-sm"
+          />
+        </div>
+
+        {/* Från / Till + Swap */}
+        <div className="grid grid-cols-5 gap-1 items-end">
+          <div className="col-span-2 space-y-2 -ml-1">
+            <Label>From</Label>
+            <UiSelect value={from} onValueChange={setFrom}>
+              <SelectTrigger className="bg-background text-foreground border border-gray-400 dark:border-gray-400 w-[180px] h-10 justify-between rounded-xl hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring transition-all duration-200 shadow-sm">
+                <SelectValue placeholder="Välj" />
+              </SelectTrigger>
+              <SelectContent>
+                {list.map(([code, name]) => (
+                  <SelectItem key={code} value={code}>
+                    {code} — {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </UiSelect>
           </div>
 
-          {/* Från / Till + Swap */}
-          <div className="grid grid-cols-5 gap-3 items-end">
-            <div className="col-span-2 space-y-2">
-              <Label>From</Label>
-              <UiSelect value={from} onValueChange={setFrom}>
-                <SelectTrigger className="bg-white/70 w-[180px] h-10 justify-between hover:bg-blue-200 transition">
-                  <SelectValue placeholder="Välj" />
-                </SelectTrigger>
-                <SelectContent>
-                  {list.map(([code, name]) => (
-                    <SelectItem key={code} value={code}>
-                      {code} — {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </UiSelect>
-            </div>
-
-            <div className="flex justify-center">
-              <Button onClick={swap} className="mt-6 bg-white/70" title="Swap">
-                <ArrowLeftRight className="h-5 w-5 text-blue-800" />
-              </Button>
-            </div>
-
-            <div className="col-span-2 space-y-2">
-              <Label>To</Label>
-              <UiSelect value={to} onValueChange={setTo}>
-                <SelectTrigger className="bg-white/70 w-[180px] h-10 pr-8 justify-between min-w-0 hover:bg-blue-200 transition -ml-7">
-                  <SelectValue placeholder="Välj valuta" />
-                </SelectTrigger>
-                <SelectContent>
-                  {list.map(([code, name]) => (
-                    <SelectItem key={code} value={code}>
-                      {code} — {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </UiSelect>
-            </div>
+          <div className="flex justify-center">
+            <Button
+              onClick={swap}
+              className="mt-6 bg-secondary text-secondary-foreground hover:bg-secondary/90 border border-gray-400 dark:border-gray-400 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring"
+              title="Swap"
+            >
+              <ArrowLeftRight className="h-5 w-4" />
+            </Button>
           </div>
 
-          {/* Resultat */}
-          {loading ? (
-            <div className="flex items-center justify-center gap-2 bg-white/60 rounded-xl p-4">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span>Hämtar växelkurs…</span>
-            </div>
-          ) : converted !== null ? (
-            <div className="bg-white/70 rounded-xl p-4 text-center">
-              <p className="text-blue-900 text-sm mb-1">
-                1 {from} = {rate} {to}
-              </p>
-              <p className="text-3xl font-bold text-blue-800">
-                {converted.toFixed(2)} {to}
-              </p>
-            </div>
-          ) : null}
+          <div className="col-span-2 space-y-2">
+            <Label>To</Label>
+            <UiSelect value={to} onValueChange={setTo}>
+              <SelectTrigger className="bg-background text-foreground border border-gray-400 dark:border-gray-400 w-[180px] h-10 -ml-5 justify-between rounded-xl hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring transition-all duration-200 shadow-sm">
+                <SelectValue placeholder="Välj valuta" />
+              </SelectTrigger>
+              <SelectContent>
+                {list.map(([code, name]) => (
+                  <SelectItem key={code} value={code}>
+                    {code} — {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </UiSelect>
+          </div>
+        </div>
 
-          {/* Fel */}
-          {err && (
-            <p className="text-center text-red-700 bg-red-100 rounded-xl p-3 text-sm">
-              {err}
+        {/* Resultat */}
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 bg-muted rounded-xl p-4">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>Hämtar växelkurs…</span>
+          </div>
+        ) : converted !== null ? (
+          <div className="bg-white dark:bg-neutral-900 text-foreground dark:text-white rounded-xl p-4 text-center shadow-sm transition-colors duration-300">
+            <p className="text-sm mb-1 text-muted-foreground dark:text-white/80">
+              1 {from} = {rate} {to}
             </p>
-          )}
+            <p className="text-3xl font-bold text-foreground dark:text-white">
+              {converted.toFixed(2)} {to}
+            </p>
+          </div>
+        ) : null}
 
-          <p className="text-center text-xs text-gray-600">
-            Rates by frankfurter.app
+        {/* Fel */}
+        {err && (
+          <p className="text-center text-destructive bg-destructive/10 border border-destructive/30 rounded-xl p-3 text-sm">
+            {err}
           </p>
-        </CardContent>
-      </Card>
+        )}
+
+        <p className="text-center text-xs text-muted-foreground">
+          Rates by frankfurter.app
+        </p>
+      </CardContent>
+    </Card>
   );
 }
+<p className="text-center text-xs text-muted-foreground"></p>;
