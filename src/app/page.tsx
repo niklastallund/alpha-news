@@ -19,15 +19,15 @@ export default async function Home() {
     .slice(0, 6);
 
   return (
-    <main className="p-2">
-      <span className="inline-block background-primary text-white text-sm font-semibold px-3 py-1 uppercase tracking-wide mb-1">
+    <main className="px-2">
+      <span className="inline-block background-primary text-sm font-semibold px-3 uppercase tracking-wide mb-1">
         live
       </span>
 
       {/* Skicka in sex senaste rubrikerna */}
       <Ticker headlines={headlines} />
 
-      <div className="mt-5 flex flex-col lg:flex-row items-start justify-center gap-6">
+      <div className="mt-10 flex flex-col lg:flex-row items-start justify-center gap-6">
         <div className="w-full md:max-w-3xl flex flex-col items-start gap-4">
           {frontPageArticles.map((article) => (
             <ArticleCard
