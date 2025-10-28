@@ -75,56 +75,60 @@ export default function NameForm() {
   }
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>
           {" "}
           <Edit className="w-[32px] h-[32px] inline-block"></Edit> Change name
         </CardTitle>
-        <CardDescription>Change your name / email.</CardDescription>
+        <CardDescription>Change your name or email.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         <Form {...nameForm}>
-          <form onSubmit={nameForm.handleSubmit(nameFormSub)}>
-            <FormField
-              control={nameForm.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input type="text" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+          <form
+            onSubmit={nameForm.handleSubmit(nameFormSub)}
+            className="h-full flex flex-col "
+          >
+            <div className="flex-1 space-y-4">
+              <FormField
+                control={nameForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={nameForm.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={nameForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={nameForm.control}
-              name="id"
-              render={({ field }) => (
-                <FormItem className="hidden">
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input type="hidden" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
+              <FormField
+                control={nameForm.control}
+                name="id"
+                render={({ field }) => (
+                  <FormItem className="hidden">
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input type="hidden" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
             <Button
               type="submit"
               disabled={nameForm.formState.isSubmitting}
