@@ -79,7 +79,7 @@ export default function ContactCard({
   return (
     <section
       className={`
-    w-full max-w-md overflow-hidden border border-t-4 rounded-sm border-t-red-500
+    w-full max-w-md overflow-hidden border border-t-3 rounded-sm border-top-primary
     bg-card text-card-foreground shadow-sm ${className ?? ""}
   `}
       aria-labelledby="contact-title"
@@ -88,7 +88,7 @@ export default function ContactCard({
       <header className="px-[18px] pt-[14px] pb-2">
         <h2
           id="contact-title"
-          className="text-2xl font-extrabold text-center text-primary mb-2"
+          className="text-2xl font-extrabold text-center mb-2"
         >
           {title}
         </h2>
