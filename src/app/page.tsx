@@ -13,10 +13,10 @@ export default async function Home() {
 
   return (
     <main className="p-2">
-      <span className="inline-block bg-red-600 text-white text-sm font-semibold px-3 py-1 uppercase tracking-wide mb-1">
+      {/* <span className="inline-block bg-red-600 text-white text-sm font-semibold px-3 py-1 uppercase tracking-wide mb-1">
         live
       </span>
-      <Ticker />
+      <Ticker /> */}
 
       {/* Container: stacks on small screens, side-by-side on md+ */}
       <div className="mt-5 flex flex-col lg:flex-row items-start justify-center gap-6">

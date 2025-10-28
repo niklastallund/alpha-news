@@ -55,9 +55,9 @@ export default function Currency() {
   };
 
   return (
-    <Card className="w-full max-w-md bg-card text-card-foreground border border-t-4 border-t-red-500">
+    <Card className="w-full max-w-md bg-card text-card-foreground">
       <CardHeader>
-        <CardTitle className="text-2xl font-extrabold text-center text-primary">
+        <CardTitle className="text-2xl font-extrabold text-center">
           Currency Converter
         </CardTitle>
       </CardHeader>
