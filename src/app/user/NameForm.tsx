@@ -75,7 +75,7 @@ export default function NameForm() {
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>
           {" "}
@@ -85,7 +85,10 @@ export default function NameForm() {
       </CardHeader>
       <CardContent>
         <Form {...nameForm}>
-          <form onSubmit={nameForm.handleSubmit(nameFormSub)}>
+          <form
+            onSubmit={nameForm.handleSubmit(nameFormSub)}
+            className="space-y-4"
+          >
             <FormField
               control={nameForm.control}
               name="name"

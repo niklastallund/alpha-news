@@ -92,7 +92,7 @@ export default function ImageUploader() {
   }
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>
           <Edit className="w-[32px] h-[32px] inline-block"></Edit> Change
@@ -100,40 +100,44 @@ export default function ImageUploader() {
         </CardTitle>
         <CardDescription>png or jpg, under 1mb</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         <Form {...imageUploadForm}>
           <form
             onSubmit={imageUploadForm.handleSubmit(imageUploadSub)}
-            className="md:flex md:gap-1 md:place-items-end p-4 flex-wrap rounded-2xl"
+            className="h-full flex flex-col"
           >
-            <FormField
-              control={imageUploadForm.control}
-              name="file"
-              render={({ field: { onChange, ...field } }) => (
-                <FormItem className="flex-1 min-w-0">
-                  <FormLabel>File to upload: (png or jpg, under 1mb)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      name={field.name}
-                      ref={field.ref}
-                      onBlur={field.onBlur}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file && file.type.includes("image")) {
-                          onChange(file);
-                        } else {
-                          onChange(undefined);
-                          e.target.value = "";
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex-1">
+              <FormField
+                control={imageUploadForm.control}
+                name="file"
+                render={({ field: { onChange, ...field } }) => (
+                  <FormItem className="flex-1 min-w-0">
+                    <FormLabel>
+                      File to upload: (png or jpg, under 1mb)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        name={field.name}
+                        ref={field.ref}
+                        onBlur={field.onBlur}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && file.type.includes("image")) {
+                            onChange(file);
+                          } else {
+                            onChange(undefined);
+                            e.target.value = "";
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button
               type="submit"

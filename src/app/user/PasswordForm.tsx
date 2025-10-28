@@ -78,7 +78,7 @@ export default function PasswordForm() {
   }
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>
           <Edit className="w-[32px] h-[32px] inline-block"></Edit> Change
@@ -86,9 +86,12 @@ export default function PasswordForm() {
         </CardTitle>
         <CardDescription>min 6 letters</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         <Form {...formEditPw}>
-          <form onSubmit={formEditPw.handleSubmit(editPwSub)}>
+          <form
+            onSubmit={formEditPw.handleSubmit(editPwSub)}
+            className="space-y-4"
+          >
             <FormField
               control={formEditPw.control}
               name="currpw"
