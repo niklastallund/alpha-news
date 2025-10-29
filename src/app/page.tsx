@@ -1,21 +1,21 @@
-import Ticker from "@/components/ticker"; // klientkomponent som tar prop { headlines: string[] }
+import Ticker from "@/components/ticker";
 import Weather from "@/components/weather";
 import Currency from "@/components/currency";
 import { prisma } from "@/lib/prisma";
 import ArticleCard from "@/components/ArticleCard";
 import ContactCard from "@/components/contact";
 
+type Headline = { id: number; text?: string | undefined };
+// Hämta 6 senaste artiklar för startsidan
 export default async function Home() {
-  // Hämta 10 senaste artiklar för startsidan
   const frontPageArticles = await prisma.article.findMany({
     orderBy: { createdAt: "desc" },
-    take: 10,
+    take: 6,
   });
-
   // Derivera de 6 senaste rubrikerna från samma query
-  const headlines: string[] = frontPageArticles
-    .map((a) => a.headline)
-    .filter((h): h is string => Boolean(h))
+  const headlines: Headline[] = frontPageArticles
+    .map((a) => ({ id: a.id, text: a.headline ?? undefined }))
+    .filter((h) => Boolean(h.text))
     .slice(0, 6);
 
   return (
@@ -23,7 +23,6 @@ export default async function Home() {
       <span className="inline-block background-primary text-white text-sm font-semibold px-3 py-1 uppercase tracking-wide mb-1">
         live
       </span>
-
       {/* Skicka in sex senaste rubrikerna */}
       <Ticker headlines={headlines} />
 
