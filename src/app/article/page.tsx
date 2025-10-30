@@ -49,7 +49,7 @@ export default async function ArticlePage({
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           {/* Search should be full width on small screens, take remaining space on larger */}
           <div className="w-full sm:flex-1">
-            <SearchBar />
+            <SearchBar placeholder="Search for articles..." />
           </div>
 
           {/* Keep filters from shrinking too small */}

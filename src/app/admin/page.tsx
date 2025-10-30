@@ -1,8 +1,16 @@
 import Page from "@/components/Page";
 import { Separator } from "@/components/ui/separator";
+import { getSessionData } from "@/lib/actions/sessiondata";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const session = await getSessionData();
+
+  if (!session || session.user.role !== "admin") {
+    return notFound();
+  }
+
   return (
     <Page>
       <div className="flex flex-col justify-center items-center my-10 gap-4">

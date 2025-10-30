@@ -9,8 +9,7 @@ import useDebounce from "@/lib/hooks/useDebounce";
 const DEBOUNCE_DELAY = 500;
 
 // A search bar component that updates the URL search parameters on input change.
-// It is mainly used on the ArticlePage to filter articles based on the search query.
-export default function SearchBar() {
+export default function SearchBar({ placeholder }: { placeholder?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") || "");
@@ -35,7 +34,7 @@ export default function SearchBar() {
   return (
     <Input
       type="text"
-      placeholder="Search for articles..."
+      placeholder={placeholder || "Search..."}
       value={query}
       onChange={handleChange}
       className="w-full"

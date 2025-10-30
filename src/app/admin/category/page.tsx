@@ -3,8 +3,16 @@ import { prisma } from "@/lib/prisma";
 import CreateCategoryForm from "./forms/CreateCategory";
 import UpdateCategoryDialog from "./forms/UpdateCategoryDialog";
 import { DeleteCategoryButton } from "./forms/DeleteCategory";
+import { getSessionData } from "@/lib/actions/sessiondata";
+import { notFound } from "next/navigation";
 
 export default async function AdminCategoryPage() {
+  const session = await getSessionData();
+
+  if (!session || session.user.role !== "admin") {
+    return notFound();
+  }
+
   const categories = await prisma.category.findMany({
     orderBy: { updatedAt: "desc" },
     take: 10,
