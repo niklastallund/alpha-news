@@ -1,4 +1,5 @@
 import SearchBar from "@/components/filtering/SearchBar";
+import PaginationBar from "@/components/PaginationBar";
 import {
   Card,
   CardContent,
@@ -6,17 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis, // added
-} from "@/components/ui/pagination";
 import { auth } from "@/lib/auth";
-import { getPaginationItems } from "@/lib/pagination";
 import { UserWithRole } from "better-auth/plugins";
 import { headers } from "next/headers";
 
@@ -31,7 +22,7 @@ function createPageHref(page: number, query?: string) {
 }
 
 // Set the pagination size
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 1;
 
 export default async function SearchUsers({
   query,
@@ -58,9 +49,6 @@ export default async function SearchUsers({
   const totalUsers: number = response.total;
   const totalPages = Math.max(1, Math.ceil(totalUsers / PAGE_SIZE));
 
-  // Windowed pagination with 2 siblings on each side
-  const paginationItems = getPaginationItems(totalPages, currentPage, 2);
-
   return (
     <Card className="min-w-1/3">
       <CardHeader>
@@ -71,63 +59,19 @@ export default async function SearchUsers({
       </CardHeader>
       <CardContent>
         <SearchBar placeholder="Search for users..." />
-        {users.map((user) => (
-          <div key={user.id} className="py-2 border-b last:border-0">
-            <p className="font-semibold">{user.name}</p>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-          </div>
-        ))}
-        {totalPages > 0 && (
-          <Pagination className="mt-8 flex justify-center">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href={createPageHref(Math.max(1, currentPage - 1), query)}
-                  aria-disabled={currentPage === 1}
-                  tabIndex={currentPage === 1 ? -1 : 0}
-                  className={
-                    currentPage === 1
-                      ? "pointer-events-none opacity-50"
-                      : undefined
-                  }
-                />
-              </PaginationItem>
-
-              {paginationItems.map((item, idx) =>
-                item === "ellipsis" ? (
-                  <PaginationItem key={`e-${idx}`}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                ) : (
-                  <PaginationItem key={item}>
-                    <PaginationLink
-                      href={createPageHref(item, query)}
-                      isActive={currentPage === item}
-                    >
-                      {item}
-                    </PaginationLink>
-                  </PaginationItem>
-                )
-              )}
-
-              <PaginationItem>
-                <PaginationNext
-                  href={createPageHref(
-                    Math.min(totalPages, currentPage + 1),
-                    query
-                  )}
-                  aria-disabled={currentPage === totalPages}
-                  tabIndex={currentPage === totalPages ? -1 : 0}
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : undefined
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
+        <div className="w-full">
+          {users.map((user) => (
+            <div key={user.id} className="py-2 border-b last:border-0">
+              <p className="font-semibold">{user.name}</p>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
+            </div>
+          ))}
+        </div>
+        <PaginationBar
+          totalPages={totalPages}
+          currentPage={currentPage}
+          createHref={createPageHref}
+        />
       </CardContent>
     </Card>
   );
