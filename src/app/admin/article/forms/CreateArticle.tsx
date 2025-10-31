@@ -228,7 +228,7 @@ export default function CreateArticleForm({ categories }: Props) {
         }
         <br />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             <FormField
               control={form.control}
               name="headline"

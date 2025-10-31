@@ -375,7 +375,30 @@ async function gererateNewsObject(
     const { object } = await generateObject({
       model: google("gemini-2.5-flash"),
       // Ändra prompten till denna:
-      prompt: `Based on "${getPureArticle.data}" that is an article in the category ${category}, create three fields: title, summary och content. Title should be a good headline between 10 and 100 chars suitable for the category ${category} in a newspaper. Summary should be a brief summary of the article between 100 and 400 chars. NO MD formatting in other fields that content. Content can be the article as it is, adjust if needd. It is important that you split the content into paragraphs, and add MD formatting to the content, the length of content should be ${words} words long. Content should not have a headline so no h1 there. Only return JSON format with these three fields and without any other text, and only MD formatting in content. Not so much bold in content.`,
+      prompt: `Based on "${getPureArticle.data}" create a JSON object with three fields:
+
+{
+  "headline": "10-100 char headline for ${category}",
+  "summary": "100-400 char plain text summary (no Markdown)",
+  "content": "Full article in Markdown format"
+}
+
+CRITICAL: For the content field, use ACTUAL Markdown syntax:
+- Separate paragraphs with blank lines (press Enter twice)
+- Use **text** for bold
+- Use ##Heading for sections
+- DO NOT use \\n - use real line breaks
+- Length: approximately ${words} words
+- NO h1 (#) heading in content
+
+Example content structure:
+Paragraph one with **bold text**.
+
+Paragraph two continues here.
+
+## Section Heading
+
+More content here.`,
       schema: articlePromptSchema,
     });
 
