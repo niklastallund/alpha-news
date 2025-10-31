@@ -97,6 +97,8 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
       // Ersätt image med den uppladdade urlen:
       const datWithImg = { ...data, image: image };
 
+      // alert("onlyfor: " + datWithImg.onlyFor);
+
       await updateArticle(datWithImg);
       // alert(JSON.stringify(datWithImg));
       toast.success("Article updated");

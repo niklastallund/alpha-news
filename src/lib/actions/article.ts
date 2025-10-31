@@ -85,6 +85,8 @@ export async function updateArticle(formData: UpdateArticleInput) {
 
   const validated = await updateArticleSchema.parseAsync(formData);
 
+  console.log("So updating onlyfor to " + validated.onlyFor);
+
   const article = await prisma.article.update({
     where: { id: validated.id },
     data: {
@@ -93,7 +95,7 @@ export async function updateArticle(formData: UpdateArticleInput) {
       content: validated.content,
       image: validated.image,
       editorsChoice: validated.editorsChoice,
-      onlyFor: validated.onlyFor,
+      onlyFor: validated.onlyFor === undefined ? null : validated.onlyFor,
       // Attach author to article if authorId is available (should always be)
       ...(authorId ? { author: { connect: { id: authorId } } } : {}),
     },
