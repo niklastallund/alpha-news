@@ -20,7 +20,7 @@ export default function UsersPanel({ users }: { users: UserWithRole[] }) {
         ))}
       </div>
 
-      <div className="w-2/3 p-4">
+      <div className="flex-1 p-4">
         <SelectedUserInfo user={selectedUser} />
       </div>
     </div>
