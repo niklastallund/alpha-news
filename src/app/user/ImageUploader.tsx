@@ -149,7 +149,7 @@ export default function ImageUploader() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="bg-amber-200 text-black">
+      <CardFooter className="bg-amber-300 text-black">
         <p>{msg}</p>
         {imageUploadForm.formState.isSubmitting && <Loader />}
       </CardFooter>

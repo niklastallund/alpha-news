@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
+import Subscribe from "../../components/Subscribe";
 
 export default async function UserPage() {
   const session = await getSessionData();
@@ -75,43 +77,9 @@ export default async function UserPage() {
         </div>
 
         <div className="p-2 md:col-span-2 lg:col-span-3">
+          <Subscribe />
+
           <br />
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Subscription</CardTitle>
-              <CardDescription></CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              Active: {JSON.stringify(sub)}.
-              <br />
-              Upgrade:
-              <br />
-              <div className="grid grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Basic</CardTitle>
-                    <CardDescription></CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    69:- / Month
-                    <Button>Upgrade</Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>PRO</CardTitle>
-                    <CardDescription></CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    99:- / Month
-                    <Button>Upgrade</Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
 
           <Card>
             <CardHeader>
@@ -119,7 +87,7 @@ export default async function UserPage() {
               <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <ul>
+              <ul className="space-y-2 font-bold underline">
                 {userData.articles.map((a) => (
                   <li key={a.id}>
                     <Link href={"/article/" + a.id}>{a.headline}</Link>
@@ -134,12 +102,12 @@ export default async function UserPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Your comments:</CardTitle>
+              <CardTitle>Your latest comments:</CardTitle>
               <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              <ul>
-                {userData.comments.map((a) => (
+              <ul className="space-y-2 font-bold underline">
+                {userData.comments.slice(0, 30).map((a) => (
                   <li key={a.id}>
                     <Link href={"/article/" + a.article.id}>
                       <span className="font-bold">

@@ -47,6 +47,15 @@ import MultiselectWithAdd, {
 import { Category } from "@/generated/prisma/wasm";
 import { useRouter } from "next/navigation";
 import ImageInput from "./ImageInput";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Props {
   categories: Category[];
@@ -65,6 +74,7 @@ export default function CreateArticleForm({ categories }: Props) {
       image: "",
       editorsChoice: false,
       categories: [],
+      onlyFor: undefined,
     },
   });
 
@@ -101,6 +111,7 @@ export default function CreateArticleForm({ categories }: Props) {
           ? importedArticle.category.split(",")
           : [],
         editorsChoice: form.getValues("editorsChoice"),
+        onlyFor: undefined,
       });
 
       // If your editor needs explicit set after reset, keep only one of these:
@@ -168,6 +179,7 @@ export default function CreateArticleForm({ categories }: Props) {
       // const parsedCategories = parseCategories(categoriesCsv);
 
       // parsedCategories is guaranteed to be non-empty at this point due to form validation
+
       const newArt = await createArticle({
         ...data,
         image,
@@ -216,7 +228,7 @@ export default function CreateArticleForm({ categories }: Props) {
         }
         <br />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             <FormField
               control={form.control}
               name="headline"
@@ -352,6 +364,38 @@ export default function CreateArticleForm({ categories }: Props) {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="onlyFor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Subscription Level</FormLabel>
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? undefined : value)
+                    }
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select subscription level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Subscription</SelectLabel>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="basic">Basic</SelectItem>
+                        <SelectItem value="pro">Pro</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button type="submit" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? "Creating..." : "Create"}
             </Button>

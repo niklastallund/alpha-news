@@ -139,7 +139,7 @@ export default function NameForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="bg-amber-200 text-black">
+      <CardFooter className="bg-amber-300 text-black">
         <p>{msg}</p>
         {nameForm.formState.isSubmitting && <Loader />}
       </CardFooter>

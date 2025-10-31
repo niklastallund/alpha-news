@@ -27,5 +27,48 @@ export async function getSessionData(): Promise<SessionData | null> {
     headers: await headers(),
   });
 
-    return sessionData;
+  return sessionData;
+}
+
+export async function getSub(): Promise<{
+  limits: Record<string, number> | undefined;
+  priceId: string | undefined;
+  id: string;
+  plan: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  trialStart?: Date;
+  trialEnd?: Date;
+  referenceId: string;
+  status:
+    | "active"
+    | "canceled"
+    | "incomplete"
+    | "incomplete_expired"
+    | "past_due"
+    | "paused"
+    | "trialing"
+    | "unpaid";
+  periodStart?: Date;
+  periodEnd?: Date;
+  cancelAtPeriodEnd?: boolean;
+  groupId?: string;
+  seats?: number;
+} | null> {
+  const session = await getSessionData();
+
+  if (session?.user.id) {
+    const res = await auth.api.listActiveSubscriptions({
+      query: { referenceId: session.user.id },
+      headers: await headers(),
+    });
+
+    //console.log("Got via server-action sub:\n" + JSON.stringify(res[0]));
+    const ok = res.find(
+      (sub) => sub.status === "active" || sub.status === "trialing"
+    );
+    return ok ?? null;
+  }
+
+  return null;
 }
