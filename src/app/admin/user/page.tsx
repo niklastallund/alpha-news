@@ -9,6 +9,7 @@
 import { notFound } from "next/navigation";
 import SearchUsers from "./SearchUsers";
 import { getSessionData } from "@/lib/actions/sessiondata";
+import Page from "@/components/Page";
 
 export default async function AdminUserPage({
   searchParams,
@@ -27,8 +28,10 @@ export default async function AdminUserPage({
   const page = params.page ? Number(params.page) : 1;
 
   return (
-    <div className="flex justify-center">
-      <SearchUsers query={query} page={page} />
-    </div>
+    <Page>
+      <div className=" w-full">
+        <SearchUsers query={query} page={page} />
+      </div>
+    </Page>
   );
 }

@@ -10,7 +10,7 @@ type TickerProps = { headlines: Headline[] }; // expects an array of Headline ob
 const Ticker: React.FC<TickerProps> = (
   { headlines = [] } // funktionell React-komponent som tar headlines och sätter en tom array
 ) => (
-  <div className="bg-primary-foreground text-black border-2 border-red-500 dark:border-red-500 py-2 overflow-hidden rounded-lg shadow transition-colors duration-300 sticky top-18 z-10">
+  <div className="bg-primary-foreground border-2 border-primary py-2 overflow-hidden rounded-lg shadow transition-colors duration-300 sticky top-18 z-10">
     <Marquee // ticker component: a client-side marquee that displays headlines
       speed={80}
       pauseOnHover

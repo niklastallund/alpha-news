@@ -12,11 +12,12 @@ import { getPaginationItems } from "@/lib/pagination";
 type PaginationBarProps = {
   totalPages: number;
   currentPage: number;
-  // createHref must return a URL string for the given page (used for <a href="..."> links)
+  siblingCount?: number; // number of sibling pages to show on each side (default 2)
+  className?: string; // optional styling class
+
+  // function to create href for a given page number
+  // should return a URL string for the given page (used for links)
   createHref: (page: number) => string;
-  // number of sibling pages to show on each side (default 2)
-  siblingCount?: number;
-  className?: string;
 };
 
 export default function PaginationBar({

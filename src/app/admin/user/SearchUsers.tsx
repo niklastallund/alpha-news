@@ -10,8 +10,10 @@ import {
 import { auth } from "@/lib/auth";
 import { UserWithRole } from "better-auth/plugins";
 import { headers } from "next/headers";
+import UsersPanel from "./UsersPanel";
 
 // Build page hrefs that keep the search query param used by SearchBar ('q')
+// and add/update the page param for pagination links
 function createPageHref(page: number, query?: string) {
   const params = new URLSearchParams();
   if (query) params.set("q", String(query));
@@ -22,7 +24,7 @@ function createPageHref(page: number, query?: string) {
 }
 
 // Set the pagination size
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 10;
 
 export default async function SearchUsers({
   query,
@@ -58,20 +60,18 @@ export default async function SearchUsers({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <SearchBar placeholder="Search for users..." />
-        <div className="w-full">
-          {users.map((user) => (
-            <div key={user.id} className="py-2 border-b last:border-0">
-              <p className="font-semibold">{user.name}</p>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-            </div>
-          ))}
+        <div className="w-1/3">
+          <SearchBar placeholder="Search for users..." />
         </div>
-        <PaginationBar
-          totalPages={totalPages}
-          currentPage={currentPage}
-          createHref={createPageHref}
-        />
+        <UsersPanel users={users} />
+        <div className="w-1/3">
+          <PaginationBar
+            totalPages={totalPages}
+            currentPage={currentPage}
+            createHref={createPageHref}
+            className="mt-4"
+          />
+        </div>
       </CardContent>
     </Card>
   );
