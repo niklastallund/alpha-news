@@ -63,7 +63,7 @@ export async function getSub(): Promise<{
       headers: await headers(),
     });
 
-    console.log("Got via server-action sub:\n" + JSON.stringify(res[0]));
+    //console.log("Got via server-action sub:\n" + JSON.stringify(res[0]));
     const ok = res.find(
       (sub) => sub.status === "active" || sub.status === "trialing"
     );

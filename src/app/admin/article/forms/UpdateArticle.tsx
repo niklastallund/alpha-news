@@ -36,6 +36,15 @@ import {
   deleteImage,
   uploadBase64ToR2,
 } from "@/lib/actions/ai";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface UpdateArticleFormProps {
   article: Article;
@@ -51,6 +60,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
       content: article.content ?? "",
       image: article.image ?? "",
       editorsChoice: article.editorsChoice ?? false,
+      onlyFor: article.onlyFor ?? undefined,
     },
   });
 
@@ -197,6 +207,37 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
                     </FormLabel>
                     <FormMessage />
                   </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="onlyFor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Subscription Level</FormLabel>
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === "none" ? undefined : value)
+                    }
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select subscription level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Subscription</SelectLabel>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="basic">Basic</SelectItem>
+                        <SelectItem value="pro">Pro</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
                 </FormItem>
               )}
             />

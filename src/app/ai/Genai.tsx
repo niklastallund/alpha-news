@@ -325,7 +325,7 @@ export default function Genai({
           </Form>
           <br />
           {msg && (
-            <div className=" rounded-lg w-full p-2 bg-amber-200 text-black mx-auto text-center">
+            <div className=" rounded-lg w-full p-2 bg-amber-300 text-black mx-auto text-center">
               <p>{msg}</p>
             </div>
           )}
@@ -372,7 +372,7 @@ export default function Genai({
                       Re-generate
                     </Button>
                     {regenMsg && (
-                      <div className="p-2 bg-amber-200 text-black rounded-lg">
+                      <div className="p-2 bg-amber-300 text-black rounded-lg">
                         {regenMsg}
                       </div>
                     )}

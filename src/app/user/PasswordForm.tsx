@@ -144,7 +144,7 @@ export default function PasswordForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="bg-amber-200 text-black">
+      <CardFooter className="bg-amber-300 text-black">
         <p>{msg}</p>
         {formEditPw.formState.isSubmitting && <Loader />}
       </CardFooter>

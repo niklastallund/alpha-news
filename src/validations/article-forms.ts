@@ -12,6 +12,7 @@ export const createArticleSchema = z.object({
   image: z.string().optional(),
   editorsChoice: z.boolean().optional(),
   categories: z.array(z.string()).min(1, "Please add at least one category."),
+  onlyFor: z.enum(["basic", "pro"]).optional(),
 });
 
 export type CreateArticleInput = z.infer<typeof createArticleSchema>;
@@ -23,6 +24,7 @@ export const updateArticleSchema = z.object({
   content: z.string().optional(),
   image: z.string().optional(),
   editorsChoice: z.boolean().optional(),
+  onlyFor: z.enum(["basic", "pro"]).optional(),
 });
 
 export type UpdateArticleInput = z.infer<typeof updateArticleSchema>;

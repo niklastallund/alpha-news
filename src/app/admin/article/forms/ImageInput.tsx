@@ -143,12 +143,12 @@ export default function ImageInput({
               {articleData.headline.trim().length < 1 &&
                 articleData.summary.trim().length < 1 &&
                 articleData.category.trim().length < 1 && (
-                  <div className="bg-amber-200 p-2 rounded-lg text-sm">
+                  <div className="bg-amber-300 text-black p-2 rounded-lg text-sm">
                     Enter a headline/summary, or add a category to generate.
                   </div>
                 )}
               {genMsg && (
-                <div className="p-2 bg-amber-200 text-black rounded-lg">
+                <div className="p-2 bg-amber-300 text-black rounded-lg">
                   {genMsg}
                 </div>
               )}

@@ -63,6 +63,7 @@ export async function createArticle(formData: CreateArticleInput) {
       content: validated.content,
       image: validated.image,
       editorsChoice: validated.editorsChoice,
+      onlyFor: validated.onlyFor,
       // Attach categories if provided. If the list is empty or undefined, do nothing.
       ...(categoryConnectOrCreate
         ? { category: { connectOrCreate: categoryConnectOrCreate } }
@@ -92,6 +93,7 @@ export async function updateArticle(formData: UpdateArticleInput) {
       content: validated.content,
       image: validated.image,
       editorsChoice: validated.editorsChoice,
+      onlyFor: validated.onlyFor,
       // Attach author to article if authorId is available (should always be)
       ...(authorId ? { author: { connect: { id: authorId } } } : {}),
     },
