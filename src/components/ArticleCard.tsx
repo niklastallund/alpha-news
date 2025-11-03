@@ -8,6 +8,7 @@ interface ArticleCardProps {
   headline?: string;
   image?: string;
   editorsChoice?: boolean;
+  onlyFor: "basic" | "pro" | null;
 }
 
 // This components displays a summary card for a given article.
@@ -17,6 +18,7 @@ export default function ArticleCard({
   headline,
   image,
   editorsChoice,
+  onlyFor,
 }: ArticleCardProps) {
   return (
     <Card className="mx-auto w-full max-w-3xl group">
@@ -39,6 +41,8 @@ export default function ArticleCard({
         <CardContent>
           <CardTitle className="text-3xl md:text-4xl font-bold leading-tight mt-0 mb-0 group-hover:underline">
             {headline}
+            <br />
+            {onlyFor && <span className="text-lg">{onlyFor}</span>}
           </CardTitle>
           {editorsChoice && (
             <p className="mt-2 text-sm italic text-green-600">

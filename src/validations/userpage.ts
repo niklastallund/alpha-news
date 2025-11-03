@@ -4,6 +4,7 @@ export const nameMailSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
   email: z.email(),
+  newsletter: z.string(),
 });
 
 export const imageUploadSchema = z.object({

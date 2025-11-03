@@ -22,6 +22,8 @@ model User {
   banExpires       DateTime?
   stripeCustomerId String?
 
+  newsLetter Boolean? @default(true)
+
   sessions Session[]
   accounts Account[]
   article  Article[]

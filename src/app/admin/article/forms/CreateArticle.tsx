@@ -78,6 +78,8 @@ export default function CreateArticleForm({ categories }: Props) {
     setImportGen(false);
   };
 
+  const [cBaI, setcBAi] = useState();
+
   const ref = useRef<MDXEditorMethods>(null);
   const [editorKey, setEditorKey] = useState<string>(Math.random().toString()); // Lägg till ett state för nyckeln
 

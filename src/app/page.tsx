@@ -32,6 +32,7 @@ export default async function Home() {
             <ArticleCard
               key={article.id}
               id={article.id}
+              onlyFor={article.onlyFor}
               image={article.image ?? undefined}
               headline={article.headline ?? undefined}
               editorsChoice={article.editorsChoice}

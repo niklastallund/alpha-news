@@ -45,7 +45,12 @@ export default async function UserPage() {
       include: { article: true },
     });
 
-    return { articles, comments };
+    const newsLetter = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { newsLetter: true },
+    });
+
+    return { articles, comments, newsLetter };
   };
 
   const userData = await getUserData();
@@ -73,7 +78,7 @@ export default async function UserPage() {
         </div>
 
         <div className="p-2 md:col-span-2 lg:col-span-1">
-          <NameForm />
+          <NameForm newsLetter={userData.newsLetter?.newsLetter ?? false} />
         </div>
 
         <div className="p-2 md:col-span-2 lg:col-span-3">
@@ -97,6 +102,8 @@ export default async function UserPage() {
               <br />
             </CardContent>
           </Card>
+
+          <br />
 
           <br />
 
