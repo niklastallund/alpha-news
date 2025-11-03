@@ -4,12 +4,19 @@ import { useState } from "react";
 import UserListItem from "./UserListItem";
 import { UserWithRole } from "better-auth/plugins";
 import SelectedUserInfo from "./SelectedUserInfo";
+import { useRouter } from "next/navigation";
 
 export default function UsersPanel({ users }: { users: UserWithRole[] }) {
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
+  const router = useRouter();
 
   function handleSelect(user: UserWithRole) {
     setSelectedUser(user);
+  }
+
+  function handleSuccess() {
+    setSelectedUser(null);
+    router.refresh();
   }
 
   return (
@@ -21,7 +28,7 @@ export default function UsersPanel({ users }: { users: UserWithRole[] }) {
       </div>
 
       <div className="flex-1 p-4">
-        <SelectedUserInfo user={selectedUser} />
+        <SelectedUserInfo user={selectedUser} onSuccess={handleSuccess} />
       </div>
     </div>
   );

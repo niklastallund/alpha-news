@@ -1,10 +1,6 @@
 //TODO
 // Implement user detail component
 // Implement user role management
-// Implement user ban functionality
-// Implement pagination for user list
-// Implement user creation component
-// Implement user activity log component
 
 import { notFound } from "next/navigation";
 import SearchUsers from "./SearchUsers";

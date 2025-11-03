@@ -9,12 +9,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserWithRole } from "better-auth/plugins";
+import { BanUserInput } from "./BanUser";
+import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 export default function SelectedUserInfo({
   user,
+  onSuccess,
 }: {
   user: UserWithRole | null;
+  onSuccess?: () => void;
 }) {
+  async function handleUnban() {
+    try {
+      await authClient.admin.unbanUser({ userId: user!.id });
+      toast.success("User unbanned successfully");
+      onSuccess?.();
+    } catch (error) {
+      toast.error(`Failed to unban user: ${error}`);
+    }
+  }
+
   return (
     <>
       {user && (
@@ -49,9 +64,11 @@ export default function SelectedUserInfo({
               <div className="flex flex-col gap-2">
                 <Button variant="outline">Set Role</Button>
                 {user?.banned ? (
-                  <Button variant="outline">Unban</Button>
+                  <Button variant="destructive" onClick={handleUnban}>
+                    Unban
+                  </Button>
                 ) : (
-                  <Button variant="destructive">Ban</Button>
+                  <BanUserInput userId={user.id} onSuccess={onSuccess} />
                 )}
               </div>
             </div>
