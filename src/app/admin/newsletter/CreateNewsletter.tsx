@@ -1,5 +1,6 @@
 "use client";
 
+import { marked } from "marked";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ export default function CreateNewsletter() {
   const ref = useRef<MDXEditorMethods>(null);
   const [editorKey, setEditorKey] = useState<string>(Math.random().toString()); // Lägg till ett state för nyckeln
 
-  const [cBai, setcBai] = useState();
+  const [cBai, setcBai] = useState(); // Är lite trött så ba döper saker här märker jag. created by ai (c b ai).
   const [loadcBai, setLoadcBai] = useState<boolean>(false);
 
   useEffect(() => {
@@ -77,6 +78,8 @@ export default function CreateNewsletter() {
       </Page>
     );
 
+  const watchedData = form.watch(["headline", "content"]);
+
   return (
     <div>
       <Card>
@@ -91,6 +94,7 @@ export default function CreateNewsletter() {
           >
             Let ai write
           </Button>
+          <br />
           {loadcBai && <Loader />}
           <br />
           <Form {...form}>
@@ -132,8 +136,65 @@ export default function CreateNewsletter() {
               <Button type="submit">Send!</Button>
             </form>
           </Form>
+          <br />
+          Preview:
+          <div>
+            <h1>{watchedData[0]}</h1>
+            <br />
+          </div>
+          <br />
+          <div>{marked.parse(watchedData[1])}</div>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+/*
+fix: nodemailer
+
+// Server Action (eller API-rutt)
+
+import { marked } => 'marked';
+// ... övriga imports (nodemailer, etc.)
+
+async function handleNewsletterSend(formData) {
+    const headline = formData.get('headline');
+    const markdownContent = formData.get('content');
+
+    // 1. Konvertera Markdown till HTML
+    const convertedBodyHtml = marked.parse(markdownContent);
+
+    // 2. Skapa det fullständiga HTML-innehållet
+    // BÄTTRE METOD: Använd en template-sträng för att inkludera rubriken och det konverterade innehållet
+    const fullHtmlContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h1>${headline}</h1>
+            <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 20px;">
+            
+            <div>
+                ${convertedBodyHtml}
+            </div>
+            
+            <p style="margin-top: 30px; font-size: 0.8em; color: #777;">
+                © 2025 Alpha News.
+            </p>
+        </div>
+    `;
+
+    // 3. Konfigurera mailOptions och skicka via Nodemailer
+    const mailOptions = {
+        // ... från, till, ämne, etc.
+        subject: headline,
+        
+        // Mycket viktigt: Sätt din HTML-sträng i 'html'-fältet
+        html: fullHtmlContent, 
+        
+        // Det är fortfarande bra att inkludera en ren text-version
+        text: `${headline}\n\n${markdownContent}`, 
+    };
+
+    // await transporter.sendMail(mailOptions);
+    // ...
+}
+*/

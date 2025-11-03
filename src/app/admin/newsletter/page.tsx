@@ -4,14 +4,6 @@ import CreateNewsletter from "./CreateNewsletter";
 import { getRole } from "@/lib/actions/sessiondata";
 
 export default async function page() {
-  const role = await getRole();
-  if (role !== "admin")
-    return (
-      <Page>
-        <div>You need to be admin.</div>
-      </Page>
-    );
-
   return (
     <Page>
       <div>

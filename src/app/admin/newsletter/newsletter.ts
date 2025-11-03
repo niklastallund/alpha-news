@@ -20,8 +20,6 @@ const newsLetterSchemaS = z.object({
 export async function gererateNewsletter(): Promise<
   ResultPatternType<{ headline: string; content: string }>
 > {
-  console.log("Newsletter started...");
-
   const articles = await prisma.article.findMany({
     take: 5,
     orderBy: { createdAt: "desc" },
@@ -35,14 +33,9 @@ export async function gererateNewsletter(): Promise<
     select: { headline: true, summary: true },
   });
 
-  console.log("Articles" + JSON.stringify(articles));
-
-  console.log("Now continuing...");
-
   try {
     // So lets get the 5 latest articles, and the active date, and let ai create something based on that.
 
-    console.log("Starting");
     const { object } = await generateObject({
       model: google("gemini-2.5-flash"),
       // Ändra prompten till denna:
@@ -76,8 +69,6 @@ Paragraph two continues here.
 More content here.`,
       schema: newsLetterSchemaS,
     });
-
-    console.log(JSON.stringify(object));
 
     return { success: true, data: { ...object } };
   } catch (e) {
