@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import SetUserRole from "./SetUserRole";
 import { UserRole } from "./SetUserRole";
+import { useSession } from "@/lib/SessionProvider";
 
 export default function SelectedUserInfo({
   user,
@@ -22,8 +23,23 @@ export default function SelectedUserInfo({
   user: UserWithRole | null;
   onSuccess?: () => void;
 }) {
+  const session = useSession();
+  const employeeId = session.user?.id;
+  const isAdmin = session.user?.role === "admin";
+
   async function handleUnban() {
     try {
+      const { data } = await authClient.admin.hasPermission({
+        userId: employeeId,
+        permission: {
+          user: ["ban"],
+        },
+      });
+
+      if (!data?.success !== true) {
+        toast.error("You do not have permission to ban users.");
+        return;
+      }
       await authClient.admin.unbanUser({ userId: user!.id });
       toast.success("User unbanned successfully");
       onSuccess?.();
@@ -64,11 +80,13 @@ export default function SelectedUserInfo({
                 )}
               </div>
               <div className="flex flex-col gap-2">
-                <SetUserRole
-                  userId={user.id}
-                  userRole={user.role as UserRole || "user"}
-                  onSuccess={onSuccess}
-                />
+                {isAdmin && (
+                  <SetUserRole
+                    userId={user.id}
+                    userRole={(user.role as UserRole) || "user"}
+                    onSuccess={onSuccess}
+                  />
+                )}
                 {user?.banned ? (
                   <Button variant="destructive" onClick={handleUnban}>
                     Unban

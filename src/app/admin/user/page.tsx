@@ -14,7 +14,10 @@ export default async function AdminUserPage({
 }) {
   const session = await getSessionData();
 
-  if (!session || session.user.role !== "admin") {
+  if (
+    !session ||
+    (session.user.role !== "admin" && session.user.role !== "employee")
+  ) {
     return notFound();
   }
 

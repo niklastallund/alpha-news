@@ -26,6 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
+import { useSession } from "@/lib/SessionProvider";
 
 export const banUserSchema = z.object({
   userId: z.string(),
@@ -41,6 +42,9 @@ export function BanUserInput({
   userId: string;
   onSuccess?: () => void;
 }) {
+  const { user } = useSession();
+  const employeeId = user?.id;
+
   const form = useForm<BanUserInput>({
     resolver: zodResolver(banUserSchema),
     defaultValues: {
@@ -51,6 +55,18 @@ export function BanUserInput({
 
   async function onSubmit(formData: BanUserInput) {
     try {
+      const { data } = await authClient.admin.hasPermission({
+        userId: employeeId,
+        permission: {
+          user: ["ban"],
+        },
+      });
+
+      if (data?.success !== true) {
+        toast.error("You do not have permission to ban users.");
+        return;
+      }
+
       await authClient.admin.banUser({
         userId: formData.userId,
         banReason: formData.banReason,

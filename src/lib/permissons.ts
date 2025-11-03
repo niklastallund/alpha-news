@@ -22,4 +22,5 @@ export const admin = ac.newRole({
 
 export const employee = ac.newRole({
   project: ["create", "update", "ban"] as const,
+  user: ["get", "list"] as const,
 });

@@ -29,6 +29,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import { useSession } from "@/lib/SessionProvider";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -50,6 +51,8 @@ export default function SetUserRole({
   onSuccess?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
+  const { user } = useSession();
+  const employeeId = user?.id;
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -60,12 +63,24 @@ export default function SetUserRole({
 
   const roles = Object.values(UserRole) as UserRole[];
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(formData: z.infer<typeof FormSchema>) {
     startTransition(async () => {
       try {
+        const { data } = await authClient.admin.hasPermission({
+          userId: employeeId,
+          permission: {
+            user: ["set-role"],
+          },
+        });
+
+        if (data?.success !== true) {
+          toast.error("You do not have permission to set user roles.");
+          return;
+        }
+
         await authClient.admin.setRole({
           userId,
-          role: data.role,
+          role: formData.role,
         });
         toast.success("User role updated successfully");
         onSuccess?.();
