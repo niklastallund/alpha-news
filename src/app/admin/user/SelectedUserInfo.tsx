@@ -12,6 +12,8 @@ import { UserWithRole } from "better-auth/plugins";
 import { BanUserInput } from "./BanUser";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import SetUserRole from "./SetUserRole";
+import { UserRole } from "./SetUserRole";
 
 export default function SelectedUserInfo({
   user,
@@ -62,7 +64,11 @@ export default function SelectedUserInfo({
                 )}
               </div>
               <div className="flex flex-col gap-2">
-                <Button variant="outline">Set Role</Button>
+                <SetUserRole
+                  userId={user.id}
+                  userRole={user.role as UserRole || "user"}
+                  onSuccess={onSuccess}
+                />
                 {user?.banned ? (
                   <Button variant="destructive" onClick={handleUnban}>
                     Unban
