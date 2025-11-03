@@ -9,10 +9,12 @@ import { notFound } from "next/navigation";
 export default async function AdminCategoryPage() {
   const session = await getSessionData();
 
-  if (!session || session.user.role !== "admin") {
+  if (
+    !session ||
+    (session.user.role !== "admin" && session.user.role !== "employee")
+  ) {
     return notFound();
   }
-
   const categories = await prisma.category.findMany({
     orderBy: { updatedAt: "desc" },
     take: 10,

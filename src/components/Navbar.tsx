@@ -12,7 +12,7 @@ export default async function Navbar() {
   // Session checks for the navbar menu
   const session = await getSessionData();
   const isLoggedIn = !!session;
-  const isAdmin = (await getRole()) === "admin";
+  const isAdminOrEmployee = (await getRole()) === "admin" || (await getRole()) === "employee";
 
   const categories: Category[] = await prisma.category.findMany({
     where: { onNavbar: true },
@@ -38,7 +38,7 @@ export default async function Navbar() {
 
           {/* Desktop menu */}
           <div className="hidden md:flex-1 md:flex items-center justify-center min-w-0">
-            <NavbarMenu isAdmin={isAdmin} categories={categories} />
+            <NavbarMenu isAdminOrEmployee={isAdminOrEmployee} categories={categories} />
           </div>
 
           {/* Desktop actions */}
@@ -49,7 +49,7 @@ export default async function Navbar() {
 
           {/* Mobile hamburger (Sheet) */}
           <div className="md:hidden">
-            <MobileNav isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
+            <MobileNav isLoggedIn={isLoggedIn} isAdminOrEmployee={isAdminOrEmployee} />
           </div>
         </div>
       </div>

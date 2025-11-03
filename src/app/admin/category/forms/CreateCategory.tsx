@@ -39,16 +39,21 @@ export default function CreateCategoryForm() {
 
   async function onSubmit(data: CreateCategoryInput) {
     try {
-      const name = data.name.trim(); // So lets just do this i guess.
+      const name = data.name.trim();
       if (name) {
-        await createCategory({ ...data, name });
+        const category = await createCategory({ ...data, name });
+
+        if (!category) {
+          toast.error("Failed to create category. Permission denied.");
+          return;
+        }
         toast.success("Category created!");
         form.reset();
       } else {
         toast.error("Name is empty.");
       }
     } catch (error) {
-      toast.error("Failed to create category.");
+      toast.error(`Failed to create category: ${error}`);
       console.error(error);
     }
   }

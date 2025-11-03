@@ -10,7 +10,10 @@ import { notFound } from "next/navigation";
 export default async function AdminArticlePage() {
   const session = await getSessionData();
 
-  if (!session || session.user.role !== "admin") {
+  if (
+    !session ||
+    (session.user.role !== "admin" && session.user.role !== "employee")
+  ) {
     return notFound();
   }
 

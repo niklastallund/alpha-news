@@ -51,7 +51,7 @@ export function DeleteCategoryButton({
               router.refresh();
             } catch (e) {
               console.error(e);
-              toast.error("Failed to delete category");
+              toast.error("Failed to delete category. Permission Denied.");
             }
           }}
         >

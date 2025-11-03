@@ -49,7 +49,13 @@ export default function UpdateCategoryForm({
     try {
       const name = data.name?.trim();
       if (name) {
-        await updateCategory({ ...data, name });
+        const catergory = await updateCategory({ ...data, name });
+
+        if (!catergory) {
+          toast.error("Failed to update category. Permission denied.");
+          return;
+        }
+
         toast.success("Category updated!");
       } else {
         toast.error("Name is empty.");

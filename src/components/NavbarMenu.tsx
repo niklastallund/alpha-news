@@ -15,10 +15,10 @@ import {
 import { Category } from "@/generated/prisma";
 
 export default function NavbarMenu({
-  isAdmin,
+  isAdminOrEmployee,
   categories,
 }: {
-  isAdmin: boolean;
+  isAdminOrEmployee: boolean;
   categories: Category[];
 }) {
   return (
@@ -69,10 +69,10 @@ export default function NavbarMenu({
           </NavigationMenuContent>
         </NavigationMenuItem>
 
-        {/* Admin Menu, only visible if user is admin */}
-        {isAdmin && (
+        {/* Employee Menu, only visible if user is admin/employee */}
+        {isAdminOrEmployee && (
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
+            <NavigationMenuTrigger>Employee</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid w-[200px] gap-4">
                 <li>

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   CreateArticleInput,
@@ -29,14 +27,7 @@ import { toast } from "sonner";
 import { createArticle } from "@/lib/actions/article";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GeneratedArticle, uploadBase64ToR2 } from "@/lib/actions/ai";
 import { addCat } from "@/lib/actions/article";
 import Genai from "@/app/ai/Genai";
@@ -136,9 +127,9 @@ export default function CreateArticleForm({ categories }: Props) {
           "categories",
           newVal.map((v) => v.toString())
         );
-        toast("Added category " + newCategory + " to databse. 👍");
+        toast.success("Added category " + newCategory + " to databse. 👍");
       } else {
-        toast(
+        toast.error(
           "ℹ️ Failed adding category " +
             newCategory +
             " to databse. \n" +
@@ -185,15 +176,20 @@ export default function CreateArticleForm({ categories }: Props) {
         image,
       });
 
+      if (!newArt || !newArt.id) {
+        toast.error(
+          "Failed to create article: Permission denied."
+        );
+        return;
+      }
+
       toast.success("Article created");
 
       form.reset();
 
       router.push("/article/" + newArt.id.toString());
-
-      // setCategoriesCsv("");
     } catch (error) {
-      toast.error("Failed to create article");
+      toast.error(`Failed to create article: ${error}`);
       console.error(error);
     }
   }

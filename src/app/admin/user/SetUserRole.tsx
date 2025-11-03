@@ -33,6 +33,7 @@ import { Label } from "@/components/ui/label";
 export enum UserRole {
   ADMIN = "admin",
   USER = "user",
+  EMPLOYEE = "employee",
 }
 
 const FormSchema = z.object({

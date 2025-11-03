@@ -16,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,12 +29,7 @@ import {
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import { Textarea } from "@/components/ui/textarea";
 import ImageInput from "./ImageInput";
-import { useState } from "react";
-import {
-  deleteFileFromR2,
-  deleteImage,
-  uploadBase64ToR2,
-} from "@/lib/actions/ai";
+import { deleteFileFromR2, uploadBase64ToR2 } from "@/lib/actions/ai";
 import {
   Select,
   SelectContent,
@@ -99,8 +93,12 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
 
       // alert("onlyfor: " + datWithImg.onlyFor);
 
-      await updateArticle(datWithImg);
-      // alert(JSON.stringify(datWithImg));
+      const updatedArticle = await updateArticle(datWithImg);
+
+      if (!updatedArticle) {
+        toast.error("Failed to update article: Permission denied");
+      }
+
       toast.success("Article updated");
     } catch (error) {
       toast.error("Failed to update article");

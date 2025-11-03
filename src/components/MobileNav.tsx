@@ -30,10 +30,10 @@ const categories: { title: string; href: string }[] = [
 
 export default function MobileNav({
   isLoggedIn,
-  isAdmin,
+  isAdminOrEmployee,
 }: {
   isLoggedIn: boolean;
-  isAdmin: boolean;
+  isAdminOrEmployee: boolean;
 }) {
   return (
     <Sheet>
@@ -111,10 +111,10 @@ export default function MobileNav({
                 </AccordionContent>
               </AccordionItem>
 
-              {isAdmin && (
+              {isAdminOrEmployee && (
                 <AccordionItem value="admin">
                   <AccordionTrigger className="px-2 text-sm">
-                    Admin
+                    Employee
                   </AccordionTrigger>
                   <AccordionContent className="pl-3 pb-2">
                     <ul className="flex flex-col gap-1">

@@ -12,30 +12,20 @@ import { notFound } from "next/navigation";
 import { prisma } from "../prisma";
 import { revalidatePath } from "next/cache";
 
-// Normalize category names: trim, collapse spaces, dedupe case-insensitive
-// Parsing is already done on the front end, but just to be sure we don't get duplicates
-// function normalizeCategoryNames(names?: string[]) {
-//   if (!names?.length) return [];
-//   const seen = new Set<string>();
-//   const out: string[] = [];
-//   names.forEach((n) => {
-//     const cleaned = (n || "").trim().replace(/\s+/g, " ");
-//     if (!cleaned) return;
-//     const key = cleaned.toLowerCase();
-//     if (!seen.has(key)) {
-//       seen.add(key);
-//       out.push(cleaned);
-//     }
-//   });
-//   return out;
-// }
-
 export async function createArticle(formData: CreateArticleInput) {
   const session = await getSessionData();
-  const role = session?.user?.role;
   const authorId = session?.user?.id;
 
-  if (role !== "admin") return notFound();
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["create"] },
+    },
+  });
+
+  if (!data.success) {
+    return notFound();
+  }
 
   const validated = await createArticleSchema.parseAsync(formData);
 
@@ -78,10 +68,18 @@ export async function createArticle(formData: CreateArticleInput) {
 
 export async function updateArticle(formData: UpdateArticleInput) {
   const session = await getSessionData();
-  const role = session?.user?.role;
   const authorId = session?.user?.id;
 
-  if (role !== "admin") return notFound();
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["update"] },
+    },
+  });
+
+  if (!data.success) {
+    return notFound();
+  }
 
   const validated = await updateArticleSchema.parseAsync(formData);
 
@@ -106,22 +104,42 @@ export async function updateArticle(formData: UpdateArticleInput) {
 }
 
 export async function deleteArticle(id: number) {
-  const role = await getRole();
+  const session = await getSessionData();
+  const authorId = session?.user?.id;
 
-  if (role !== "admin") return notFound();
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["delete"] },
+    },
+  });
+
+  if (!data.success) {
+    return { success: false, error: "No permission" };
+  }
 
   const article = await prisma.article.delete({
     where: { id },
   });
 
   revalidatePath("/admin/article");
-  return article;
+  return { success: true, article: article };
 }
 
 export async function updateArticleCategories(formData: FormData) {
-  const role = await getRole();
+  const session = await getSessionData();
+  const authorId = session?.user?.id;
 
-  if (role !== "admin") return notFound();
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["update"] },
+    },
+  });
+
+  if (!data.success) {
+    return notFound();
+  }
 
   const articleIdRaw = formData.get("articleId");
   const selected = formData.getAll("categoryIds");
@@ -149,9 +167,6 @@ export async function updateArticleCategories(formData: FormData) {
   return;
 }
 
-// So here i will put all that stuff, maybe the ai too?
-// Well no, maybe move this to article.ts ? fix
-
 export type ArticleWithCat = {
   category: {
     name: string;
@@ -170,6 +185,7 @@ export type ArticleWithCat = {
   content: string | null;
   editorsChoice: boolean;
   views: number;
+  onlyFor: SubscriptionLevel | null;
 };
 
 export async function getArticles(): Promise<ArticleWithCat[]> {
@@ -186,9 +202,10 @@ export async function getArticles(): Promise<ArticleWithCat[]> {
   }
 }
 
-import { Category } from "@/generated/prisma/wasm";
+import { Category, SubscriptionLevel } from "@/generated/prisma/wasm";
 import { addCategorySchema } from "@/validations/article-forms";
 import { ResultPatternType } from "@/lib/actions/ai";
+import { auth } from "../auth";
 
 // Maybe move this to another server-action? fix
 export async function getCats(): Promise<Category[]> {
@@ -200,7 +217,19 @@ export async function getCats(): Promise<Category[]> {
 export async function addCat(
   cat: string
 ): Promise<ResultPatternType<Category>> {
-  // First check if exist:
+  const session = await getSessionData();
+  const authorId = session?.user?.id;
+
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["create"] },
+    },
+  });
+
+  if (!data.success) {
+    return notFound();
+  }
 
   try {
     const parsedName = await addCategorySchema.parseAsync({ name: cat });

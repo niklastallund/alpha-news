@@ -6,15 +6,26 @@ import {
   UpdateCategoryInput,
   updateCategorySchema,
 } from "@/validations/category-forms";
-import { getRole } from "./sessiondata";
+import { getRole, getSessionData } from "./sessiondata";
 import { notFound } from "next/navigation";
 import { prisma } from "../prisma";
 import { revalidatePath } from "next/cache";
+import { auth } from "../auth";
 
 export async function createCategory(formData: CreateCategoryInput) {
-  const role = await getRole();
+  const session = await getSessionData();
+  const authorId = session?.user?.id;
 
-  if (role !== "admin") return notFound();
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["create"] },
+    },
+  });
+
+  if (!data.success) {
+    return notFound();
+  }
 
   const validated = await createCategorySchema.parseAsync(formData);
 
@@ -30,9 +41,19 @@ export async function createCategory(formData: CreateCategoryInput) {
 }
 
 export async function updateCategory(formData: UpdateCategoryInput) {
-  const role = await getRole();
+  const session = await getSessionData();
+  const authorId = session?.user?.id;
 
-  if (role !== "admin") return notFound();
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["update"] },
+    },
+  });
+
+  if (!data.success) {
+    return notFound();
+  }
 
   const validated = await updateCategorySchema.parseAsync(formData);
 
@@ -49,9 +70,19 @@ export async function updateCategory(formData: UpdateCategoryInput) {
 }
 
 export async function deleteCategory(id: number) {
-  const role = await getRole();
+  const session = await getSessionData();
+  const authorId = session?.user?.id;
 
-  if (role !== "admin") return notFound();
+  const data = await auth.api.userHasPermission({
+    body: {
+      userId: authorId,
+      permission: { project: ["delete"] },
+    },
+  });
+
+  if (!data.success) {
+    return notFound();
+  }
 
   const category = await prisma.category.delete({
     where: { id },

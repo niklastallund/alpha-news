@@ -45,12 +45,16 @@ export function DeleteArticleButton({
           action={async (formData) => {
             try {
               const id = Number(formData.get("id"));
-              await deleteArticle(id);
+              const { success, error } = await deleteArticle(id);
+              if (!success) {
+                toast.error(`Failed to delete article: ${error}`);
+                return;
+              }
               toast.success("Article deleted");
               router.refresh();
             } catch (e) {
               console.error(e);
-              toast.error("Failed to delete article");
+              toast.error(`Failed to delete article: ${e}`);
             }
           }}
         >
