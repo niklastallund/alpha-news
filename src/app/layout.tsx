@@ -37,7 +37,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <SessionProvider
           session={sessionData?.session ?? null}
@@ -50,7 +50,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <Navbar />
-            {children}
+            <main className="flex-1">{children}</main>
             <Footer />
             <Toaster richColors position="top-center" />
             <CookieConsent />

@@ -1,5 +1,3 @@
-"use client";
-
 import { MapPin, Phone, Building2 } from "lucide-react";
 
 // Small footer component with 3 columns: Brand, Center, Contact
@@ -7,7 +5,7 @@ export function Footer() {
   return (
     <footer className="bg-background/95 border-t-2 border-border mt-5">
       <div className="mx-auto max-w-screen-xl py-6">
-        <div className="flex flex-row md:items-start justify-between px-5 gap-4 lg:gap-72">
+        <div className="flex flex-row md:items-start justify-between px-5 gap-4 md:gap-10 lg:gap-72">
           {/* Brand (left) */}
           <div className="space-y-4 w-full md:w-1/3">
             <p className="text-xs md:text-sm text-muted-foreground leading-relaxed pr-4">
