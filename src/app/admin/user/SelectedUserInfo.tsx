@@ -36,7 +36,9 @@ export default function SelectedUserInfo({
         },
       });
 
-      if (!data?.success !== true) {
+      console.log("Permission check data:", data);
+
+      if (data?.success !== true) {
         toast.error("You do not have permission to ban users.");
         return;
       }
