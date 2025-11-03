@@ -9,7 +9,6 @@ import EditCommentForm from "./EditCommentForm";
 import { DeleteCommentButton } from "./DeleteComment";
 import { pickAvatarBg } from "@/lib/avatar-color";
 import { formatDateTime, wasEdited } from "@/lib/date";
-import { Separator } from "../ui/separator";
 
 // This component only takes the necessary props to render a comment item,
 // but you can send the whole comment and user objects to it and destructure them here

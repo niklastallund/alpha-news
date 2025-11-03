@@ -1,5 +1,4 @@
 "use server";
-// So in this folder we have serveractions
 
 import { headers } from "next/headers";
 import { auth } from "../auth";

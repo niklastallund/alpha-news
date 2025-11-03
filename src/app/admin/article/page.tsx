@@ -4,12 +4,18 @@ import { getArticles, getCats } from "@/lib/actions/article";
 import CreateArticleForm from "./forms/CreateArticle";
 import UpdateArticleDialog from "./forms/UpdateArticleDialog";
 import { DeleteArticleButton } from "./forms/DeleteArticle";
+import { getSessionData } from "@/lib/actions/sessiondata";
+import { notFound } from "next/navigation";
 
 export default async function AdminArticlePage() {
+  const session = await getSessionData();
+
+  if (!session || session.user.role !== "admin") {
+    return notFound();
+  }
+
   const articles = await getArticles();
   const categories = await getCats();
-
-  // console.log(JSON.stringify(categories));
 
   return (
     <Page>
