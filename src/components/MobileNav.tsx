@@ -20,20 +20,16 @@ import {
 import AccountMenu from "./AccountMenu";
 import { ModeToggle } from "./theme-toggle";
 import { Separator } from "./ui/separator";
-
-const categories: { title: string; href: string }[] = [
-  { title: "Technology", href: "#" },
-  { title: "Health", href: "#" },
-  { title: "Finance", href: "#" },
-  { title: "Sport", href: "#" },
-];
+import { Category } from "@/generated/prisma";
 
 export default function MobileNav({
   isLoggedIn,
   isAdminOrEmployee,
+  categories = [],
 }: {
   isLoggedIn: boolean;
   isAdminOrEmployee: boolean;
+  categories: Category[];
 }) {
   return (
     <Sheet>
@@ -73,14 +69,24 @@ export default function MobileNav({
                 </AccordionTrigger>
                 <AccordionContent className="pl-3 pb-2">
                   <ul className="flex flex-col gap-1">
+                    <li>
+                      <SheetClose asChild>
+                        <Link
+                          href={`/article`}
+                          className="block px-2 py-1.5 rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
+                        >
+                          All
+                        </Link>
+                      </SheetClose>
+                    </li>
                     {categories.map((c) => (
-                      <li key={c.title}>
+                      <li key={c.id}>
                         <SheetClose asChild>
                           <Link
-                            href={c.href}
+                            href={`/article?cat=${encodeURIComponent(c.name)}`}
                             className="block px-2 py-1.5 rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
                           >
-                            {c.title}
+                            {c.name}
                           </Link>
                         </SheetClose>
                       </li>
@@ -95,14 +101,26 @@ export default function MobileNav({
                 </AccordionTrigger>
                 <AccordionContent className="pl-3 pb-2">
                   <ul className="flex flex-col gap-1">
+                    <li>
+                      <SheetClose asChild>
+                        <Link
+                          href={`/article?editors=1`}
+                          className="block px-2 py-1.5 rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
+                        >
+                          All
+                        </Link>
+                      </SheetClose>
+                    </li>
                     {categories.map((c) => (
-                      <li key={`ed-${c.title}`}>
+                      <li key={`ed-${c.id}`}>
                         <SheetClose asChild>
                           <Link
-                            href={c.href}
+                            href={`/article?editors=1&cat=${encodeURIComponent(
+                              c.name
+                            )}`}
                             className="block px-2 py-1.5 rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
                           >
-                            {c.title}
+                            {c.name}
                           </Link>
                         </SheetClose>
                       </li>
@@ -121,7 +139,7 @@ export default function MobileNav({
                       <li>
                         <SheetClose asChild>
                           <Link
-                            href="#"
+                            href="/admin"
                             className="block px-2 py-1.5 rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
                           >
                             Dashboard

@@ -25,15 +25,20 @@ interface CommentProps {
     name: string;
     image: string | null;
     role: string | null;
+    banned: boolean | null;
   };
 
-  isAuthor: boolean;
+  isUserTheAuthor: boolean;
+  isArticleAuthor?: boolean;
 }
 
+// This component renders a single comment item, with support for editing
+// if the current user is the author of the comment.
 export function CommentItem({
   comment: { id, content, createdAt, updatedAt },
   user,
-  isAuthor,
+  isUserTheAuthor: isAuthor,
+  isArticleAuthor,
 }: CommentProps) {
   // Local state to manage editing mode + optimistic content
   const [isEditing, setIsEditing] = useState(false);
@@ -60,8 +65,22 @@ export function CommentItem({
     setIsEditing(true);
   }
 
+  // Helper to capitalize first letter of a string, used for role display
+  function capitalizeFirstLetter(str: string) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   return (
-    <Card className="shadow-sm">
+    <Card
+      className={
+        isAuthor
+          ? "border-t-green-600"
+          : isArticleAuthor
+          ? "border-t-amber-500"
+          : ""
+      }
+    >
       {/* make CardContent relative so we can absolutely position the controls */}
       <CardContent className="px-5 py-2 relative">
         <div className="flex gap-5">
@@ -83,8 +102,20 @@ export function CommentItem({
             <div className="flex items-center gap-2">
               <span className="text-md font-medium">{user.name}</span>
               {user.role && (
-                <span className="text-xs text-muted-foreground">
-                  {user.role}
+                <span
+                  className={
+                    isAuthor
+                      ? "text-xs text-green-600 font-semibold"
+                      : isArticleAuthor
+                      ? "text-xs text-amber-500 font-semibold"
+                      : "text-xs text-muted-foreground"
+                  }
+                >
+                  {isAuthor
+                    ? "You"
+                    : isArticleAuthor
+                    ? "Author"
+                    : capitalizeFirstLetter(user.role)}
                 </span>
               )}
             </div>
@@ -122,6 +153,13 @@ export function CommentItem({
               {wasEdited(createdAt, updatedAt) && (
                 <span className="ml-2 text-xs italic text-muted-foreground">
                   Edited {formatDateTime(updatedAt)}
+                </span>
+              )}
+            </div>
+            <div>
+              {user.banned && (
+                <span className="text-xs font-semibold text-red-600 italic">
+                  This user is banned.
                 </span>
               )}
             </div>

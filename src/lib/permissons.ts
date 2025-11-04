@@ -17,12 +17,11 @@ export const user = ac.newRole({
 });
 
 export const admin = ac.newRole({
-  ...adminAc.statements,
   project: ["create", "share", "update", "delete", "ban"],
-  user: ["get", "list", "ban", "set-role"],
+  ...adminAc.statements,
 });
 
 export const employee = ac.newRole({
   project: ["create", "update", "ban"],
-  user: ["get", "list"],
+  user: ["get", "list", "ban"],
 });

@@ -32,16 +32,24 @@ export default function AccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
   // Use compact inline buttons so they visually match NavbarMenu items.
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 xl:gap-2">
       {isLoggedIn ? (
         <>
-          <Button variant="default" onClick={() => router.push("/user")}>
-            <User className="h-4 w-4" />
+          <Button
+            variant="default"
+            onClick={() => router.push("/user")}
+            className="h-8 text-xs xl:h-9 xl:text-sm z-10"
+          >
+            <User />
             Profile
           </Button>
 
-          <Button variant="ghost" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4" />
+          <Button
+            variant="ghost"
+            onClick={handleSignOut}
+            className="h-8 text-xs xl:h-9 xl:text-sm"
+          >
+            <LogOut />
             Sign Out
           </Button>
         </>
@@ -49,8 +57,11 @@ export default function AccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
         <>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="default">
-                <LogIn className="h-4 w-4" />
+              <Button
+                className="h-8 text-xs xl:h-9 xl:text-sm"
+                variant="default"
+              >
+                <LogIn />
                 Sign In
               </Button>
             </DialogTrigger>
@@ -64,8 +75,8 @@ export default function AccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
 
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost">
-                <UserPlus className="h-4 w-4" />
+              <Button className="h-8 text-xs xl:h-9 xl:text-sm" variant="ghost">
+                <UserPlus />
                 Sign Up
               </Button>
             </DialogTrigger>

@@ -64,24 +64,24 @@ export default function Weather() {
   }
 
   return (
-    <div className="bg-card text-foreground p-8 sm:p-10 w-full max-w-md border rounded-sm border-t-3 border-top-primary transition-all duration-300 ">
+    <div className="bg-card text-foreground p-8 sm:p-10 w-full lg:max-w-md border rounded-sm border-t-3 border-top-primary transition-all duration-300 ">
       <h1 className="text-2xl font-extrabold text-center mb-8">
         Weather Forecast
       </h1>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-4 items-stretch">
         <input
           type="text"
           placeholder="Enter city"
           value={city}
           onChange={(e) => setCity(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-grow p-3 border border-gray-400 dark:border-gray-400 bg-background text-foreground rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-ring transition duration-150"
+          className="flex-1 min-w-0 w-full p-3 border border-gray-400 dark:border-gray-400 bg-background text-foreground rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-ring transition duration-150"
         />
         <button
           onClick={getWeather}
           disabled={loading}
-          className="bg-muted text-foreground hover:bg-muted/80 px-4 py-2 rounded-md border border-gray-400 dark:border-gray-400 transition-colors shadow-sm"
+          className="shrink-0 bg-muted text-foreground hover:bg-muted/80 px-4 py-2 rounded-md border border-gray-400 dark:border-gray-400 transition-colors shadow-sm"
         >
           {loading ? "Loading..." : "Get"}
         </button>

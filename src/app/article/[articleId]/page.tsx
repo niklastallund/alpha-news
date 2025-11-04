@@ -92,7 +92,10 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
             createdAt={article.createdAt}
             updatedAt={article.updatedAt}
             categories={article.category.map((cat) => cat.name)}
-            authors={article.author.map((auth) => auth.name)}
+            authors={article.author.map((auth) => ({
+              id: auth.id,
+              name: auth.name,
+            }))}
             comments={article.comments}
           />
         )}

@@ -18,6 +18,7 @@ import type { Session, User } from "better-auth";
 // Add role to User in SessionContextProps. (Its not there as default).
 interface UserAndRole extends User {
   role: string | null;
+  banned: boolean | null;
 }
 
 interface SessionContextProps {

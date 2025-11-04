@@ -12,7 +12,9 @@ import { wasEdited } from "@/lib/date";
 // Export type for comments with author info, used in child components
 export type CommentWithAuthor = Prisma.CommentGetPayload<{
   include: {
-    author: { select: { id: true; name: true; image: true; role: true } };
+    author: {
+      select: { id: true; name: true; image: true; role: true; banned: true };
+    };
   };
 }>;
 
@@ -26,7 +28,7 @@ interface ArticleProps {
   createdAt?: Date;
   updatedAt?: Date;
   categories?: string[];
-  authors?: string[];
+  authors?: { id: string; name: string }[];
   comments?: CommentWithAuthor[];
 }
 
@@ -63,27 +65,24 @@ export default function Article({
   comments = [],
 }: ArticleProps) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col lg:min-w-1/2 min-w-full">
       <article className="prose dark:prose-invert lg:prose-lg">
-        <h1 className="!mb-4">{headline}</h1>
+        <h1 className="mb-4!">{headline}</h1>
 
         {/* Categories and editor's choice, show on one line if both exist */}
         {(categories.length > 0 || editorsChoice) && (
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm italic text-muted-foreground min-w-0">
               <span className="flex items-center min-w-0">
-                <LibraryBig size={16} className="mr-1 flex-shrink-0" />
-                <span
-                  className="truncate"
-                  title={categories.join(", ")} // hover shows full list (if truncated)
-                >
+                <LibraryBig size={16} className="mr-1 shrink-0" />
+                <span className="truncate" title={categories.join(", ")}>
                   {categories.join(", ")}
                 </span>
               </span>
             </p>
 
             {editorsChoice && (
-              <p className="text-sm italic text-green-600 flex-shrink-0">
+              <p className="text-sm italic text-green-600 shrink-0">
                 <span className="flex items-center">
                   <ThumbsUp size={16} className="mr-1" />
                   {`Editor's choice.`}
@@ -99,7 +98,7 @@ export default function Article({
             alt={"null"}
             width={1000}
             height={1000}
-            className="!mt-4 min-w-xl object-cover rounded-xs"
+            className="mt-4! object-cover rounded-xs"
           />
         )}
 
@@ -123,7 +122,7 @@ export default function Article({
           <p className="mt-4 text-sm italic text-muted-foreground">
             <span className="flex items-center">
               <PencilLine size={16} className="mr-1" />
-              {`Written by ${authors.join(", ")}`}
+              {`Written by ${authors.map((a) => a.name).join(", ")}`}
             </span>
           </p>
         )}
@@ -138,7 +137,11 @@ export default function Article({
         </ReactMarkdown>
       </article>
       <Separator className="my-6" />
-      <CommentSection comments={comments} articleId={id} />
+      <CommentSection
+        comments={comments}
+        articleId={id}
+        articleAuthorIds={authors.map((a) => a.id)}
+      />
     </div>
   );
 }
