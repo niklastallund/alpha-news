@@ -312,6 +312,10 @@ export async function changeUserName(
   const id = userdata.id as string;
   if (!id) return { success: false, msg: "No id" };
 
+  // Check newsletter
+  const newsletter = userdata.newsletter as string;
+  if (!newsletter) return { success: false, msg: "No newsletter" };
+
   // Get the user to compare. This is maybe uneccassary. fix
   const checkUsr = await prisma.user.findUnique({ where: { id } });
   if (!checkUsr || checkUsr.id !== id)
@@ -331,6 +335,17 @@ export async function changeUserName(
 
         if (!newmail) return { success: false, msg: "Failed to change email" };
       }
+
+      // Change newsletter:
+      let nl: boolean = newsletter === "true";
+      console.log("Setting to " + nl);
+
+      const updNewsletter = await prisma.user.update({
+        where: { id },
+        data: { newsLetter: nl },
+      });
+
+      console.log(updNewsletter);
 
       // Now change name:
       const newname = await prisma.user.update({

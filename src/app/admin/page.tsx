@@ -1,6 +1,6 @@
 import Page from "@/components/Page";
 import { Separator } from "@/components/ui/separator";
-import { getSessionData } from "@/lib/actions/sessiondata";
+import { getRole, getSessionData } from "@/lib/actions/sessiondata";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -22,6 +22,7 @@ export default async function AdminPage() {
         <Link href="/admin/article">Manage Articles</Link>
         <Link href="/admin/category">Manage Categories</Link>
         <Link href="/admin/user">Manage Users</Link>
+        <Link href="/admin/newsletter">Newsletters</Link>
       </div>
     </Page>
   );

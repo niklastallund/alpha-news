@@ -27,8 +27,9 @@ import { changeUserName } from "@/lib/actions/edituser";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import Loader from "@/components/Loader";
+import { Checkbox } from "@/components/ui/checkbox";
 
-export default function NameForm() {
+export default function NameForm({ newsLetter }: { newsLetter: boolean }) {
   const { user } = useSession();
 
   const [msg, setMsg] = useState<string>("");
@@ -39,6 +40,7 @@ export default function NameForm() {
       id: user?.id,
       name: user?.name,
       email: user?.email,
+      newsletter: newsLetter ? "true" : "false",
     },
   });
 
@@ -64,6 +66,7 @@ export default function NameForm() {
     formData.append("name", values.name ?? "Anonymous");
     formData.append("email", values.email);
     formData.append("id", values.id);
+    formData.append("newsletter", values.newsletter);
 
     const result = await changeUserName(formData);
 
@@ -79,9 +82,10 @@ export default function NameForm() {
       <CardHeader>
         <CardTitle>
           {" "}
-          <Edit className="w-[32px] h-[32px] inline-block"></Edit> Change name
+          <Edit className="w-[32px] h-[32px] inline-block"></Edit> Change
+          details
         </CardTitle>
-        <CardDescription>Change your name or email.</CardDescription>
+        <CardDescription>Change your details</CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <Form {...nameForm}>
@@ -118,6 +122,26 @@ export default function NameForm() {
 
               <FormField
                 control={nameForm.control}
+                name="newsletter"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Newsletter</FormLabel>
+                    <FormControl>
+                      <Checkbox
+                        className="w-10 h-10 p-2"
+                        checked={field.value === "true"}
+                        {...field}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked ? "true" : "false");
+                        }}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={nameForm.control}
                 name="id"
                 render={({ field }) => (
                   <FormItem className="hidden">
@@ -129,6 +153,7 @@ export default function NameForm() {
                 )}
               />
             </div>
+
             <Button
               type="submit"
               disabled={nameForm.formState.isSubmitting}
