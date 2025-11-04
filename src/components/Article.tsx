@@ -63,27 +63,24 @@ export default function Article({
   comments = [],
 }: ArticleProps) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col lg:min-w-1/2 min-w-full">
       <article className="prose dark:prose-invert lg:prose-lg">
-        <h1 className="!mb-4">{headline}</h1>
+        <h1 className="mb-4!">{headline}</h1>
 
         {/* Categories and editor's choice, show on one line if both exist */}
         {(categories.length > 0 || editorsChoice) && (
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm italic text-muted-foreground min-w-0">
               <span className="flex items-center min-w-0">
-                <LibraryBig size={16} className="mr-1 flex-shrink-0" />
-                <span
-                  className="truncate"
-                  title={categories.join(", ")} // hover shows full list (if truncated)
-                >
+                <LibraryBig size={16} className="mr-1 shrink-0" />
+                <span className="truncate" title={categories.join(", ")}>
                   {categories.join(", ")}
                 </span>
               </span>
             </p>
 
             {editorsChoice && (
-              <p className="text-sm italic text-green-600 flex-shrink-0">
+              <p className="text-sm italic text-green-600 shrink-0">
                 <span className="flex items-center">
                   <ThumbsUp size={16} className="mr-1" />
                   {`Editor's choice.`}
@@ -99,7 +96,7 @@ export default function Article({
             alt={"null"}
             width={1000}
             height={1000}
-            className="!mt-4 min-w-xl object-cover rounded-xs"
+            className="mt-4! object-cover rounded-xs"
           />
         )}
 

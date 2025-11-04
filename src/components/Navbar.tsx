@@ -12,7 +12,8 @@ export default async function Navbar() {
   // Session checks for the navbar menu
   const session = await getSessionData();
   const isLoggedIn = !!session;
-  const isAdminOrEmployee = (await getRole()) === "admin" || (await getRole()) === "employee";
+  const isAdminOrEmployee =
+    (await getRole()) === "admin" || (await getRole()) === "employee";
 
   const categories: Category[] = await prisma.category.findMany({
     where: { onNavbar: true },
@@ -20,12 +21,12 @@ export default async function Navbar() {
   });
 
   return (
-    <nav className="sticky top-0 mb-2 z-50 bg-background/100 border-b-3 border-primary">
+    <nav className="sticky top-0 mb-2 z-50 bg-background border-b-[3px] border-primary">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between py-2">
           <Link
             href="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse flex-shrink-0"
+            className="flex items-center space-x-3 rtl:space-x-reverse shrink-0"
           >
             <Image
               src="/alphalogo.svg"
@@ -38,18 +39,24 @@ export default async function Navbar() {
 
           {/* Desktop menu */}
           <div className="hidden md:flex-1 md:flex items-center justify-center min-w-0">
-            <NavbarMenu isAdminOrEmployee={isAdminOrEmployee} categories={categories} />
+            <NavbarMenu
+              isAdminOrEmployee={isAdminOrEmployee}
+              categories={categories}
+            />
           </div>
 
           {/* Desktop actions */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
             <AccountMenu isLoggedIn={isLoggedIn} />
             <ModeToggle />
           </div>
 
           {/* Mobile hamburger (Sheet) */}
           <div className="md:hidden">
-            <MobileNav isLoggedIn={isLoggedIn} isAdminOrEmployee={isAdminOrEmployee} />
+            <MobileNav
+              isLoggedIn={isLoggedIn}
+              isAdminOrEmployee={isAdminOrEmployee}
+            />
           </div>
         </div>
       </div>
