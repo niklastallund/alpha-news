@@ -64,7 +64,9 @@ export default async function UserPage() {
           <div>
             <span className="text-4xl">{session.user.name}</span>
             <br />
-            <span className="text-xl font-bold">{session.user.email}</span>
+            <span className="text-xl font-bold">
+              {session.user.email} ({session.user.role})
+            </span>
             <br />
           </div>
         </div>
