@@ -55,7 +55,7 @@ export default function Currency() {
   };
 
   return (
-    <Card className="w-full max-w-md bg-card text-card-foreground">
+    <Card className="w-full lg:max-w-md bg-card text-card-foreground">
       <CardHeader>
         <CardTitle className="text-2xl font-extrabold text-center">
           Currency Converter
@@ -150,4 +150,3 @@ export default function Currency() {
     </Card>
   );
 }
-<p className="text-center text-xs text-muted-foreground"></p>;

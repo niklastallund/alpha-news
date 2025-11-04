@@ -29,7 +29,7 @@ export default async function Home() {
 
       <Page>
         <div className="mt-10 flex flex-col lg:flex-row items-start justify-center gap-6">
-          <div className="w-full md:max-w-3xl flex flex-col items-start gap-4">
+          <div className="w-full md:max-w-3xl flex flex-col items-start gap-4 min-w-0">
             {frontPageArticles.map((article) => (
               <ArticleCard
                 key={article.id}
@@ -41,7 +41,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <aside className="w-full max-w-sm flex flex-col justify-center items-start gap-4">
+          <aside className="w-full lg:max-w-sm flex flex-col justify-center items-start gap-4 min-w-0">
             <Weather />
             <Currency />
             <ContactCard />

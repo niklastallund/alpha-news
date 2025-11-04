@@ -70,8 +70,8 @@ export default function ContactCard({
   title = "Contact Alpha-News",
   subtitle = "Tips or questions? Get in touch!",
   email = "editor@alpha-news.com",
-  phoneDisplay = "+46 11 120111",
-  phoneHref = "+4611120111",
+  phoneDisplay = "(555) FACTS-333",
+  phoneHref = "#",
   facebookUrl = "#",
   facebookHandle = "@alpha-news",
   className,
@@ -79,13 +79,13 @@ export default function ContactCard({
   return (
     <section
       className={`
-    w-full max-w-md overflow-hidden border border-t-3 rounded-sm border-top-primary
+    w-full lg:max-w-md overflow-hidden border border-t-3 rounded-sm border-top-primary
     bg-card text-card-foreground shadow-sm ${className ?? ""}
   `}
       aria-labelledby="contact-title"
     >
       <div aria-hidden="true" />
-      <header className="px-[18px] pt-[14px] pb-2">
+      <header className="px-[18px] pt-3.5 pb-2">
         <h2
           id="contact-title"
           className="text-2xl font-extrabold text-center mb-2"
@@ -97,10 +97,10 @@ export default function ContactCard({
         </p>
       </header>
 
-      <div role="list" className="grid gap-[2px] bg-border py-[2px]">
+      <div role="list" className="grid gap-0.5 bg-border py-0.5">
         {/* Email the editor */}
         <ContactItem
-          href={`mailto:${email}`}
+          href={`#`}
           title="Email the editor"
           subtitle={email}
           ariaLabel={`Email the editor at ${email}`}
@@ -125,7 +125,7 @@ export default function ContactCard({
         {/* Facebook */}
         <ContactItem
           href={facebookUrl}
-          title="Follow us on Facebook"
+          title="Follow us on Fakebook"
           subtitle={facebookHandle}
           ariaLabel="Follow us on Facebook"
         >
@@ -143,7 +143,7 @@ export default function ContactCard({
 
         {/* Phone */}
         <ContactItem
-          href={`tel:${phoneHref}`}
+          href={`#`}
           title="Call the newsroom"
           subtitle={phoneDisplay}
           ariaLabel={`Call the newsroom at ${phoneDisplay}`}
