@@ -12,7 +12,9 @@ import { wasEdited } from "@/lib/date";
 // Export type for comments with author info, used in child components
 export type CommentWithAuthor = Prisma.CommentGetPayload<{
   include: {
-    author: { select: { id: true; name: true; image: true; role: true } };
+    author: {
+      select: { id: true; name: true; image: true; role: true; banned: true };
+    };
   };
 }>;
 
@@ -26,7 +28,7 @@ interface ArticleProps {
   createdAt?: Date;
   updatedAt?: Date;
   categories?: string[];
-  authors?: string[];
+  authors?: { id: string; name: string }[];
   comments?: CommentWithAuthor[];
 }
 
@@ -120,7 +122,7 @@ export default function Article({
           <p className="mt-4 text-sm italic text-muted-foreground">
             <span className="flex items-center">
               <PencilLine size={16} className="mr-1" />
-              {`Written by ${authors.join(", ")}`}
+              {`Written by ${authors.map((a) => a.name).join(", ")}`}
             </span>
           </p>
         )}
@@ -135,7 +137,11 @@ export default function Article({
         </ReactMarkdown>
       </article>
       <Separator className="my-6" />
-      <CommentSection comments={comments} articleId={id} />
+      <CommentSection
+        comments={comments}
+        articleId={id}
+        articleAuthorIds={authors.map((a) => a.id)}
+      />
     </div>
   );
 }

@@ -71,7 +71,6 @@ export default function ContactCard({
   subtitle = "Tips or questions? Get in touch!",
   email = "editor@alpha-news.com",
   phoneDisplay = "(555) FACTS-333",
-  phoneHref = "#",
   facebookUrl = "#",
   facebookHandle = "@alpha-news",
   className,

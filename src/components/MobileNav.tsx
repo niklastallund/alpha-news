@@ -139,7 +139,7 @@ export default function MobileNav({
                       <li>
                         <SheetClose asChild>
                           <Link
-                            href="#"
+                            href="/admin"
                             className="block px-2 py-1.5 rounded-md text-sm hover:bg-accent hover:text-accent-foreground"
                           >
                             Dashboard

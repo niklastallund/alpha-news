@@ -53,7 +53,7 @@ export default async function ArticlePage({
           </div>
 
           {/* Keep filters from shrinking too small */}
-          <div className="flex items-center gap-2 sm:flex-shrink-0">
+          <div className="flex items-center gap-2 sm:shrink-0">
             <CategoryFilter
               categories={categories}
               selectedCategory={selectedCategory}
