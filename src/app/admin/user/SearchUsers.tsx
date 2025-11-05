@@ -60,11 +60,11 @@ export default async function SearchUsers({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="w-1/3">
+        <div className="w-auto lg:w-1/3">
           <SearchBar placeholder="Search for users..." />
         </div>
         <UsersPanel users={users} />
-        <div className="w-1/3">
+        <div className="w-auto lg:w-1/3">
           <PaginationBar
             totalPages={totalPages}
             currentPage={currentPage}

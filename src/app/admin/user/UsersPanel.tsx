@@ -20,8 +20,8 @@ export default function UsersPanel({ users }: { users: UserWithRole[] }) {
   }
 
   return (
-    <div className="flex gap-4 mt-2">
-      <div className="w-1/3">
+    <div className="flex flex-col lg:flex-row gap-4 mt-2">
+      <div className="w-auto lg:w-1/3">
         {users.map((user) => (
           <UserListItem key={user.id} user={user} onSelect={handleSelect} />
         ))}

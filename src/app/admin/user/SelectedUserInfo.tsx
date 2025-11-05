@@ -59,7 +59,7 @@ export default function SelectedUserInfo({
               <p className="text-lg font-semibold">{user?.name}</p>
             </CardTitle>
             <CardDescription>
-              <p className="text-sm">{`ID: ${user?.id}`}</p>
+              <p className="text-xs">{`ID: ${user?.id}`}</p>
             </CardDescription>
           </CardHeader>
           <CardContent>
