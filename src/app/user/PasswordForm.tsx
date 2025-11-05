@@ -67,14 +67,14 @@ export default function PasswordForm() {
     formData.append("confirmPassword", values.confirmPassword);
     formData.append("currpw", values.currpw);
 
-    // // add in edituser
-    // const result = await changeUserPw(formData);
+    // add in edituser
+    const result = await changeUserPw(formData);
 
-    //   if (result.success) {
-    //     // So you will get logged out.
-    //     window.location.reload();
-    //   }
-    //   setMsg(result.msg);
+      if (result.success) {
+        // So you will get logged out.
+        window.location.reload();
+      }
+      setMsg(result.msg);
   }
 
   return (

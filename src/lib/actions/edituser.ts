@@ -1,9 +1,9 @@
 "use server";
 
-import { fileTypeFromBuffer } from "file-type"; //ok, lets try.
+// import { fileTypeFromBuffer } from "file-type"; //ok, lets try.
 import {
   changePwSchema,
-  imageUploadSchema,
+  // imageUploadSchema,
   nameMailSchema,
 } from "@/validations/userpage";
 import { prisma } from "../prisma";
@@ -12,8 +12,8 @@ import { headers } from "next/headers";
 
 import {
   S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
+  // PutObjectCommand,
+  // DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 
 const s3Client = new S3Client({
@@ -35,97 +35,99 @@ export async function uploadUserImageToCloud(
 ): Promise<{ success: boolean; msg: string }> {
   // console.log("uploadUserImageToCloud called");
 
-  try {
-    const userId = formData.get("userId") as string;
-    if (!userId) return { success: false, msg: "No user id." };
+  return { success: false, msg: "Not implemented." };
 
-    // Check file
-    const file = formData.get("file") as File;
-    if (!file || file.size === 0)
-      return { success: false, msg: "No valid file." };
+  // try {
+  //   const userId = formData.get("userId") as string;
+  //   if (!userId) return { success: false, msg: "No user id." };
 
-    if (file.size > 1 * 1024 * 1024)
-      return { success: false, msg: "File is too big. (1MB)" };
+  //   // Check file
+  //   const file = formData.get("file") as File;
+  //   if (!file || file.size === 0)
+  //     return { success: false, msg: "No valid file." };
 
-    // Check filetype
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+  //   if (file.size > 1 * 1024 * 1024)
+  //     return { success: false, msg: "File is too big. (1MB)" };
 
-    const fileType = await fileTypeFromBuffer(buffer);
-    if (
-      !fileType ||
-      (fileType.mime !== "image/png" && fileType.mime !== "image/jpeg")
-    )
-      return { success: false, msg: "Invalid filetype (only jpg or png)" };
+  //   // Check filetype
+  //   const arrayBuffer = await file.arrayBuffer();
+  //   const buffer = Buffer.from(arrayBuffer);
 
-    const fileExtension = fileType.ext;
+  //   const fileType = await fileTypeFromBuffer(buffer);
+  //   if (
+  //     !fileType ||
+  //     (fileType.mime !== "image/png" && fileType.mime !== "image/jpeg")
+  //   )
+  //     return { success: false, msg: "Invalid filetype (only jpg or png)" };
 
-    // Parse validation
-    const parseResult = imageUploadSchema.safeParse(
-      Object.fromEntries(formData.entries())
-    );
+  //   const fileExtension = fileType.ext;
 
-    if (!parseResult.success)
-      return { success: false, msg: parseResult.error.issues[0].message };
+  //   // Parse validation
+  //   const parseResult = imageUploadSchema.safeParse(
+  //     Object.fromEntries(formData.entries())
+  //   );
 
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { image: true },
-    });
+  //   if (!parseResult.success)
+  //     return { success: false, msg: parseResult.error.issues[0].message };
 
-    if (!existingUser)
-      return { success: false, msg: "No existing user with id " + userId };
+  //   // Check if user exists
+  //   const existingUser = await prisma.user.findUnique({
+  //     where: { id: userId },
+  //     select: { image: true },
+  //   });
 
-    // Delete old image from R2 if exists
-    if (existingUser.image) {
-      // Extract filename from URL (e.g., from https://pub-xxx.r2.dev/userid_timestamp.jpg)
-      const oldFileName = existingUser.image.split("/").pop();
-      if (oldFileName) {
-        try {
-          await s3Client.send(
-            new DeleteObjectCommand({
-              Bucket: process.env.R2_BUCKET_NAME!,
-              Key: oldFileName,
-            })
-          );
-          // console.log(`Deleted old image: ${oldFileName}`);
-        } catch (e) {
-          console.log("Could not delete old image:", e);
-          // Continue anyway ✌️ =)
-        }
-      }
-    }
+  //   if (!existingUser)
+  //     return { success: false, msg: "No existing user with id " + userId };
 
-    // Upload new image to R2 =)
-    const fileName = `${userId}_${Date.now()}.${fileExtension}`;
+  //   // Delete old image from R2 if exists
+  //   if (existingUser.image) {
+  //     // Extract filename from URL (e.g., from https://pub-xxx.r2.dev/userid_timestamp.jpg)
+  //     const oldFileName = existingUser.image.split("/").pop();
+  //     if (oldFileName) {
+  //       try {
+  //         await s3Client.send(
+  //           new DeleteObjectCommand({
+  //             Bucket: process.env.R2_BUCKET_NAME!,
+  //             Key: oldFileName,
+  //           })
+  //         );
+  //         // console.log(`Deleted old image: ${oldFileName}`);
+  //       } catch (e) {
+  //         console.log("Could not delete old image:", e);
+  //         // Continue anyway ✌️ =)
+  //       }
+  //     }
+  //   }
 
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME!,
-        Key: fileName,
-        Body: buffer,
-        ContentType: fileType.mime,
-      })
-    );
+  //   // Upload new image to R2 =)
+  //   const fileName = `${userId}_${Date.now()}.${fileExtension}`;
 
-    // Construct public URL
-    const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+  //   await s3Client.send(
+  //     new PutObjectCommand({
+  //       Bucket: process.env.R2_BUCKET_NAME!,
+  //       Key: fileName,
+  //       Body: buffer,
+  //       ContentType: fileType.mime,
+  //     })
+  //   );
 
-    // Update user with new image URL
-    const updUserWithPic = await prisma.user.update({
-      where: { id: userId },
-      data: { image: imageUrl },
-    });
+  //   // Construct public URL
+  //   const imageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
 
-    if (updUserWithPic) {
-      return { success: true, msg: "Profile pic uploaded!" };
-    }
-    return { success: false, msg: "Update failed." };
-  } catch (e) {
-    console.error("Upload error:", e);
-    return { success: false, msg: "Server error. \n" + e };
-  }
+  //   // Update user with new image URL
+  //   const updUserWithPic = await prisma.user.update({
+  //     where: { id: userId },
+  //     data: { image: imageUrl },
+  //   });
+
+  //   if (updUserWithPic) {
+  //     return { success: true, msg: "Profile pic uploaded!" };
+  //   }
+  //   return { success: false, msg: "Update failed." };
+  // } catch (e) {
+  //   console.error("Upload error:", e);
+  //   return { success: false, msg: "Server error. \n" + e };
+  // }
 }
 
 /**
