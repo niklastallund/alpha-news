@@ -18,10 +18,6 @@ import { useEffect, useState } from "react";
 
 export default function Subscribe() {
   const session = useSession();
-
-  if (!session.user) return "No user.";
-
-  const [subs, setSubs] = useState<any[]>([]);
   const [uSub, setuSub] = useState<{
     limits: Record<string, number> | undefined;
     priceId: string | undefined;
@@ -53,8 +49,6 @@ export default function Subscribe() {
       if (session.user?.id) {
         const res = await authClient.subscription.list();
 
-        setSubs(res.data || []);
-
         const userSub = res.data?.filter(
           (s) => s.referenceId === session.user?.id
         )[0];
@@ -63,7 +57,9 @@ export default function Subscribe() {
       }
     };
     fetchSubs();
-  }, [session.user.id]);
+  }, [session.user?.id]);
+
+  if (!session.user) return "No user.";
 
   return (
     <div>

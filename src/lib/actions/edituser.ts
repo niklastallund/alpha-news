@@ -337,9 +337,8 @@ export async function changeUserName(
       }
 
       // Change newsletter:
-      let nl: boolean = newsletter === "true";
+      const nl: boolean = newsletter === "true";
       console.log("Setting to " + nl);
-
       const updNewsletter = await prisma.user.update({
         where: { id },
         data: { newsLetter: nl },

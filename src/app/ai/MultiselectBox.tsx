@@ -83,6 +83,7 @@ export default function MultiselectWithAdd({
 
   const [dropDown, setDropDown] = useState(dropdownVisible);
   const [PV, setPV] = useState<boolean>(false);
+  const [adderStr, setadderStr] = useState("");
 
   useEffect(() => {
     if (!PV && preValues) {
@@ -95,7 +96,7 @@ export default function MultiselectWithAdd({
     // What did i want to do here?
   }, [dropDown]);
 
-  if (disabled)
+  if (disabled){
     return (
       <div
         id={id}
@@ -104,9 +105,8 @@ export default function MultiselectWithAdd({
         <input className="hidden" id={id} />
         {placeholder}
       </div>
-    );
+    );}
 
-  const [adderStr, setadderStr] = useState("");
 
   async function adderSub() {
     const res = addCategorySchema.safeParse({ name: adderStr });

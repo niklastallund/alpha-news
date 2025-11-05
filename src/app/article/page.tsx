@@ -71,6 +71,7 @@ export default async function ArticlePage({
             image={article.image ?? undefined}
             headline={article.headline ?? undefined}
             editorsChoice={article.editorsChoice}
+            onlyFor={article.onlyFor}
           />
         ))}
       </div>
