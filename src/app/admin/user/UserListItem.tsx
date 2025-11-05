@@ -11,7 +11,7 @@ export default function UserListItem({
   onSelect?: (user: UserWithRole) => void;
 }) {
   return (
-    <div className="py-2 border-b flex items-center gap-4">
+    <div className="flex py-2 border-b items-center gap-4">
       <div>
         <p className="font-semibold">{user.name} </p>
         <p className="text-sm text-muted-foreground">{user.email}</p>

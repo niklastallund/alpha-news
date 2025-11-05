@@ -82,7 +82,7 @@ export function CommentItem({
       }
     >
       {/* make CardContent relative so we can absolutely position the controls */}
-      <CardContent className="px-5 py-2 relative">
+      <CardContent className="px-5 py-2 pb-14 sm:pb-4 relative">
         <div className="flex gap-5">
           <Avatar className="h-9 w-9">
             {user.image ? (
@@ -168,7 +168,7 @@ export function CommentItem({
 
         {/* bottom-right controls for author (absolute to CardContent) */}
         {isAuthor && !isEditing && (
-          <div className="absolute right-4 bottom-3 flex items-center gap-2">
+          <div className="flex items-center gap-2 absolute right-4 bottom-3">
             <Button
               variant="outline"
               size="sm"
@@ -178,7 +178,6 @@ export function CommentItem({
             >
               Edit
             </Button>
-
             <DeleteCommentButton commentId={id} userId={user.id} />
           </div>
         )}
