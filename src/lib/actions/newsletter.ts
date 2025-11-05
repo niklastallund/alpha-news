@@ -10,12 +10,13 @@ import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import { markdownToTxt } from "markdown-to-txt";
 import { marked } from "marked";
-import { getSessionData } from "./sessiondata";
+import { getSessionData, getSub } from "./sessiondata";
 
 import {
   newsletterMailSchema,
   newsletterMailSendSchema,
   newsLetterSchema,
+  personalNewsLetterSchema,
   sentNLMailsReturnType,
 } from "@/app/admin/newsletter/nltypesschemas";
 
@@ -28,6 +29,52 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
+export async function sendPersonalNewsletter(
+  user: string,
+  subject: string,
+  mdtext: string
+): Promise<ResultPatternType<ResultPatternType<string>>> {
+  // Check session and role.
+  const session = await getSessionData();
+  if (
+    !session ||
+    (session.user?.role !== "admin" && session.user?.role !== "employee")
+  ) {
+    return { success: false, msg: "You need to be admin or employee" };
+  }
+
+  try {
+    // console.log(
+    //   "Start the parse with data: \n" + user + "\n" + subject + "\n" + mdtext
+    // );
+    const safeParseResult = await personalNewsLetterSchema.safeParseAsync({
+      user,
+      headline: subject,
+      content: mdtext,
+    });
+    // console.log("Parse ended." + JSON.stringify(safeParseResult));
+
+    if (safeParseResult.success) {
+      // console.log("Parse Success. Sending mail:");
+      const sendTo = await sendEmailMD(user, subject, mdtext);
+
+      // console.log(JSON.stringify(sendTo));
+
+      // console.log("Returning..");
+
+      return { success: true, data: sendTo };
+    } else {
+      // console.log("Parsing failed");
+      return {
+        success: false,
+        msg: "Not valid data. " + JSON.stringify(safeParseResult.error?.issues),
+      };
+    }
+  } catch (e) {
+    return { success: false, msg: JSON.stringify(e) };
+  }
+}
 
 export async function sendNewsletters(
   subject: string,
@@ -157,6 +204,90 @@ export async function getNLMails(): Promise<string[]> {
   return emails.map((e) => e.email);
 }
 
+export async function gereratePersonalNewsletter(to: string) {
+  const articles = await prisma.article.findMany({
+    take: 5,
+    orderBy: { createdAt: "desc" },
+    select: { headline: true, summary: true },
+  });
+
+  const articlesPRO = await prisma.article.findMany({
+    where: { onlyFor: "pro" },
+    take: 5,
+    orderBy: { createdAt: "desc" },
+    select: { headline: true, summary: true },
+  });
+
+  const user = await prisma.user.findUnique({
+    where: { email: to },
+    include: {
+      article: {
+        select: {
+          headline: true,
+          summary: true,
+        },
+      },
+      comments: true,
+    },
+  });
+
+  const sub = (await getSub())?.plan;
+
+  // console.log("SUB: " + sub);
+
+  try {
+    // So lets get the 5 latest articles, and the active date, and let ai create something based on that.
+
+    const { object } = await generateObject({
+      model: google("gemini-2.5-flash"),
+      // Ändra prompten till denna:
+      prompt: `Write a personal newsletter for the user with this data: ${JSON.stringify(
+        user
+      )}. The newsletter is for a news site called "Alpha news", and the newsletter should be based on the 5 latest articles: ${JSON.stringify(
+        articles
+      )}. And the latest articles for PRO subscribers is ${JSON.stringify(
+        articlesPRO
+      )}. The user has the subscription: ${sub}. If not PRO, promote why a subscriber should get PRO access, based on the pro articles!
+
+      Create a JSON object with two fields:
+
+{
+  "headline": "10-50 char headline for a newsletter.",
+  "content": "Full newsletter summerizing the latest articles.
+}
+
+Separate paragraphs with two real line breaks (important!).
+
+CRITICAL: For the content field, use ACTUAL Markdown syntax.
+
+- Use **text** for bold
+- Use ##Heading for sections
+- **DO NOT use the escape sequence \\n** anywhere in the content. Use literal, physical line breaks.
+- Length: approximately between 500 - 800 words.
+- NO h1 (#) heading in content
+
+Example content structure:
+Paragraph one with **bold text**.
+
+Paragraph two continues here.
+
+## Section Heading
+
+More content here.`,
+      schema: newsLetterSchema,
+    });
+
+    return { success: true, data: { ...object } };
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    console.log(errorMsg);
+    return {
+      success: false,
+      msg: "Object article failed. " + String(errorMsg),
+    };
+  }
+}
+
 /**
  *
  * @returns An Generated newsletter!
@@ -183,7 +314,7 @@ export async function gererateNewsletter(): Promise<
     const { object } = await generateObject({
       model: google("gemini-2.5-flash"),
       // Ändra prompten till denna:
-      prompt: `Write a newsletter for the subscribers of a news site, based on the 5 latest articles: ${JSON.stringify(
+      prompt: `Write a newsletter for the subscribers of a news site called "Alpha news", based on the 5 latest articles: ${JSON.stringify(
         articles
       )}. And the latest articles for PRO subscribers is ${JSON.stringify(
         articlesPRO
@@ -195,11 +326,9 @@ export async function gererateNewsletter(): Promise<
   "content": "Full newsletter summerizing the latest articles.
 }
 
-
+Separate paragraphs with two real line breaks (important!).
 
 CRITICAL: For the content field, use ACTUAL Markdown syntax.
-
-Separate paragraphs with two real line breaks (important!).
 
 - Use **text** for bold
 - Use ##Heading for sections
