@@ -52,7 +52,7 @@ export default async function UserPage() {
     <Page>
       <div className="w-full md:grid md:grid-cols-2 lg:grid-cols-3 gap-2">
         <div className="p-2 md:col-span-2 lg:col-span-3 md:flex md:flex-wrap md:gap-2 md:items-end">
-          <UserPic></UserPic>
+          {/* <UserPic></UserPic> */}
 
           <div>
             <span className="text-4xl">{session.user.name}</span>
