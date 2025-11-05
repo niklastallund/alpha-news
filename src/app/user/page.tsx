@@ -1,5 +1,6 @@
 // So this is the landingpage for the user after signing in, or clicked on user in nav.
 // Here the user can see its role, change profilepic, details and password.
+export const dynamic = "force-dynamic";
 
 import Page from "@/components/Page";
 import { getSessionData } from "@/lib/actions/sessiondata";
