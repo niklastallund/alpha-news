@@ -22,3 +22,9 @@ export const newsLetterSchema = z.object({
   headline: z.string(),
   content: z.string(),
 });
+
+export const personalNewsLetterSchema = z.object({
+  user: z.email(),
+  headline: z.string(),
+  content: z.string(),
+});

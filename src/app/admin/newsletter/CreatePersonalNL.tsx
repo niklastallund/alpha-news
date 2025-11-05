@@ -19,13 +19,32 @@ import { MDXEditorMethods } from "@mdxeditor/editor";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { gererateNewsletter } from "../../../lib/actions/newsletter";
+import {
+  gererateNewsletter,
+  gereratePersonalNewsletter,
+  getNLMails,
+  sendPersonalNewsletter,
+} from "../../../lib/actions/newsletter";
 import Loader from "@/components/Loader";
 import { sendNewsletters } from "../../../lib/actions/newsletter";
 import { ResultPatternType } from "@/lib/actions/ai";
-import { newsLetterSchema } from "./nltypesschemas";
+import { newsLetterSchema, personalNewsLetterSchema } from "./nltypesschemas";
 
-export default function CreateNewsletter() {
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface Props {
+  mails: string[];
+}
+
+export default function CreatePersonalNewsletter({ mails }: Props) {
   const ref = useRef<MDXEditorMethods>(null);
   const [editorKey, setEditorKey] = useState<string>(Math.random().toString()); // Lägg till ett state för nyckeln
 
@@ -36,9 +55,14 @@ export default function CreateNewsletter() {
 
   useEffect(() => {
     const writeNL = async () => {
-      const gcBai = await gererateNewsletter();
+      if (watchedData[2] === undefined) {
+        alert("You must pick a mail");
+        return;
+      }
 
-      if (gcBai.success) {
+      const gcBai = await gereratePersonalNewsletter(watchedData[2]);
+
+      if (gcBai.success && gcBai.data) {
         ref.current?.setMarkdown(gcBai.data.content);
         form.setValue("headline", gcBai.data.headline);
         form.setValue("content", gcBai.data.content);
@@ -52,39 +76,37 @@ export default function CreateNewsletter() {
     if (loadcBai) writeNL();
   }, [loadcBai]);
 
-  const form = useForm<z.infer<typeof newsLetterSchema>>({
-    resolver: zodResolver(newsLetterSchema),
+  const form = useForm<z.infer<typeof personalNewsLetterSchema>>({
+    resolver: zodResolver(personalNewsLetterSchema),
     defaultValues: {
+      user: undefined,
       headline: "",
       content: "",
     },
   });
 
-  async function nlSub(values: z.infer<typeof newsLetterSchema>) {
+  async function nlSub(values: z.infer<typeof personalNewsLetterSchema>) {
     // Gör om till HTML och en text-fall back.
     setsendMsg("");
     setsending(true);
     if (
       values.content.trim().length === 0 ||
-      values.headline.trim().length === 0
+      values.headline.trim().length === 0 ||
+      values.user.trim().length === 0
     ) {
-      alert("You need to have a headline and content");
+      alert("You need to have a headline and content and user");
       setsending(false);
       return;
     }
     // DO SHIT
-    const sendNl = await sendNewsletters(values.headline, values.content);
+    const sendNl = await sendPersonalNewsletter(
+      values.user,
+      values.headline,
+      values.content
+    );
 
     if (sendNl.success) {
-      setsendMsg([
-        ...sendNl.data
-          .filter((f) => f.data.success)
-          .map((data) => "Sent to " + data.to),
-        ...sendNl.data
-          .filter((f) => !f.data.success)
-          .map((data) => "Failed to send to " + data.to),
-      ]);
-
+      setsendMsg("Newsletter was sent.");
       setsending(false);
     } else {
       setsendMsg(sendNl.msg);
@@ -104,13 +126,13 @@ export default function CreateNewsletter() {
     return "You need to be admin or employee";
   }
 
-  const watchedData = form.watch(["headline", "content"]);
+  const watchedData = form.watch(["headline", "content", "user"]);
 
   return (
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>Write a general newsletter for all subscribers.</CardTitle>
+          <CardTitle>Write a personal newsletter.</CardTitle>
         </CardHeader>
         <CardContent>
           {sending ? (
@@ -122,19 +144,13 @@ export default function CreateNewsletter() {
             <div>
               {sendMsg && (
                 <div className="bg-amber-200 text-black p-2 rounded-lg max-h-[50vh] overflow-y-scroll mb-10">
-                  {Array.isArray(sendMsg) && (
-                    <ul className="">
-                      {sendMsg.map((mail) => (
-                        <li key={crypto.randomUUID()}>{mail}</li>
-                      ))}
-                    </ul>
-                  )}
+                  {sendMsg}
                 </div>
               )}
               <Button
                 type="button"
                 onClick={() => setLoadcBai(true)}
-                disabled={loadcBai}
+                disabled={loadcBai || watchedData[2] === undefined}
               >
                 Let ai write
               </Button>
@@ -143,6 +159,47 @@ export default function CreateNewsletter() {
               <br />
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(nlSub)} className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="user"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Newsletter subscribers:</FormLabel>
+                        <Select
+                          onValueChange={(value) =>
+                            field.onChange(value === "none" ? undefined : value)
+                          }
+                          defaultValue={field.value || ""}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select user" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>User email</SelectLabel>
+                              {mails?.length === 0 && session.user?.email && (
+                                <SelectItem
+                                  key={crypto.randomUUID()}
+                                  value={session.user?.email}
+                                >
+                                  {session.user?.email}
+                                </SelectItem>
+                              )}
+                              {mails?.map((m) => (
+                                <SelectItem key={crypto.randomUUID()} value={m}>
+                                  {m}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name="headline"
