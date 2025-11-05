@@ -64,14 +64,14 @@ export default async function UserPage() {
           </div>
         </div>
 
+        <div className="p-2">{/* <ImageUploader /> */}</div>
+
         <div className="p-2">
-          <ImageUploader />
+          <PasswordForm />
         </div>
 
-        <div className="p-2">{/* <PasswordForm /> */}</div>
-
         <div className="p-2 md:col-span-2 lg:col-span-1">
-          {/* <NameForm newsLetter={userData.newsLetter?.newsLetter ?? false} /> */}
+          <NameForm newsLetter={userData.newsLetter?.newsLetter ?? false} />
         </div>
 
         <div className="p-2 md:col-span-2 lg:col-span-3">
