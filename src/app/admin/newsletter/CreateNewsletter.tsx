@@ -23,7 +23,7 @@ import { gererateNewsletter } from "../../../lib/actions/newsletter";
 import Loader from "@/components/Loader";
 import { sendNewsletters } from "../../../lib/actions/newsletter";
 import { ResultPatternType } from "@/lib/actions/ai";
-import { newsLetterSchema } from "./nltypesschemas";
+import { newsLetterSchema } from "../../../validations/nltypesschemas";
 
 export default function CreateNewsletter() {
   const ref = useRef<MDXEditorMethods>(null);

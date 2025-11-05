@@ -18,7 +18,7 @@ import {
   newsLetterSchema,
   personalNewsLetterSchema,
   sentNLMailsReturnType,
-} from "@/app/admin/newsletter/nltypesschemas";
+} from "@/validations/nltypesschemas";
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,

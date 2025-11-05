@@ -28,7 +28,10 @@ import {
 import Loader from "@/components/Loader";
 import { sendNewsletters } from "../../../lib/actions/newsletter";
 import { ResultPatternType } from "@/lib/actions/ai";
-import { newsLetterSchema, personalNewsLetterSchema } from "./nltypesschemas";
+import {
+  newsLetterSchema,
+  personalNewsLetterSchema,
+} from "../../../validations/nltypesschemas";
 
 import {
   Select,
