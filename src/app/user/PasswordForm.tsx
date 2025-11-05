@@ -26,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { changeUserPw } from "@/lib/actions/edituser";
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/lib/SessionProvider";
+// import { useSession } from "@/lib/SessionProvider";
 import Loader from "@/components/Loader";
 
 export default function PasswordForm() {
@@ -41,8 +41,8 @@ export default function PasswordForm() {
     },
   });
 
-  const { user } = useSession();
-  if (!user) return "no user.";
+  // const { user } = useSession();
+  // if (!user) return "no user.";
 
   // fix: go through all my forms, and decide how every form should work. This is workin i think.
   async function editPwSub(values: z.infer<typeof changePwSchema>) {

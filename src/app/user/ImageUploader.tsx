@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { useSession } from "@/lib/SessionProvider";
+// import { useSession } from "@/lib/SessionProvider";
 import { uploadUserImageToCloud } from "@/lib/actions/edituser";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ import Loader from "@/components/Loader";
 // If we need an update function? I dont know. fix
 
 export default function ImageUploader() {
-  const { user } = useSession();
+  // const { user } = useSession();
 
   const [msg, setMsg] = useState<string>("");
 

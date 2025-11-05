@@ -14,7 +14,7 @@ import { nameMailSchema } from "@/validations/userpage";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "@/lib/SessionProvider";
+// import { useSession } from "@/lib/SessionProvider";
 import {
   Form,
   FormControl,
@@ -30,7 +30,7 @@ import Loader from "@/components/Loader";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export default function NameForm({ newsLetter }: { newsLetter: boolean }) {
-  const { user } = useSession();
+  // const { user } = useSession();
 
   const [msg, setMsg] = useState<string>("");
 
