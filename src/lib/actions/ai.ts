@@ -2,26 +2,19 @@
 
 import { createAzure } from "@ai-sdk/azure";
 import { google } from "@ai-sdk/google";
-import { googleTools } from "@ai-sdk/google/internal";
-import { generateObject, generateText, experimental_generateImage } from "ai";
-import { title } from "process";
-import { success, z } from "zod";
-import { ca } from "zod/v4/locales";
+import { generateObject, generateText } from "ai";
+import { z } from "zod";
 import { fileTypeFromBuffer } from "file-type"; // Import from 'file-type'
 
 // So this we need for image generation
 import { experimental_generateImage as generateImage } from "ai";
-import { openai } from "@ai-sdk/openai";
 
 // For uploading
 import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
-  CopyObjectCommand,
-  CopyObjectCommandInput,
 } from "@aws-sdk/client-s3";
-import { prisma } from "@/lib/prisma";
 
 const s3Client = new S3Client({
   region: "auto",
@@ -69,31 +62,31 @@ export type ResultPatternType<T, Err = string> =
       msg: Err;
     };
 
-// SO I AM HERE. FIXING... Okej, men vi har ju redan en funktion för det här?
-export async function deleteImage(imageURL: string) {
-  try {
-    const key = getFileKeyFromUrl(imageURL);
-  } catch (e) {}
-}
+// // SO I AM HERE. FIXING... Okej, men vi har ju redan en funktion för det här?
+// export async function deleteImage(imageURL: string) {
+//   try {
+//     const key = getFileKeyFromUrl(imageURL);
+//   } catch (e) {}
+// }
 
-function getFileKeyFromUrl(fullUrl: string): string | null {
-  const publicUrl = process.env.R2_PUBLIC_URL;
+// function getFileKeyFromUrl(fullUrl: string): string | null {
+//   const publicUrl = process.env.R2_PUBLIC_URL;
 
-  if (!publicUrl || !fullUrl.startsWith(publicUrl)) {
-    console.log("URL does not match expected public R2 domain:", fullUrl);
-    return null;
-  }
+//   if (!publicUrl || !fullUrl.startsWith(publicUrl)) {
+//     console.log("URL does not match expected public R2 domain:", fullUrl);
+//     return null;
+//   }
 
-  // Safely extract the key by removing the public URL prefix.
-  const key = fullUrl.substring(publicUrl.length);
+//   // Safely extract the key by removing the public URL prefix.
+//   const key = fullUrl.substring(publicUrl.length);
 
-  // Basic check to ensure the key isn't empty after removal.
-  if (key.length === 0) {
-    return null;
-  }
+//   // Basic check to ensure the key isn't empty after removal.
+//   if (key.length === 0) {
+//     return null;
+//   }
 
-  return key;
-}
+//   return key;
+// }
 
 /*
  * Deletes a file from the configured Cloudflare R2 bucket.
@@ -150,7 +143,8 @@ function decodeBase64DataURL(
   try {
     const buffer = Buffer.from(base64Data, "base64");
     return { buffer, contentType };
-  } catch (error) {
+  } catch (e) {
+    console.log(JSON.stringify(e));
     return null;
   }
 }
@@ -162,13 +156,13 @@ export async function uploadBase64ToR2(
   const decoded = decodeBase64DataURL(base64DataUrl);
 
   const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"]; // Definiera tillåtna typer
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // Max 5 MB i byte
+  // const MAX_FILE_SIZE = 5 * 1024 * 1024; // Max 5 MB i byte
 
   if (!decoded) {
     return { success: false, msg: "Ogiltigt eller skadligt filformat." };
   }
 
-  const { buffer: imageBuffer, contentType } = decoded;
+  const { buffer: imageBuffer } = decoded;
 
   // 1. Storlekskontroll (Tänk på DoS-skydd)
   if (imageBuffer.length > 5 * 1024 * 1024) {
@@ -261,7 +255,7 @@ export async function generateImageForArticle(
       };
     }
 
-    const deploymentName = "dall-e-3";
+    // const deploymentName = "dall-e-3";
     const apiVersion = "2024-02-01";
 
     const azure = createAzure({
@@ -323,7 +317,7 @@ export async function generateImageForArticle(
     // console.log(JSON.stringify(e));
     const errorMsg = e instanceof Error ? e.message : String(e);
 
-    return { success: false, msg: "Pure article failed. " + JSON.stringify(e) };
+    return { success: false, msg: "Pure article failed. " + errorMsg };
   }
 }
 

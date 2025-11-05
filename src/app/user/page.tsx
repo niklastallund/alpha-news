@@ -15,13 +15,10 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
 import Subscribe from "../../components/Subscribe";
 
 export default async function UserPage() {
@@ -29,11 +26,11 @@ export default async function UserPage() {
 
   if (!session) redirect("/");
 
-  const sub = await prisma.subscription.findFirst({
-    where: {
-      referenceId: session.user.id,
-    },
-  });
+  // const sub = await prisma.subscription.findFirst({
+  //   where: {
+  //     referenceId: session.user.id,
+  //   },
+  // });
 
   const getUserData = async () => {
     const articles = await prisma.article.findMany({

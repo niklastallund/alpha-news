@@ -20,7 +20,6 @@ import {
   linkPlugin,
   linkDialogPlugin,
   tablePlugin,
-  BlockTypeSelect,
 } from "@mdxeditor/editor";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 

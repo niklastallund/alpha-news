@@ -1,6 +1,5 @@
 "use client";
 
-import { marked } from "marked";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +21,6 @@ import z from "zod";
 import { gererateNewsletter } from "../../../lib/actions/newsletter";
 import Loader from "@/components/Loader";
 import { sendNewsletters } from "../../../lib/actions/newsletter";
-import { ResultPatternType } from "@/lib/actions/ai";
 import { newsLetterSchema } from "../../../validations/nltypesschemas";
 
 export default function CreateNewsletter() {
@@ -33,6 +31,14 @@ export default function CreateNewsletter() {
 
   const [sending, setsending] = useState<boolean>();
   const [sendMsg, setsendMsg] = useState<string | string[]>();
+
+  const form = useForm<z.infer<typeof newsLetterSchema>>({
+    resolver: zodResolver(newsLetterSchema),
+    defaultValues: {
+      headline: "",
+      content: "",
+    },
+  });
 
   useEffect(() => {
     const writeNL = async () => {
@@ -50,15 +56,7 @@ export default function CreateNewsletter() {
     };
 
     if (loadcBai) writeNL();
-  }, [loadcBai]);
-
-  const form = useForm<z.infer<typeof newsLetterSchema>>({
-    resolver: zodResolver(newsLetterSchema),
-    defaultValues: {
-      headline: "",
-      content: "",
-    },
-  });
+  }, [loadcBai, form]);
 
   async function nlSub(values: z.infer<typeof newsLetterSchema>) {
     // Gör om till HTML och en text-fall back.
@@ -104,7 +102,7 @@ export default function CreateNewsletter() {
     return "You need to be admin or employee";
   }
 
-  const watchedData = form.watch(["headline", "content"]);
+  // const watchedData = form.watch(["headline", "content"]);
 
   return (
     <div>

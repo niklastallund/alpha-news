@@ -69,7 +69,7 @@ export default function UpdateArticleForm({ article }: UpdateArticleFormProps) {
         // We need to delete the old, and upload the new.
 
         if (article.image) {
-          const deleted = await deleteFileFromR2(article.image);
+          await deleteFileFromR2(article.image);
           // alert("Deleted " + deleted);
         }
 

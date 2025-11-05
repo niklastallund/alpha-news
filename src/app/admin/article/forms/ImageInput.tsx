@@ -9,7 +9,7 @@ import {
   generateImageForArticle,
 } from "@/lib/actions/ai";
 import Image from "next/image";
-import { ChangeEvent, useCallback, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 interface ImageInputProps {
   // RHFs Controller:
   onChange: (value: string | undefined) => void;
@@ -31,7 +31,6 @@ export default function ImageInput({
   onChange,
   onBlur,
   value, // So this will hold the image now :) perfect.
-  name,
   showUploader = false,
   showGenerate = false,
   articleData = undefined,
@@ -86,7 +85,6 @@ export default function ImageInput({
         }
 
         if (file.size > MAX_FILE_SIZE) {
-          const maxSizeMB = MAX_FILE_SIZE / (1024 * 1024);
           alert(`Max 5 MB`);
           e.target.value = ""; // Återställ input
           return;

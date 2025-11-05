@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { useState, useCallback } from "react";
 import {
   generateArticle,
   GeneratedArticle,
@@ -18,7 +12,6 @@ import Markdown from "react-markdown";
 import z from "zod";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -75,7 +68,7 @@ const GenAiSchema = z.object({
 export default function Genai({
   setter,
   close: closeFun = () => null,
-  img = false,
+  // img = false,
   categories,
 }: Props) {
   const genForm = useForm<z.infer<typeof GenAiSchema>>({
@@ -142,32 +135,35 @@ export default function Genai({
     setMsg(result.msg);
   }
 
-  const addCategory = useCallback(async (s: string) => {
-    // FIrst normalizeCategoryName. Then trim, just in case.
-    const newCategory = await normalizeCategoryName(s).trim();
+  const addCategory = useCallback(
+    async (s: string) => {
+      // FIrst normalizeCategoryName. Then trim, just in case.
+      const newCategory = await normalizeCategoryName(s).trim();
 
-    const result = await addCat(newCategory);
-    if (result.success) {
-      // Try to add it to the value;
-      const newVal = [
-        ...(genForm.getValues("category") ?? []),
-        result.data.name,
-      ];
+      const result = await addCat(newCategory);
+      if (result.success) {
+        // Try to add it to the value;
+        const newVal = [
+          ...(genForm.getValues("category") ?? []),
+          result.data.name,
+        ];
 
-      genForm.setValue(
-        "category",
-        newVal.map((v) => v.toString())
-      );
-      toast("Added category " + newCategory + " to databse. 👍");
-    } else {
-      toast(
-        "ℹ️ Failed adding category " +
-          newCategory +
-          " to databse. \n" +
-          result.msg
-      );
-    }
-  }, []);
+        genForm.setValue(
+          "category",
+          newVal.map((v) => v.toString())
+        );
+        toast("Added category " + newCategory + " to databse. 👍");
+      } else {
+        toast(
+          "ℹ️ Failed adding category " +
+            newCategory +
+            " to databse. \n" +
+            result.msg
+        );
+      }
+    },
+    [genForm]
+  );
 
   const [regenMsg, setregenMsg] = useState("");
 
@@ -203,7 +199,7 @@ export default function Genai({
     } else {
       setregenMsg("Failed");
     }
-  }, []);
+  }, [generatedArticle]);
 
   return (
     <div>

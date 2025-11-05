@@ -1,6 +1,6 @@
 import Page from "@/components/Page";
 import { Separator } from "@/components/ui/separator";
-import { getRole, getSessionData } from "@/lib/actions/sessiondata";
+import { getSessionData } from "@/lib/actions/sessiondata";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 

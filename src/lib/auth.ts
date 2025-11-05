@@ -63,7 +63,7 @@ export const auth = betterAuth({
               select: { id: true },
             });
             if (getId) {
-              const upd = await prisma.subscription.update({
+              await prisma.subscription.update({
                 where: { id: getId.id },
                 data: { cancelAtPeriodEnd: true },
               });
@@ -74,7 +74,7 @@ export const auth = betterAuth({
               select: { id: true },
             });
             if (getId) {
-              const upd = await prisma.subscription.update({
+              await prisma.subscription.update({
                 where: { id: getId.id },
                 data: { cancelAtPeriodEnd: false },
               });

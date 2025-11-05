@@ -78,8 +78,6 @@ export default function CreateArticleForm({ categories }: Props) {
     setImportGen(false);
   };
 
-  const [cBaI, setcBAi] = useState();
-
   const ref = useRef<MDXEditorMethods>(null);
   const [editorKey, setEditorKey] = useState<string>(Math.random().toString()); // Lägg till ett state för nyckeln
 
@@ -179,9 +177,7 @@ export default function CreateArticleForm({ categories }: Props) {
       });
 
       if (!newArt || !newArt.id) {
-        toast.error(
-          "Failed to create article: Permission denied."
-        );
+        toast.error("Failed to create article: Permission denied.");
         return;
       }
 

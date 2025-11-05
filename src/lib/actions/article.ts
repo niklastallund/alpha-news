@@ -7,7 +7,7 @@ import {
   UpdateArticleInput,
   updateArticleSchema,
 } from "@/validations/article-forms";
-import { getRole, getSessionData } from "./sessiondata";
+import { getSessionData } from "./sessiondata";
 import { notFound } from "next/navigation";
 import { prisma } from "../prisma";
 import { revalidatePath } from "next/cache";

@@ -1,6 +1,5 @@
 "use client";
 
-import { marked } from "marked";
 import { ForwardRefEditor } from "@/components/ForwardRefEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,18 +19,11 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import {
-  gererateNewsletter,
   gereratePersonalNewsletter,
-  getNLMails,
   sendPersonalNewsletter,
 } from "../../../lib/actions/newsletter";
 import Loader from "@/components/Loader";
-import { sendNewsletters } from "../../../lib/actions/newsletter";
-import { ResultPatternType } from "@/lib/actions/ai";
-import {
-  newsLetterSchema,
-  personalNewsLetterSchema,
-} from "../../../validations/nltypesschemas";
+import { personalNewsLetterSchema } from "../../../validations/nltypesschemas";
 
 import {
   Select,
@@ -56,6 +48,17 @@ export default function CreatePersonalNewsletter({ mails }: Props) {
   const [sending, setsending] = useState<boolean>();
   const [sendMsg, setsendMsg] = useState<string | string[]>();
 
+  const form = useForm<z.infer<typeof personalNewsLetterSchema>>({
+    resolver: zodResolver(personalNewsLetterSchema),
+    defaultValues: {
+      user: undefined,
+      headline: "",
+      content: "",
+    },
+  });
+
+  const watchedData = form.watch(["headline", "content", "user"]);
+
   useEffect(() => {
     const writeNL = async () => {
       if (watchedData[2] === undefined) {
@@ -77,16 +80,7 @@ export default function CreatePersonalNewsletter({ mails }: Props) {
     };
 
     if (loadcBai) writeNL();
-  }, [loadcBai]);
-
-  const form = useForm<z.infer<typeof personalNewsLetterSchema>>({
-    resolver: zodResolver(personalNewsLetterSchema),
-    defaultValues: {
-      user: undefined,
-      headline: "",
-      content: "",
-    },
-  });
+  }, [loadcBai, form, watchedData]);
 
   async function nlSub(values: z.infer<typeof personalNewsLetterSchema>) {
     // Gör om till HTML och en text-fall back.
@@ -128,8 +122,6 @@ export default function CreatePersonalNewsletter({ mails }: Props) {
   ) {
     return "You need to be admin or employee";
   }
-
-  const watchedData = form.watch(["headline", "content", "user"]);
 
   return (
     <div>

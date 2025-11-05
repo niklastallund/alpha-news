@@ -2,18 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { PanelTopOpen } from "lucide-react";
-import React, { MouseEventHandler, useEffect, useState } from "react";
-import { Form, useForm } from "react-hook-form";
-import z from "zod";
-import { addCat } from "@/lib/actions/article";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import React, { useEffect, useState } from "react";
 import { addCategorySchema } from "@/validations/article-forms";
 import { Label } from "@/components/ui/label";
 
@@ -96,7 +86,7 @@ export default function MultiselectWithAdd({
     // What did i want to do here?
   }, [dropDown]);
 
-  if (disabled){
+  if (disabled) {
     return (
       <div
         id={id}
@@ -105,11 +95,11 @@ export default function MultiselectWithAdd({
         <input className="hidden" id={id} />
         {placeholder}
       </div>
-    );}
-
+    );
+  }
 
   async function adderSub() {
-    const res = addCategorySchema.safeParse({ name: adderStr });
+    addCategorySchema.safeParse({ name: adderStr });
     adderFun(adderStr);
   }
 

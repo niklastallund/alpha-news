@@ -2,7 +2,6 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Article from "@/components/Article";
 import Page from "@/components/Page";
-import { auth } from "@/lib/auth";
 import { getRole, getSessionData, getSub } from "@/lib/actions/sessiondata";
 import Subscribe from "@/components/Subscribe";
 
@@ -15,7 +14,7 @@ export default async function ArticleDetailsPage(props: { params: Params }) {
   const articleId = parseInt(params.articleId);
 
   const sessionData = await getSessionData();
-  const user = sessionData?.user;
+  // const user = sessionData?.user;
   const role = await getRole();
   const sub = await getSub();
 

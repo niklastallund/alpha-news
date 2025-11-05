@@ -3,7 +3,7 @@
 import { ResultPatternType } from "@/lib/actions/ai";
 import { google } from "@ai-sdk/google";
 
-import { generateObject, generateText, experimental_generateImage } from "ai";
+import { generateObject } from "ai";
 
 import { prisma } from "@/lib/prisma";
 
@@ -151,7 +151,7 @@ export async function sendEmailMD(
     // create html:
     const html = await marked.parse(mdtext);
 
-    const send = await transporter.sendMail({
+    await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to,
       subject,

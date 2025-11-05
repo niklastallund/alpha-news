@@ -280,8 +280,8 @@ export async function changeUserPw(
 
       if (!data) return { success: false, msg: "Failed" };
       return { success: true, msg: "Password changed." };
-    } catch (e: unknown) {
-      return { success: false, msg: "Failed." };
+    } catch (e) {
+      return { success: false, msg: "Failed." + JSON.stringify(e) };
     }
   } else {
     return { success: false, msg: "Not valid pw" };
