@@ -1,5 +1,6 @@
 "use server";
 
+import { fileTypeFromBuffer } from "file-type"; //ok, lets try.
 import {
   changePwSchema,
   imageUploadSchema,
@@ -50,13 +51,14 @@ export async function uploadUserImageToCloud(
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // file.type: (property) Blob.type: string
-    // The type read-only property of the Blob interface returns the MIME type of the file.
-
-    if (!file || (file.type !== "image/png" && file.type !== "image/jpeg"))
+    const fileType = await fileTypeFromBuffer(buffer);
+    if (
+      !fileType ||
+      (fileType.mime !== "image/png" && fileType.mime !== "image/jpeg")
+    )
       return { success: false, msg: "Invalid filetype (only jpg or png)" };
 
-    const fileExtension = file.type === "image/png" ? ".png" : ".jpg";
+    const fileExtension = fileType.ext;
 
     // Parse validation
     const parseResult = imageUploadSchema.safeParse(
@@ -103,7 +105,7 @@ export async function uploadUserImageToCloud(
         Bucket: process.env.R2_BUCKET_NAME!,
         Key: fileName,
         Body: buffer,
-        ContentType: file.type,
+        ContentType: fileType.mime,
       })
     );
 

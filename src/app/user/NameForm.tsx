@@ -68,13 +68,13 @@ export default function NameForm({ newsLetter }: { newsLetter: boolean }) {
     formData.append("id", values.id);
     formData.append("newsletter", values.newsletter);
 
-    const result = await changeUserName(formData);
+    // const result = await changeUserName(formData);
 
-    if (result.success) {
-      // So you will get logged out.
-      window.location.reload();
-    }
-    setMsg(result.msg);
+    // if (result.success) {
+    //   // So you will get logged out.
+    //   window.location.reload();
+    // }
+    // setMsg(result.msg);
   }
 
   return (
