@@ -41,11 +41,11 @@ export default function ImageUploader() {
   const imageUploadForm = useForm<z.infer<typeof imageUploadSchema>>({
     resolver: zodResolver(imageUploadSchema),
     defaultValues: {
-      userId: user?.id,
+      userId: "",
     },
   });
 
-  if (!user) return "no user.";
+  // if (!user) return "no user.";
 
   // So this is when pressing upload (the submit function):
   async function imageUploadSub(values: z.infer<typeof imageUploadSchema>) {

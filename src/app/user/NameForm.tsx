@@ -37,14 +37,14 @@ export default function NameForm({ newsLetter }: { newsLetter: boolean }) {
   const nameForm = useForm<z.infer<typeof nameMailSchema>>({
     resolver: zodResolver(nameMailSchema),
     defaultValues: {
-      id: user?.id,
-      name: user?.name,
-      email: user?.email,
+      id: "",
+      name: "",
+      email: "",
       newsletter: newsLetter ? "true" : "false",
     },
   });
 
-  if (!user) return "no user.";
+  // if (!user) return "no user.";
 
   async function nameFormSub(values: z.infer<typeof nameMailSchema>) {
     // Unnessasary ? fix.
