@@ -1,14 +1,11 @@
 "use server";
 
-import { writeFile, mkdir, unlink, stat } from "fs/promises";
-import { fileTypeFromBuffer } from "file-type"; //ok, lets try.
 import {
   changePwSchema,
   imageUploadSchema,
   nameMailSchema,
 } from "@/validations/userpage";
 import { prisma } from "../prisma";
-import path from "path";
 import { auth } from "../auth";
 import { headers } from "next/headers";
 
@@ -53,14 +50,13 @@ export async function uploadUserImageToCloud(
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const fileType = await fileTypeFromBuffer(buffer);
-    if (
-      !fileType ||
-      (fileType.mime !== "image/png" && fileType.mime !== "image/jpeg")
-    )
+    // file.type: (property) Blob.type: string
+    // The type read-only property of the Blob interface returns the MIME type of the file.
+
+    if (!file || (file.type !== "image/png" && file.type !== "image/jpeg"))
       return { success: false, msg: "Invalid filetype (only jpg or png)" };
 
-    const fileExtension = fileType.ext;
+    const fileExtension = file.type === "image/png" ? ".png" : ".jpg";
 
     // Parse validation
     const parseResult = imageUploadSchema.safeParse(
@@ -107,7 +103,7 @@ export async function uploadUserImageToCloud(
         Bucket: process.env.R2_BUCKET_NAME!,
         Key: fileName,
         Body: buffer,
-        ContentType: fileType.mime,
+        ContentType: file.type,
       })
     );
 
@@ -126,130 +122,6 @@ export async function uploadUserImageToCloud(
     return { success: false, msg: "Update failed." };
   } catch (e) {
     console.error("Upload error:", e);
-    return { success: false, msg: "Server error. \n" + e };
-  }
-}
-
-// /**
-//  * Uploads an image and saves it to our cloudstorage in folder uploads with a random name, and sets the filename as image in the user.
-//  * @param formData Must contain a valid image file < 1mb in format jpg or png, and userId.
-//  * @returns  {success: boolean, msg: string}
-//  */
-// export async function uploadUserImageToCloud(
-//   formData: FormData
-// ): Promise<{ success: boolean; msg: string }> {
-//   // CHECK parse and valid file.
-
-//   // So first create the file locally i guess?
-
-//   // Upload the file
-
-//   // Get the url for the file
-
-//   //Save the url in our db.
-
-//   return { success: false, msg: "not done" };
-// }
-
-//Fix: cloud instead! I just keep this...
-/**
- * Uploads an image and saves it to public/uploads folder with a random name, and sets the filename as image in the user.
- * @param formData Must contain a valid image file < 1mb in format jpg or png, and userId.
- * @returns {success: boolean, msg: string}
- */
-export async function uploadUserImage(
-  formData: FormData
-): Promise<{ success: boolean; msg: string }> {
-  // console.log(
-  //   "uploadUserImage called with formdata:\n" + JSON.stringify(formData)
-  // );
-
-  try {
-    const userId = formData.get("userId") as string;
-    if (!userId) return { success: false, msg: "No user id." };
-
-    // I think its not bad to check here too. ( also checking in client so we dont get unhandled errors due to limits in nextconfig)
-    const file = formData.get("file") as File;
-    if (!file || file.size === 0)
-      return { success: false, msg: "No valid file." };
-
-    if (file.size > 1 * 1024 * 1024)
-      return { success: false, msg: "File is to big. (1MB)" };
-
-    // Check filetype:
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer); // saves it as buffer.
-
-    const fileType = await fileTypeFromBuffer(buffer);
-    if (
-      !fileType ||
-      (fileType.mime !== "image/png" && fileType.mime !== "image/jpeg")
-    )
-      return { success: false, msg: "Invalid filetype (only jpg or png)" };
-
-    const fileExtension = fileType?.ext || "png"; // So a fallback to png? Can cause trouble maybe. fix
-
-    // parse
-    const parseResult = imageUploadSchema.safeParse(
-      Object.fromEntries(formData.entries())
-    );
-
-    if (!parseResult.success)
-      return { success: false, msg: parseResult.error.issues[0].message };
-
-    // check if the user exist.
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { image: true },
-    });
-
-    // So we (try) delete it now:
-    if (!existingUser)
-      return { success: false, msg: "No existing user with id " + userId };
-
-    if (existingUser.image) {
-      // we remove the old one.
-      const oldFileName = path.basename(existingUser.image);
-      const oldFilePath = path.join(
-        process.cwd(),
-        "public",
-        "uploads",
-        oldFileName
-      );
-
-      try {
-        await stat(oldFilePath);
-        await unlink(oldFilePath);
-      } catch (e) {
-        console.log(
-          "Could not delete old image file at " +
-            oldFilePath +
-            JSON.stringify(e)
-        );
-      }
-    }
-
-    // Here we get the public folder and subfolder uploads:
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    const fileName = `${userId}_${Date.now()}.${fileExtension}`;
-    const filePath = path.join(uploadDir, fileName);
-
-    await mkdir(uploadDir, { recursive: true }); // Create folder.
-
-    await writeFile(filePath, buffer); //create file (writes the buffer to file).
-
-    // Save the new file in user table image field.
-    const updUserWithPic = await prisma.user.update({
-      where: { id: userId },
-      data: { image: `/uploads/${fileName}` },
-    });
-
-    if (updUserWithPic) {
-      return { success: true, msg: "Profile pic uploaded!" };
-    }
-    return { success: false, msg: "Update failed." };
-  } catch (e) {
-    //console.log(JSON.stringify(e));
     return { success: false, msg: "Server error. \n" + e };
   }
 }

@@ -79,16 +79,16 @@ export default function ImageUploader() {
       return;
     }
 
-    // const result: { success: boolean; msg: string } =
-    //   await uploadUserImageToCloud(formData);
+    const result: { success: boolean; msg: string } =
+      await uploadUserImageToCloud(formData);
 
-    // if (!result.success) {
-    //   imageUploadForm.setError("file", { message: result.msg });
-    //   setMsg(result.msg);
-    //   return;
-    // }
+    if (!result.success) {
+      imageUploadForm.setError("file", { message: result.msg });
+      setMsg(result.msg);
+      return;
+    }
 
-    //window.location.reload();
+    window.location.reload();
   }
 
   return (
