@@ -2,6 +2,8 @@ import Image from "next/image";
 
 import { getSessionData } from "@/lib/actions/sessiondata";
 
+export const dynamic = "force-dynamic";
+
 export default async function UserPic() {
   const session = await getSessionData();
 

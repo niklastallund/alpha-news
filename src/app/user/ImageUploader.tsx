@@ -1,7 +1,6 @@
 // This uploads a profile picture for the user :)
 "use client";
 
-export const dynamic = "force-dynamic";
 
 import {
   Form,
