@@ -10,20 +10,20 @@ import { prisma } from "../prisma";
 import { auth } from "../auth";
 import { headers } from "next/headers";
 
-// import {
-//   S3Client,
-//   // PutObjectCommand,
-//   // DeleteObjectCommand,
-// } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  // PutObjectCommand,
+  // DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 
-// const s3Client = new S3Client({
-//   region: "auto",
-//   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-//   credentials: {
-//     accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-//     secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-//   },
-// });
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
 
 /**
  * Uploads an image and saves it to our cloud storage in folder uploads with a random name, and sets the filename as image in the user.
