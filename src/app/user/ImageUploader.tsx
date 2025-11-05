@@ -1,7 +1,6 @@
 // This uploads a profile picture for the user :)
 "use client";
 
-
 import {
   Form,
   FormControl,
@@ -89,7 +88,7 @@ export default function ImageUploader() {
       return;
     }
 
-    window.location.reload();
+    //window.location.reload();
   }
 
   return (
