@@ -50,14 +50,22 @@ export default function ImageUploader() {
   // So this is when pressing upload (the submit function):
   async function imageUploadSub(values: z.infer<typeof imageUploadSchema>) {
     // Create a new FormData to pass to the uploadUserImage in actions/edituser.ts (wich handles the upload).
+
+    // Narrowing helpers without using `any`
+    const isBlob = (v: unknown): v is Blob =>
+      typeof Blob !== "undefined" && v instanceof Blob;
+
+    const isFile = (v: unknown): v is File =>
+      typeof File !== "undefined" && v instanceof File;
+
     const formData = new FormData();
 
-    if (!values.file) {
-      setMsg("No file.");
-      return;
+    if (isBlob(values.file)) {
+      const filename =
+        isFile(values.file) && values.file.name ? values.file.name : "upload";
+      formData.append("file", values.file, filename);
     }
 
-    formData.append("file", values.file);
     formData.append("userId", values.userId ?? "");
 
     const parseResult = imageUploadSchema.safeParse(values);

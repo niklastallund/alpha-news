@@ -6,25 +6,39 @@ const FileLikeSchema = z
     type: z.string().min(1).optional(),
     name: z.string().min(1).optional(),
   })
-  .loose();
+  .passthrough();
+
+const BlobSchema = z.custom<Blob>(
+  (v) => typeof Blob !== "undefined" && v instanceof Blob,
+  { message: "Expected a File/Blob" }
+);
+
+const AnyFileSchema = z.union([BlobSchema, FileLikeSchema]);
 
 export const imageUploadSchema = z.object({
-  file: FileLikeSchema.refine((f) => f.size > 0, { message: "No file!" })
-    .refine((f) => f.size <= 5 * 1024 * 1024, {
-      message: "File too large (max 5MB)",
-    })
-    .refine((f) => !f.type || f.type.startsWith("image/"), {
-      message: "Only images are allowed",
+  file: AnyFileSchema
+    .superRefine((f, ctx) => {
+      if (!f) return;
+      const size = f instanceof Blob ? f.size : f.size;
+      const type = f instanceof Blob ? f.type : f.type;
+      if (!size || size <= 0) {
+        ctx.addIssue({ code: "custom", message: "No file!" });
+      }
+      if (size > 5 * 1024 * 1024) {
+        ctx.addIssue({ code: "custom", message: "File too large (max 5MB)" });
+      }
+      if (type && !type.startsWith("image/")) {
+        ctx.addIssue({ code: "custom", message: "Only images are allowed" });
+      }
     })
     .optional(),
   userId: z.string(),
 });
 
-
 export const nameMailSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
-  email: z.email(),
+  email: z.string().email(),
   newsletter: z.string(),
 });
 
@@ -39,7 +53,7 @@ export const changePwSchema = z
       ctx.addIssue({
         code: "custom",
         path: ["confirmPassword"],
-        message: "Passwords dont match.",
+        message: "Passwords don't match.",
       });
     }
   });
