@@ -1,31 +1,31 @@
 import z from "zod";
 
-// Safe fallback for server/import-time evaluation (when global File may be undefined)
-const FileSchema = typeof File === "undefined" ? z.any() : z.instanceof(File);
+const FileLikeSchema = z
+  .object({
+    size: z.number().int().nonnegative(),
+    type: z.string().min(1).optional(),
+    name: z.string().min(1).optional(),
+  })
+  .loose();
+
+export const imageUploadSchema = z.object({
+  file: FileLikeSchema.refine((f) => f.size > 0, { message: "No file!" })
+    .refine((f) => f.size <= 5 * 1024 * 1024, {
+      message: "File too large (max 5MB)",
+    })
+    .refine((f) => !f.type || f.type.startsWith("image/"), {
+      message: "Only images are allowed",
+    })
+    .optional(),
+  userId: z.string(),
+});
+
 
 export const nameMailSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
   email: z.email(),
   newsletter: z.string(),
-});
-
-export const imageUploadSchema = z.object({
-  file: FileSchema
-    // Only run size validation in environments where File exists
-    .superRefine((val, ctx) => {
-      if (typeof File !== "undefined") {
-        const file = val as File | undefined;
-        if (file && file.size === 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "No file!",
-          });
-        }
-      }
-    })
-    .optional(),
-  userId: z.string(),
 });
 
 export const changePwSchema = z
